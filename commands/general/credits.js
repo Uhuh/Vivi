@@ -5,7 +5,7 @@ const credits = {
     name: "credits",
     args: "",
     type: "",
-    run: (message, client) => {
+    run: (message, args, client) => {
         const embed = new Discord.MessageEmbed();
 
         const { user } = client;
