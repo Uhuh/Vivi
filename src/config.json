@@ -1,0 +1,10 @@
+{
+    "prefix"      : "bb",
+
+    "bot_info"    : {
+        "name"    : "Bow-Bot",
+        "version" : 1.0
+    },
+
+    "token"       : "NzMxOTg3MDIyMDA4NDE4MzM0.XwuCLA.eG_nK1E1Brf8Ow81Oy0giQSul60"
+}
