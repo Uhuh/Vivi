@@ -9,7 +9,7 @@ const commandHandler = (client: BowBot) => {
 
   for (const file of helpCommands) {
     const command = require(`./general/${file}`)
-    client.commands.set(command.name.toLowerCase(), command)
+    client.commands.set(command.default.name.toLowerCase(), command.default)
   }
 }
 

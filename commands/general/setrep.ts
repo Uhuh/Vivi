@@ -1,4 +1,5 @@
 import { Message } from "discord.js";
+import { GET_REP, SET_REP } from "../../src/setup_tables";
 
 const setrep = {
 	desc: '(ADMIN) Sets a Users Rep',
@@ -11,13 +12,11 @@ const setrep = {
 		if (args.length < 1 || Number.isNaN(Number(args[1])) || !userArg || message.author.id === userArg.id) return;
 		let uRep = Number(args[1]) || 0;
 
-		reputation[userArg.id] = {
-			repu: uRep
-		};
+		const userRep = GET_REP(userArg.id);
 
-		fs.writeFile("./reputation.json", JSON.stringify(reputation), (err) => {
-			if (err) console.log(err);
-		});
+		userRep.reputation += uRep;
+
+		SET_REP(userRep);
 
 		message.channel.send(`${message.author} has set ${userArg}'s rep to ${uRep}!`);
 

@@ -1,4 +1,5 @@
 import { Message } from "discord.js";
+import { GET_REP, SET_REP } from "../../src/setup_tables";
 
 const giverep = {
 	desc: '(ADMIN) Give rep to user',
@@ -9,21 +10,14 @@ const giverep = {
 		if (!message.guild || !message.member?.hasPermission(["MANAGE_GUILD"])) return;
 		const userArg = message.mentions?.members?.last();
 		if (args.length < 1 || Number.isNaN(Number(args[1])) || !userArg || message.author.id === userArg.id) return;
-		let uRep = (Number(args[1]) > 0 ? Math.ceil(Number(args[1])) : 1);
+		const uRep = (Number(args[1]) > 0 ? Math.ceil(Number(args[1])) : 1);
 
-		if (!reputation[userArg.id]) {
-			reputation[userArg.id] = {
-				repu: Math.min(uRep, 4294967296)
-			};
-		} else {
-			reputation[userArg.id] = {
-				repu: Math.min(reputation[userArg.id].repu + uRep, 4294967296)
-			};
-		}
+		const userRep = GET_REP(userArg.id);
+		console.log(userRep);
+		userRep.reputation += uRep;
+		console.log(userRep);
 
-		fs.writeFile("./reputation.json", JSON.stringify(reputation), (err) => {
-			if (err) console.log(err);
-		});
+		SET_REP(userRep);
 
 		message.channel.send(`${message.author} gave ${userArg} ${uRep}!`);
 

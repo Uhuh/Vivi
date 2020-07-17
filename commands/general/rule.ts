@@ -7,7 +7,7 @@ const rule = {
 	type: 'admin',
 	run: (message: Message, args: string[]) => {
 		if (!message.guild || !message.member?.hasPermission(["MANAGE_GUILD"])) return;
-		if (args.length && Number.isNaN(Number(args[0]))) {
+		if (args.length && !Number.isNaN(Number(args[0]))) {
 			const rules = [
 				`1). No NSFW in this server. Any NSFW posted here will result in a ban.`,
 				`2). Venting and Ranting belong in their appropriate channels, please don't do it in the main <#729515427109011467>  chat.`,

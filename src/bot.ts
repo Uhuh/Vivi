@@ -4,7 +4,8 @@ dotenv.config();
 import msg from '../events/message';
 import * as config from './vars'
 import commandHandler from '../commands/commandHandler';
-import * as fs from 'fs';
+import { GET_REACTS } from './setup_tables';
+import { handle_packet } from '../events/rawPacket';
 
 //TODO
 /*
@@ -33,14 +34,23 @@ interface Command {
   run: Function
 };
 
+interface ReactRole {
+  role_id: string;
+  emoji: string;
+};
+
 export default class BowBot extends Discord.Client {
   config: any;
   commands: Discord.Collection<string, Command>;
+  reactMessages: string[];
+  reactRoles: Discord.Collection<string, ReactRole>;
   constructor() {
     super();
 
     this.config = config;
     this.commands = new Discord.Collection();
+    this.reactRoles = new Discord.Collection();
+    this.reactMessages = [];
     commandHandler(this);
     this.once('ready', () => {
       console.log(`[Started]: ${new Date()}\n`);
@@ -49,10 +59,10 @@ export default class BowBot extends Discord.Client {
     })
 
     //CMD Handling
-
+    this.on("raw", packet => handle_packet(packet, this));
     this.on('message', message => {
       //this.gainCoins(message); //Turned off for now
-      msg(this, message);
+      msg(this, message as Discord.Message);
     });
     this.on("messageReactionAdd", (reaction, user) => this.handleReaction(reaction, user, 'add'));
     this.on("messageReactionRemove", (reaction, user) => this.handleReaction(reaction, user, 'remove'));
@@ -61,7 +71,7 @@ export default class BowBot extends Discord.Client {
   handleReaction = (reaction: Discord.MessageReaction, user: Discord.User | Discord.PartialUser, type: string) => {
     try {
       if (!reaction) return;
-      const msg = reactRoles[reaction.message.id];
+      const msg = this.reactRoles.get(reaction.message.id);
       // If DNE ignore
       if (!msg) return;
 
@@ -77,12 +87,12 @@ export default class BowBot extends Discord.Client {
 
         switch (type) {
           case 'add':
-            member.roles.add(msg.roleId)
-              .catch(() => console.error(`Could not give user role : ${msg.roleId}`));
+            member.roles.add(msg.role_id)
+              .catch(() => console.error(`Could not give user role : ${msg.role_id}`));
             break;
           case 'remove':
-            member.roles.remove(msg.roleId)
-              .catch(() => console.error(`Could not remove user role : ${msg.roleId}`));
+            member.roles.remove(msg.role_id)
+              .catch(() => console.error(`Could not remove user role : ${msg.role_id}`));
         }
       }
     } catch (e) {
@@ -111,6 +121,16 @@ export default class BowBot extends Discord.Client {
       .catch(console.error);
   };
 
+  loadReactRoles = () => {
+    const reactRoles = GET_REACTS();
+    console.log(reactRoles);
+    this.reactMessages = reactRoles.map(r => r.message_id);
+    for (const row of reactRoles) {
+      this.reactRoles.set(row.message_id, { role_id: row.role_id, emoji: row.emoji })
+    }
+  }
+
+/* This is disabled for now
   gainCoins = (message: Discord.Message) => {
     //Coin Handling
     if (message.author.bot) return;
@@ -139,9 +159,10 @@ export default class BowBot extends Discord.Client {
           msg.delete({ timeout: 5000 })
         });
     }
-  };
+  };*/
 
   async start() {
     await this.login(this.config.TOKEN);
+    this.loadReactRoles();
   }
 }

@@ -9,6 +9,7 @@ const msg = (client: BowBot, message: Message) => {
     // + 1 for the damn space.
     const [command, ...args] = message.content.substring(client.config.PREFIX.length).match(/\S+/g) || [];
 
+    if(!command) return;
     //If the command isn't in the big ol' list.
     const clientCommand = client.commands.get(command.toLowerCase());
     if (!clientCommand)

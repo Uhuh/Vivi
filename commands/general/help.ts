@@ -6,7 +6,7 @@ const help = {
   name: 'help',
   args: '',
   type: '',
-  run: async function (message: Message, args: string[], client: BowBot) {
+  run: async function (message: Message, _args: string[], client: BowBot) {
     const embed = new MessageEmbed();
 
     const {user} = client;

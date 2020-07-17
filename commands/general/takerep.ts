@@ -1,4 +1,5 @@
 import { Message } from "discord.js";
+import { GET_REP, SET_REP } from "../../src/setup_tables";
 
 const takerep = {
 	desc: '(ADMIN) Takes a Users Rep',
@@ -9,21 +10,13 @@ const takerep = {
 		if (!message.guild || !message.member?.hasPermission(["MANAGE_GUILD"])) return;
 		const userArg = message.mentions?.members?.last();
 		if (args.length < 1 || Number.isNaN(Number(args[1])) || !userArg || message.author.id === userArg.id) return;
-		let uRep = (args[1] > 0 ? Math.ceil(args[1]) : 1);
+		let uRep = (Number(args[1]) > 0 ? Math.ceil(Number(args[1])) : 1);
 
-		if (!reputation[userArg.id]) {
-			reputation[userArg.id] = {
-				repu: Math.max(uRep, -4294967296)
-			};
-		} else {
-			reputation[userArg.id] = {
-				repu: Math.max(reputation[userArg.id].repu - uRep, -4294967296)
-			};
-		}
+		const userRep = GET_REP(userArg.id);
 
-		fs.writeFile("./reputation.json", JSON.stringify(reputation), (err) => {
-			if (err) console.log(err);
-		});
+		userRep.reputation -= uRep;
+
+		SET_REP(userRep);
 
 		message.channel.send(`${message.author} has taken ${uRep} from ${userArg}.`);
 

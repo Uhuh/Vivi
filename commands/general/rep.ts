@@ -1,24 +1,19 @@
 import { Message } from "discord.js";
+import { GET_REP } from "../../src/setup_tables";
 
 const rep = {
 	desc: 'Check Your, or Another Users Rep',
 	name: 'rep',
 	args: '[@user]',
 	type: '',
-	run: (message: Message, args: string[]) => {
+	run: (message: Message, _args: string[]) => {
 		const userArg = message.mentions.members?.last() || message.author;
-		let uRep = 0;
 
 		if (!userArg) return;
 
-		if (!reputation[userArg.id]) {
-			reputation[userArg.id] = {
-				repu: 0
-			};
-		}
-		uRep = reputation[userArg.id].repu;
+		const userRep = GET_REP(userArg.id);
 
-		message.channel.send(`${userArg} has ${uRep} repuation points!`);
+		message.channel.send(`${userArg} has ${userRep?.reputation || 0} repuation points!`);
 		//.then(msg => {
 		//    msg.delete({ timeout: 10000 } )
 		//});
