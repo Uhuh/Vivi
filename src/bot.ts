@@ -6,7 +6,7 @@ import * as config from './vars'
 import commandHandler from '../commands/commandHandler';
 import { GET_REACTS, GET_WORDS, GET_USER_WARN, SET_WARN } from './setup_tables';
 import { handle_packet } from '../events/rawPacket';
-import { MessageDelete, MessageEdit } from '../events/serverLogs';
+import { MessageDelete, MessageEdit, UserJoin } from '../events/serverLogs';
 
 //TODO
 /*
@@ -87,6 +87,7 @@ export default class BowBot extends Discord.Client {
       MessageEdit(this, oldMsg, newMsg);
       this.filterWords(newMsg as Discord.Message);
     });
+    this.on("guildMemberAdd", member => UserJoin(this, member));
   }
 
   handleReaction = (reaction: Discord.MessageReaction, user: Discord.User | Discord.PartialUser, type: string) => {

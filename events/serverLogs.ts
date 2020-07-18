@@ -1,9 +1,39 @@
 import * as Discord from 'discord.js';
 import BowBot from "../src/bot";
 import { SERVER_LOGS, GUILD } from '../src/vars';
+import * as ta from 'time-ago';
 
 // Discord Message
 type DMsg =  Discord.Message | Discord.PartialMessage;
+
+export const UserJoin = (client: BowBot, member: Discord.GuildMember | Discord.PartialGuildMember) => {
+  const embed = new Discord.MessageEmbed();
+  const channel = client.guilds.cache.get(GUILD)?.channels.cache.get(SERVER_LOGS) as Discord.TextChannel;
+  const howLong = ta.ago(member.user?.createdTimestamp);
+
+  let warnings = '';
+  if (howLong.includes('second') || howLong.includes('days')) {
+    warnings += `- Account is new\n`;
+  } if (!member.user?.avatarURL()) {
+    warnings += `- Account has no avatar`;
+  }
+
+  embed
+    .setTitle('**User Joined**')
+    .setAuthor(member.user?.username, member.user?.avatarURL() || '')
+    .setDescription(`<@${member.id}> joined the server`)
+    .addField(`**Account created**`, howLong)
+    .setFooter(`ID: ${member.id}`);
+
+  if (warnings !== '') {
+    embed
+      .addField(`**WARNING**`, 
+        `\`\`\`asciidocs\n${warnings}\`\`\``
+      )
+  }
+
+  channel.send(embed);
+}
 
 export const MessageDelete = (client: BowBot, message: DMsg) => {
   const embed = new Discord.MessageEmbed();
