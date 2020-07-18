@@ -4,3 +4,4 @@ node_modules
 .vscode
 build
 bowbot.db
+yarn-error*
