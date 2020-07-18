@@ -4,7 +4,7 @@ const topic = {
 	desc: "Random Topic Generator",
 	name: "topic",
 	args: "",
-	type: "",
+	type: "general",
 	run: (message: Message) => {
 		const responses = [
 			'How tall are you?',

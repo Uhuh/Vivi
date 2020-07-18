@@ -6,7 +6,7 @@ const help = {
   name: 'help',
   args: '',
   type: '',
-  run: async function (message: Message, _args: string[], client: BowBot) {
+  run: async function (message: Message, args: string[], client: BowBot) {
     const embed = new MessageEmbed();
 
     const {user} = client;
@@ -22,10 +22,22 @@ const help = {
       .setFooter(`Replying to: ${message.author.tag}`)
       .setTimestamp(new Date());
 
+    if(!args.length) {
+      embed.setTitle('**Command Categories**')
+      embed.addField(`**General**`, `Try out \`${client.config.PREFIX}help general\``);
+      embed.addField(`**Admin**`, `Try out \`${client.config.PREFIX}help admin\``);
+    } else if(args.length === 1) {
+      args[0] = args[0].toLowerCase();
+      if(args[0] !== 'general' &&  args[0] !== 'admin') {
+        return;
+      }
+      embed.setTitle(`**${args[0].toUpperCase()} commands**`);
 
-    for (const func of client.commands.values()) {
-      if(func.type === 'owner' || (func.type === 'admin' && !message.member?.hasPermission(["MANAGE_MESSAGES"]))) continue;
-      embed.addField(`**${client.config.PREFIX}${func.name} ${func.args}**`, `${func.desc === "" ? "No desciption" : func.desc}`);
+      for (const func of client.commands.values()) {
+        if(func.type === args[0]) {
+          embed.addField(`**${client.config.PREFIX}${func.name} ${func.args}**`, `${func.desc}`);
+        }
+      }
     }
 
     message.channel.send({ embed });

@@ -4,7 +4,7 @@ const members = {
 	desc: "Shows Current Member Count",
 	name: "members",
 	args: "",
-	type: '',
+	type: 'general',
 	run: (message: Message) => {
 		message.channel.send(`Total Members (Minus Bots): ${message.guild?.members.cache.filter(member => !member.user.bot).size}`);
 	}

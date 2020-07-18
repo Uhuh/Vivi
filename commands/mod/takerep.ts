@@ -2,7 +2,7 @@ import { Message } from "discord.js";
 import { GET_REP, SET_REP } from "../../src/setup_tables";
 
 const takerep = {
-	desc: '(ADMIN) Takes a Users Rep',
+	desc: ' Takes a Users Rep',
 	name: 'takerep',
 	args: '<@user> <Rep>',
 	type: 'admin',

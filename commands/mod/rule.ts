@@ -1,7 +1,7 @@
 import { Message } from "discord.js";
 
 const rule = {
-	desc: '(ADMIN) Displays Given Rule',
+	desc: ' Displays Given Rule',
 	name: 'rule',
 	args: '<Rule Number>',
 	type: 'admin',

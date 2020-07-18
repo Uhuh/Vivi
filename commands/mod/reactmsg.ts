@@ -3,7 +3,7 @@ import BowBot from "../../src/bot";
 import { SET_REACT } from "../../src/setup_tables";
 
 const reactmsg = {
-  desc: '(ADMIN) Set a Reaction Role for a Message',
+  desc: ' Set a Reaction Role for a Message',
   name: 'reactmsg',
   args: '<Message ID> <Role ID> <Emoji> <Channel ID>',
   type: 'admin',

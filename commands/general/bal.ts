@@ -5,7 +5,7 @@ const bal = {
 	desc: 'Check your Balance',
 	name: 'bal',
 	args: '[@user]',
-	type: '',
+	type: 'general',
 	run: (message: Message) => {
 		const userId = message.mentions.members?.last()?.id || message.author.id;
 		const userCoins = GET_COINS(userId);

@@ -5,7 +5,7 @@ const credits = {
 	desc: "Bot Development Credits",
 	name: "credits",
 	args: "",
-	type: "",
+	type: "general",
 	run: (message: Message, _args: string[], client: BowBot) => {
 		const embed = new MessageEmbed();
 

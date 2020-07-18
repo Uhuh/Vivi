@@ -5,7 +5,7 @@ const rep = {
 	desc: 'Check Your, or Another Users Rep',
 	name: 'rep',
 	args: '[@user]',
-	type: '',
+	type: 'general',
 	run: (message: Message, _args: string[]) => {
 		const userArg = message.mentions.members?.last() || message.author;
 

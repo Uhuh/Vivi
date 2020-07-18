@@ -4,7 +4,7 @@ const dice = {
 	desc: "Role a Die/Dice",
 	name: "dice",
 	args: "<Number of Dice>d<Die Number> ex 2d4",
-	type: "",
+	type: "general",
 	run: (message: Message, args: string[]) => {
 		let [numRolls, diceSize] = [1, 6];
 
