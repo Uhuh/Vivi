@@ -25,7 +25,7 @@ const warn = {
     const user = message.guild?.members.cache.get(userId || '');
 
     if (!user) {
-      return console.error(`Issue getting user on guild. User ID: ${userId}`);
+      return message.reply(`Issue finding that user with that user id. Make sure you copied the ID correctly.`);
     }
 
     let userWarnings = GET_USER_WARN(userId || '');
@@ -50,6 +50,8 @@ const warn = {
           .catch(() => console.error(`Can't DM user, probably has friends on.`));
         message.delete().catch(() => console.error(`Issues deleting the message!`));
     }
+
+    return;
 	}
 }
 

@@ -8,9 +8,9 @@ const removeWarn = {
 	type: 'admin',
 	run: (message: Message, args: string[]) => {
     if (!args.length) {
-      return message.reply(`please supply a user id.`);
+      return message.reply(`please supply a warn id. They're shown in the \`warnings\` command`);
     } else if (Number.isNaN(args[0])) {
-      return message.reply(`invalid id, make sure it's a number shown in the warnings command.`)
+      return message.reply(`invalid warn id, make sure it's a number shown in the warnings command.`)
     }
     
     DELETE_WARN(args[0]);
