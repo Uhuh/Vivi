@@ -165,8 +165,8 @@ export default class BowBot extends Discord.Client {
           default:
             message.reply(`warning. You gained a strike. You have ${++numWarns}/3 strikes.`);
             SET_WARN(message.author.id, `Saying a banned word.`);
-            this.logIssue('AutoMod: Warn', `Warned for saying a banned word.`, this.user!, message.author);
-            message.author.send(`You have been warned!\n**Reason:** Warned for saying a banned word.`)
+            this.logIssue('AutoMod: Warn', `Warned for saying a banned word. ||${word}||`, this.user!, message.author);
+            message.author.send(`You have been warned!\n**Reason:** Warned for saying a banned word. ${word}`)
             .catch(() => console.error(`Can't DM user, probably has friends on.`));
             message.delete().catch(() => console.error(`Issues deleting the message!`));
         }

@@ -24,7 +24,7 @@ const help = {
 
 
     for (const func of client.commands.values()) {
-      if(func.type === 'owner' || (func.type === 'admin' && !message.member?.hasPermission(["MANAGE_GUILD"]))) continue;
+      if(func.type === 'owner' || (func.type === 'admin' && !message.member?.hasPermission(["MANAGE_MESSAGES"]))) continue;
       embed.addField(`**${client.config.PREFIX}${func.name} ${func.args}**`, `${func.desc === "" ? "No desciption" : func.desc}`);
     }
 
