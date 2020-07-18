@@ -28,8 +28,8 @@ const ban = {
       user.ban({ reason })
         .then(() => {
           const embed = new MessageEmbed();
-          client.logIssue('Ban', reason, message.author, user?.user || userId || 'Not found');
-          embed.setTitle(`**Banned** ${user?.user.tag || 'Not found'} (<@${userId}>)`);
+          client.logIssue('Ban', reason, message.author, user?.user || userId || 'User');
+          embed.setTitle(`**Banned** ${user?.user.tag || 'User'} (<@${userId}>)`);
           message.channel.send(embed);
         })
         .catch(() => message.reply(`I had issues trying to ban that user!`));
@@ -37,8 +37,8 @@ const ban = {
       message.guild?.members.ban(userId || '')
       .then(() => {
         const embed = new MessageEmbed();
-        client.logIssue('Ban', reason, message.author, userId || 'Not found');
-        embed.setTitle(`**Banned** ${'Not found'} (<@${userId}>)`);
+        client.logIssue('Ban', reason, message.author, userId || 'User');
+        embed.setTitle(`**Banned** User (<@${userId}>)`);
         message.channel.send(embed);
       })
       .catch(() => message.reply(`I had issues trying to ban that user!`));
