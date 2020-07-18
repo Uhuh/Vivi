@@ -162,7 +162,7 @@ export default class BowBot extends Discord.Client {
             this.logIssue('AutoMod: Ban', `Strike! You're out!`, this.user!, message.author)
             return;
           default:
-            message.reply(`warning. You gained a strike. You have ${++numWarns} strike${numWarns > 1 ? 's' : ''}.`);
+            message.reply(`warning. You gained a strike. You have ${++numWarns}/3 strikes.`);
             SET_WARN(message.author.id, `Saying a banned word.`);
             this.logIssue('AutoMod: Warn', `Warned for saying a banned word.`, this.user!, message.author);
             message.author.send(`You have been warned!\n**Reason:** Warned for saying a banned word.`)
@@ -177,7 +177,7 @@ export default class BowBot extends Discord.Client {
     const channel = this.guilds.cache.get(this.config.GUILD)?.channels.cache.get(this.config.MOD_LOGS);
     const embed = new Discord.MessageEmbed();
     embed.setTitle(`${type}`)
-      .addField(`**User**`, `${user.tag}(<@${user.id}>)`, true)
+      .addField(`**User**`, `${user.tag} (<@${user.id}>)`, true)
       .addField(`**Moderator**`, mod.tag, true)
       .addField(`**Reason**`, reason)
       .setColor(15158332)
