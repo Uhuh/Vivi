@@ -15,7 +15,7 @@ const removeWarn = {
     
     DELETE_WARN(args[0]);
 
-    return message.reply(`done! ...if that waren ID existed at least. (Make sure to check!)`);
+    return message.reply(`done! ...if that warn ID existed at least. (Make sure to check!)`);
   }
 }
 
