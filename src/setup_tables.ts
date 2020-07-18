@@ -42,10 +42,11 @@ function checkDataBase() {
       );
 
       CREATE TABLE warnings (
+        id INTEGER PRIMARY KEY,
         user_id TEXT,
+        reporter TEXT,
         reason TEXT,
-        date TEXT,
-        PRIMARY KEY (user_id, date)
+        date TEXT
       );
 
       CREATE TABLE mod_cases (
@@ -63,9 +64,18 @@ function checkDataBase() {
 
 checkDataBase();
 
-export const SET_WARN = (user_id: string, reason: string, date = new Date().getTime()) =>
-  db.prepare(`INSERT OR REPLACE INTO warnings (user_id, reason, date) VALUES (@user_id, @reason, @date)`)
-  .run({ user_id, reason, date });
+export const SET_WARN = (
+  user_id: string, 
+  reason: string, 
+  reporter: string, 
+  date = Math.trunc(new Date().getTime()/1000)
+) =>
+  db.prepare(`INSERT OR REPLACE INTO warnings (user_id, reason, reporter, date) VALUES (@user_id, @reason, @reporter, @date)`)
+  .run({ user_id, reason, reporter, date });
+
+export const DELETE_WARN = (id: string) =>
+  db.prepare(`DELETE FROM warnings WHERE id = @id`)
+  .run({ id });
 
 export const GET_USER_WARN = (user_id: string) =>
   db.prepare(`SELECT * FROM warnings WHERE user_id = @user_id`)

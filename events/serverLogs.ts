@@ -43,7 +43,7 @@ export const MessageDelete = (client: BowBot, message: DMsg) => {
     .setAuthor(message.author?.tag, message.author?.avatarURL() || '')
     .setDescription(message.content)
     .addField('**---**',
-      `**Message author:** <@${message.author?.id}>\n**Channel:** <#${message.channel?.id}>)`
+      `**Message author:** <@${message.author?.id}>\n**Channel:** <#${message.channel?.id}>`
     )
     .setFooter(`ID: ${message.id}`)
     .setTimestamp(new Date());
