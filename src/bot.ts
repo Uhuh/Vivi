@@ -4,8 +4,9 @@ dotenv.config();
 import msg from '../events/message';
 import * as config from './vars'
 import commandHandler from '../commands/commandHandler';
-import { GET_REACTS } from './setup_tables';
+import { GET_REACTS, GET_WORDS, GET_USER_WARN, SET_WARN } from './setup_tables';
 import { handle_packet } from '../events/rawPacket';
+import { MessageDelete, MessageEdit } from '../events/serverLogs';
 
 //TODO
 /*
@@ -43,6 +44,9 @@ export default class BowBot extends Discord.Client {
   config: any;
   commands: Discord.Collection<string, Command>;
   reactMessages: string[];
+  bannedWords: string[];
+  caseCount: number = 0;
+  muteRole = '732816563664715846';
   reactRoles: Discord.Collection<string, ReactRole>;
   constructor() {
     super();
@@ -51,6 +55,7 @@ export default class BowBot extends Discord.Client {
     this.commands = new Discord.Collection();
     this.reactRoles = new Discord.Collection();
     this.reactMessages = [];
+    this.bannedWords = [];
     commandHandler(this);
     this.once('ready', () => {
       console.log(`[Started]: ${new Date()}\n`);
@@ -63,9 +68,25 @@ export default class BowBot extends Discord.Client {
     this.on('message', message => {
       //this.gainCoins(message); //Turned off for now
       msg(this, message as Discord.Message);
+      if(
+        message.channel?.type !== 'dm' && 
+        !message.author?.bot &&
+        !message.member?.hasPermission('MANAGE_MESSAGES')
+      ) {
+        this.filterWords(message as Discord.Message);
+      }
     });
     this.on("messageReactionAdd", (reaction, user) => this.handleReaction(reaction, user, 'add'));
     this.on("messageReactionRemove", (reaction, user) => this.handleReaction(reaction, user, 'remove'));
+    this.on("messageDelete", message => {
+      if (message.author?.bot) return;
+      MessageDelete(this, message);
+    });
+    this.on("messageUpdate", (oldMsg, newMsg) => {
+      if (oldMsg.author?.bot) return;
+      MessageEdit(this, oldMsg, newMsg);
+      this.filterWords(newMsg as Discord.Message);
+    });
   }
 
   handleReaction = (reaction: Discord.MessageReaction, user: Discord.User | Discord.PartialUser, type: string) => {
@@ -121,6 +142,56 @@ export default class BowBot extends Discord.Client {
       .catch(console.error);
   };
 
+  filterWords = (message: Discord.Message) => {
+    let userWarnings = GET_USER_WARN(message.author.id)
+
+    if(!userWarnings) userWarnings = [];
+
+    let numWarns = userWarnings.length;
+
+    /**
+     * Loop through all the users words, check if they're in the banned list
+     */
+    for(const word of message.content.split(' ')) {
+      if(this.bannedWords.includes(word.toLowerCase())) {
+        switch (numWarns) {
+          case 3: // If they're at three strikes they get banned on the 4th :)
+            message.channel.send(`Banned ${message.author.username} for getting more than 3 strikes.`);
+            message.delete().catch(() => console.error(`Issues deleting the message!`));
+            message.member?.ban().catch(() => message.channel.send(`Issues banning user.`));
+            this.logIssue('AutoMod: Ban', `Strike! You're out!`, this.user!, message.author)
+            return;
+          default:
+            message.reply(`warning. You gained a strike. You have ${++numWarns} strike${numWarns > 1 ? 's' : ''}.`);
+            SET_WARN(message.author.id, `Saying a banned word.`);
+            this.logIssue('AutoMod: Warn', `Warned for saying a banned word.`, this.user!, message.author);
+            message.author.send(`You have been warned!\n**Reason:** Warned for saying a banned word.`)
+            .catch(() => console.error(`Can't DM user, probably has friends on.`));
+            message.delete().catch(() => console.error(`Issues deleting the message!`));
+        }
+      }
+    }
+  }
+
+  logIssue = (type: string, reason = 'No reason provided.', mod: Discord.User, user: Discord.User) => {
+    const channel = this.guilds.cache.get(this.config.GUILD)?.channels.cache.get(this.config.MOD_LOGS);
+    const embed = new Discord.MessageEmbed();
+    embed.setTitle(`${type}`)
+      .addField(`**User**`, `${user.tag}(<@${user.id}>)`, true)
+      .addField(`**Moderator**`, mod.tag, true)
+      .addField(`**Reason**`, reason)
+      .setColor(15158332)
+      .setTimestamp(new Date());
+    
+    try {
+      if(channel && channel instanceof Discord.TextChannel) {
+        channel.send(embed);
+      }
+    } catch {
+      console.error(`Issue when trying to write log case`)
+    }
+  }
+
   loadReactRoles = () => {
     const reactRoles = GET_REACTS();
     console.log(reactRoles);
@@ -128,6 +199,12 @@ export default class BowBot extends Discord.Client {
     for (const row of reactRoles) {
       this.reactRoles.set(row.message_id, { role_id: row.role_id, emoji: row.emoji })
     }
+  }
+
+  loadBannedWords = () => {
+    const words = GET_WORDS();
+    console.log(words);
+    this.bannedWords = words.map(w => w.word) || [];
   }
 
 /* This is disabled for now
@@ -164,5 +241,6 @@ export default class BowBot extends Discord.Client {
   async start() {
     await this.login(this.config.TOKEN);
     this.loadReactRoles();
+    this.loadBannedWords();
   }
 }

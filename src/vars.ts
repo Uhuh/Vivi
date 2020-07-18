@@ -1,3 +1,6 @@
-export const PREFIX: string = process.env.PREFIX || "!"
+export const PREFIX: string = process.env.PREFIX || "-"
 export const TOKEN: string = process.env.TOKEN || ""
+export const MOD_LOGS: string = process.env.MOD_LOGS || "733782251195596852"
+export const SERVER_LOGS: string = process.env.SERVER_LOGS || "733782298972913824"
 export const BOT_OWNER: string = process.env.BOT_OWNER || "125492204234997761"
+export const GUILD: string = process.env.GUILD || "731977848251744267"

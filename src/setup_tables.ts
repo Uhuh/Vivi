@@ -29,6 +29,32 @@ function checkDataBase() {
         user_id TEXT,
         coins INTEGER
       );
+
+      CREATE TABLE banned_words (
+        id INTEGER PRIMARY KEY,
+        word TEXT
+      );
+
+      CREATE TABLE rules (
+        id INTEGER PRIMARY KEY,
+        rule_position INTEGER,
+        rule TEXT
+      );
+
+      CREATE TABLE warnings (
+        user_id TEXT,
+        reason TEXT,
+        date TEXT,
+        PRIMARY KEY (user_id, date)
+      );
+
+      CREATE TABLE mod_cases (
+        id INTEGER PRIMARY KEY,
+        user_id TEXT,
+        mod_id TEXT,
+        reason TEXT,
+        date TEXT
+      );
     `;
 
     db.exec(sqlInit);
@@ -36,6 +62,22 @@ function checkDataBase() {
 }
 
 checkDataBase();
+
+export const SET_WARN = (user_id: string, reason: string, date = new Date().getTime()) =>
+  db.prepare(`INSERT OR REPLACE INTO warnings (user_id, reason, date) VALUES (@user_id, @reason, @date)`)
+  .run({ user_id, reason, date });
+
+export const GET_USER_WARN = (user_id: string) =>
+  db.prepare(`SELECT * FROM warnings WHERE user_id = @user_id`)
+  .all({ user_id });
+
+export const SET_WORD = (word: string) =>
+  db.prepare(`INSERT OR REPLACE INTO banned_words (word) VALUES (@word)`)
+  .run({ word });
+
+export const GET_WORDS = () =>
+  db.prepare(`SELECT word FROM banned_words`)
+  .all();
 
 export const GET_REP = (user_id: string) => 
   db.prepare(`SELECT * FROM user_rep WHERE user_id = @user_id`)
