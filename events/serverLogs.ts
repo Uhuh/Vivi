@@ -20,7 +20,7 @@ export const UserJoin = (client: BowBot, member: Discord.GuildMember | Discord.P
 
   embed
     .setTitle('**User Joined**')
-    .setAuthor(member.user?.username, member.user?.avatarURL() || '')
+    .setAuthor(member.user?.tag, member.user?.avatarURL() || '')
     .setDescription(`<@${member.id}> joined the server`)
     .addField(`**Account created**`, howLong)
     .setFooter(`ID: ${member.id}`);
@@ -40,7 +40,7 @@ export const MessageDelete = (client: BowBot, message: DMsg) => {
   const channel = client.guilds.cache.get(GUILD)?.channels.cache.get(SERVER_LOGS) as Discord.TextChannel;
   embed
     .setTitle('**Message Deleted**')
-    .setAuthor(message.author?.username, message.author?.avatarURL() || '')
+    .setAuthor(message.author?.tag, message.author?.avatarURL() || '')
     .setDescription(message.content)
     .addField('**---**',
       `**Message author:** <@${message.author?.id}>\n**Channel:** <#${message.channel?.id}>)`
@@ -56,7 +56,7 @@ export const MessageEdit = (client: BowBot, oldMsg: DMsg, newMsg: DMsg) => {
   const channel = client.guilds.cache.get(GUILD)?.channels.cache.get(SERVER_LOGS) as Discord.TextChannel;
   embed
     .setTitle('**Message Edited**')
-    .setAuthor(newMsg.author?.username, newMsg.author?.avatarURL() || '')
+    .setAuthor(newMsg.author?.tag, newMsg.author?.avatarURL() || '')
     .setDescription(oldMsg.content)
     .addField('**After edit**', newMsg.content)
     .addField('**---**',
