@@ -154,7 +154,7 @@ export default class BowBot extends Discord.Client {
      * Loop through all the users words, check if they're in the banned list
      */
     for(const word of message.content.split(' ')) {
-      if(this.bannedWords.includes(word.toLowerCase())) {
+      if(this.bannedWords.find(w => word.includes(w.toLowerCase()))) {
         switch (numWarns) {
           case 3: // If they're at three strikes they get banned on the 4th :)
             message.channel.send(`Banned ${message.author.username} for getting more than 3 strikes.`);
