@@ -22,21 +22,29 @@ const ban = {
     // Ensure the user is in the guild
     const user = message.guild?.members.cache.get(userId || '');
 
-    if (!user) {
-      return console.error(`Issue getting user on guild. User ID: ${userId}`);
-    }
-
     const reason = args.join(' ').trim() === '' ? 'No reason provided.' : args.join(' ').trim();
 
-    user.ban({ reason })
+    if (user) {
+      user.ban({ reason })
+        .then(() => {
+          const embed = new MessageEmbed();
+          client.logIssue('Ban', reason, message.author, user?.user || userId || 'Not found');
+          embed.setTitle(`**Banned** ${user?.user.tag || 'Not found'} (<@${userId}>)`);
+          message.channel.send(embed);
+        })
+        .catch(() => message.reply(`I had issues trying to ban that user!`));
+    } else {
+      message.guild?.members.ban(userId || '')
       .then(() => {
         const embed = new MessageEmbed();
-        client.logIssue('Ban', reason, message.author, user.user);
-        embed.setTitle(`**Banned** ${user.user.tag} (<@${user.id}>)`);
+        client.logIssue('Ban', reason, message.author, userId || 'Not found');
+        embed.setTitle(`**Banned** ${'Not found'} (<@${userId}>)`);
         message.channel.send(embed);
       })
       .catch(() => message.reply(`I had issues trying to ban that user!`));
+    }
 
+    return;
 	}
 }
 

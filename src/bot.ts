@@ -174,11 +174,11 @@ export default class BowBot extends Discord.Client {
     }
   }
 
-  logIssue = (type: string, reason = 'No reason provided.', mod: Discord.User, user: Discord.User) => {
+  logIssue = (type: string, reason = 'No reason provided.', mod: Discord.User, user: Discord.User | string) => {
     const channel = this.guilds.cache.get(this.config.GUILD)?.channels.cache.get(this.config.MOD_LOGS);
     const embed = new Discord.MessageEmbed();
     embed.setTitle(`${type}`)
-      .addField(`**User**`, `${user.tag} (<@${user.id}>)`, true)
+      .addField(`**User**`, `${(typeof user === 'string' ? user : user?.tag) } (<@${(typeof user === 'string' ? user : user.id)}>)`, true)
       .addField(`**Moderator**`, mod.tag, true)
       .addField(`**Reason**`, reason)
       .setColor(15158332)
