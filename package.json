@@ -4,7 +4,8 @@
   "description": "Bow Bot is designed for the game Discord server LoveSick",
   "main": "index.js",
   "scripts": {
-    "prestart": "tsc",
+    "build": "tsc",
+    "prestart": "yarn build",
     "start": "node build/src/index.js",
     "tslint": "tslint --project ./tsconfig.json --fix"
   },
