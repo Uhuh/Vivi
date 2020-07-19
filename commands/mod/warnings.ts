@@ -33,7 +33,7 @@ const warnings = {
     console.log(userWarnings);
 
     embed
-      .setTitle(`**Warnings - User : ${args[0]}**`)
+      .setTitle(`**Warnings - User : ${userId}**`)
       .setDescription(`**Total:** \`${userWarnings.length}\``);
 
     for (const warn of userWarnings) {
