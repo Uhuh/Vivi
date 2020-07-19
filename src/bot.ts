@@ -90,7 +90,7 @@ export default class BowBot extends Discord.Client {
     this.on("guildMemberAdd", member => UserJoin(this, member));
   }
 
-  handleReaction = (reaction: Discord.MessageReaction, user: Discord.User | Discord.PartialUser, type: string) => {
+  handleReaction = async (reaction: Discord.MessageReaction, user: Discord.User | Discord.PartialUser, type: string) => {
     try {
       if (!reaction) return;
       const msg = this.reactRoles.get(reaction.message.id);
@@ -104,8 +104,15 @@ export default class BowBot extends Discord.Client {
       const emojiId = emoji.id || emoji.name;
 
       if (emojiId === msg.emoji) {
-        const member = message.guild.members.cache.get(user.id);
-        if (!member) throw new Error(`Member not found: ${user.username} - ${user.id}`);
+        let member = message.guild.members.cache.get(user.id);
+        if (!member) {
+          member = await message.guild.members.fetch(user.id);
+        }
+
+        // If they're still not there after forcing cache throw error
+        if (!member) {
+          throw new Error(`Member not found: ${user.username} - ${user.id}`);
+        }
 
         switch (type) {
           case 'add':
