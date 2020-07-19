@@ -85,7 +85,13 @@ export default class BowBot extends Discord.Client {
     this.on("messageUpdate", (oldMsg, newMsg) => {
       if (oldMsg.author?.bot) return;
       MessageEdit(this, oldMsg, newMsg);
-      this.filterWords(newMsg as Discord.Message);
+      if(
+        newMsg.channel?.type !== 'dm' && 
+        !newMsg.author?.bot &&
+        !newMsg.member?.hasPermission('MANAGE_MESSAGES')
+      ) {
+        this.filterWords(newMsg as Discord.Message);
+      }
     });
     this.on("guildMemberAdd", member => UserJoin(this, member));
   }
