@@ -102,10 +102,7 @@ export default class BowBot extends Discord.Client {
       if (!reaction) return;
       const msg = this.reactRoles.get(reaction.message.id);
       // If DNE ignore
-      if (!msg) {
-        reaction.users.remove(user.id).catch(console.error); 
-        return;
-      }
+      if (!msg) return;
 
       const { message, emoji } = reaction;
 
@@ -135,6 +132,8 @@ export default class BowBot extends Discord.Client {
             member.roles.remove(msg.role_id)
               .catch(() => console.error(`Could not remove user role : ${msg.role_id}`));
         }
+      } else {
+        reaction.users.remove(user.id);
       }
     } catch (e) {
       console.error(e);
