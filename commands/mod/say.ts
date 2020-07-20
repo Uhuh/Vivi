@@ -7,7 +7,7 @@ const say = {
 	args: "",
 	type: "owner",
 	run: (message: Message, args: string[], client: BowBot) => {
-		if (args.length > 0 && message.author.id === client.config.BOT_OWNER) {
+		if (args.length > 0 && message.member?.hasPermission(["MANAGE_MESSAGES"])) {
 			message.delete();
 			const toSay = args.join(' ');
 			message.channel.send(toSay);
