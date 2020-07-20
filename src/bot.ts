@@ -114,7 +114,7 @@ export default class BowBot extends Discord.Client {
         let member = message.guild.members.cache.get(user.id);
         if (!member) {
           console.log(`Role ${type} - Failed to get member from cache. Going to fetch and retry....`);
-          message.guild.members.fetch(user.id);
+          await message.guild.members.fetch(user.id);
           member = message.guild.members.cache.get(user.id);
         }
 

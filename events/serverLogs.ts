@@ -12,7 +12,7 @@ export const UserJoin = (client: BowBot, member: Discord.GuildMember | Discord.P
   const howLong = ta.ago(member.user?.createdTimestamp);
 
   let warnings = '';
-  if (howLong.includes('second') || howLong.includes('days')) {
+  if (howLong.includes('second') || howLong.includes('day') || howLong.includes('minute')) {
     warnings += `- Account is new\n`;
   } if (!member.user?.avatarURL()) {
     warnings += `- Account has no avatar`;
