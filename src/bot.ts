@@ -102,7 +102,10 @@ export default class BowBot extends Discord.Client {
       if (!reaction) return;
       const msg = this.reactRoles.get(reaction.message.id);
       // If DNE ignore
-      if (!msg) return;
+      if (!msg) {
+        reaction.users.remove(user.id).catch(console.error); 
+        return;
+      }
 
       const { message, emoji } = reaction;
 
@@ -113,7 +116,9 @@ export default class BowBot extends Discord.Client {
       if (emojiId === msg.emoji) {
         let member = message.guild.members.cache.get(user.id);
         if (!member) {
-          member = await message.guild.members.fetch(user.id);
+          console.log(`Role ${type} - Failed to get member from cache. Going to fetch and retry....`);
+          message.guild.members.fetch(user.id);
+          member = message.guild.members.cache.get(user.id);
         }
 
         // If they're still not there after forcing cache throw error
