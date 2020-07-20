@@ -8,7 +8,7 @@ const addword = {
 	args: '<list of words separated by a comma>',
 	type: 'admin',
 	run: (message: Message, args: string[], client: BowBot) => {
-		if (!message.guild || !message.member?.hasPermission(["MANAGE_GUILD"])) return;
+		if (!message.guild || !message.member?.hasPermission(["MANAGE_CHANNELS"])) return;
     const words = args.join('').split(',');
     
     for(const word of words) {
@@ -20,4 +20,4 @@ const addword = {
 	}
 }
 
-export default addword
+export default addword;
