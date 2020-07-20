@@ -3,6 +3,24 @@ import * as DB from 'better-sqlite3';
 const db = new DB('bowbot.db');
 
 function checkDataBase() {
+  const muteCheck = db.prepare(`
+    SELECT count(*) FROM sqlite_master WHERE type='table' AND name='mutes';
+  `).get();
+
+  if (!muteCheck['count(*)']) {
+    console.log(`WARNING: Mute table missing; generating`);
+    const sqlInit = `
+      CREATE TABLE mutes (
+        id INTEGER PRIMARY KEY,
+        user_id TEXT,
+        date_muted TEXT,
+        unmute_date TEXT
+      );
+    `;
+
+    db.exec(sqlInit);
+  }
+
   const dbCheck = db.prepare(`
     SELECT count(*) FROM sqlite_master WHERE type='table' AND name='react_roles';
   `).get();
@@ -64,6 +82,12 @@ function checkDataBase() {
 
 checkDataBase();
 
+export const MUTE_USER = (user_id: string, date_muted: string, unmute_date: string) =>
+  db.prepare(
+    `INSERT OR REPLACE INTO mutes (user_id, date_muted, unmute_date) VALUES (@user_id, @mute_date, @unmute_date)`
+  )
+  .run({ user_id, date_muted, unmute_date });
+
 export const SET_WARN = (
   user_id: string, 
   reason: string, 
@@ -88,6 +112,10 @@ export const SET_WORD = (word: string) =>
 export const GET_WORDS = () =>
   db.prepare(`SELECT word FROM banned_words`)
   .all();
+
+export const REMOVE_WORD = (word: string) =>
+  db.prepare(`DELETE FROM banned_words WHERE word = @word`)
+  .run({ word });
 
 export const GET_REP = (user_id: string) => 
   db.prepare(`SELECT * FROM user_rep WHERE user_id = @user_id`)
