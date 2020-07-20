@@ -3,21 +3,24 @@ import BowBot from "../../src/bot";
 import { REMOVE_WORD } from "../../src/setup_tables";
 
 const listWords = {
-	desc: 'Remove "word"(s) from banned list (- separate)',
+	desc: 'Remove "word"(s) from banned list (, separate)',
 	name: 'removeword',
-	args: '',
+	args: '<list of IDs found in the listwords command>',
 	type: 'admin',
 	run: (message: Message, args: string[], client: BowBot) => {
 		if (!message.guild || !message.member?.hasPermission(["MANAGE_CHANNELS"])) return;
-    const words = args.join('').split('-');
+		const IDs = args.join('').split(',').map(id => Number(id));
+		
+		IDs.sort(function(a, b){return b-a});
 
-    for(const word of words) {
-			REMOVE_WORD(word.toLowerCase());
-			const w = client.bannedWords.find(r => r.toString() === word.toLowerCase());
-			if(!w) continue;
-
-			client.bannedWords.splice(client.bannedWords.indexOf(w), 1);
-			client.bannedStrings.splice(client.bannedStrings.indexOf(word), 1);
+    for(const ID of IDs) {
+			const word = client.bannedStrings.find(w => Number(w.id) === ID);
+			if(!word) continue;
+			const index = client.bannedStrings.indexOf(word);
+			
+			REMOVE_WORD(ID);
+			client.bannedWords.splice(index, 1);
+			client.bannedStrings.splice(index, 1);
     }
 
     message.channel.send(`Successfully removed the words.`);

@@ -45,7 +45,7 @@ export default class BowBot extends Discord.Client {
   commands: Discord.Collection<string, Command>;
   reactMessages: string[];
   bannedWords: RegExp[];
-  bannedStrings: string[];
+  bannedStrings: { id: string, word: string }[];
   caseCount: number = 0;
   muteRole = '732816563664715846';
   reactRoles: Discord.Collection<string, ReactRole>;
@@ -223,7 +223,7 @@ export default class BowBot extends Discord.Client {
     const words = GET_WORDS();
     console.log(words);
     this.bannedWords = words.map(w => new RegExp(`(${w.word})`, 'g')) || [];
-    this.bannedStrings = words.map(w => w.word) || [];
+    this.bannedStrings = words || [];
   }
 
 /* This is disabled for now

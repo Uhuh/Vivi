@@ -110,12 +110,12 @@ export const SET_WORD = (word: string) =>
   .run({ word });
 
 export const GET_WORDS = () =>
-  db.prepare(`SELECT word FROM banned_words`)
+  db.prepare(`SELECT * FROM banned_words`)
   .all();
 
-export const REMOVE_WORD = (word: string) =>
-  db.prepare(`DELETE FROM banned_words WHERE word = @word`)
-  .run({ word });
+export const REMOVE_WORD = (id: Number) =>
+  db.prepare(`DELETE FROM banned_words WHERE id = @id`)
+  .run({ id });
 
 export const GET_REP = (user_id: string) => 
   db.prepare(`SELECT * FROM user_rep WHERE user_id = @user_id`)

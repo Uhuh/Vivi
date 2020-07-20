@@ -12,7 +12,8 @@ const addword = {
     const words = args.join('').split('-');
     
     for(const word of words) {
-      SET_WORD(word);
+			SET_WORD(word);
+			console.log(word);
 			client.bannedWords.push(new RegExp(`(${word})`, 'g'));
 			console.log(client.bannedWords);
     }
