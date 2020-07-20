@@ -1,6 +1,6 @@
 import { Message } from "discord.js";
 import BowBot from "../../src/bot";
-import { SET_WORD } from "../../src/setup_tables";
+import { SET_WORD, GET_NEW_WORD } from "../../src/setup_tables";
 
 const addword = {
 	desc: 'Add a word or list of words to banned list. Make sure you understand what you\'re adding.',
@@ -14,7 +14,9 @@ const addword = {
     for(const word of words) {
 			SET_WORD(word);
 			console.log(word);
+			const newWord = GET_NEW_WORD();
 			client.bannedWords.push(new RegExp(`(${word})`, 'g'));
+			client.bannedStrings.push(newWord);
 			console.log(client.bannedWords);
     }
 

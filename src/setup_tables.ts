@@ -113,6 +113,10 @@ export const GET_WORDS = () =>
   db.prepare(`SELECT * FROM banned_words`)
   .all();
 
+export const GET_NEW_WORD = () =>
+  db.prepare(`SELECT * FROM banned_words ORDER BY id DESC LIMIT 1`)
+  .get();
+
 export const REMOVE_WORD = (id: Number) =>
   db.prepare(`DELETE FROM banned_words WHERE id = @id`)
   .run({ id });
