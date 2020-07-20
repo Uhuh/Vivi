@@ -51,7 +51,6 @@ export default class BowBot extends Discord.Client {
   reactRoles: Discord.Collection<string, ReactRole>;
   constructor() {
     super();
-
     this.config = config;
     this.commands = new Discord.Collection();
     this.reactRoles = new Discord.Collection();
@@ -60,6 +59,7 @@ export default class BowBot extends Discord.Client {
     this.bannedStrings = [];
     commandHandler(this);
     this.once('ready', () => {
+      this.options = { fetchAllMembers: true };
       console.log(`[Started]: ${new Date()}\n`);
       console.log('Bow-Bot is ready!');
       setInterval(() => this.randomPres(), 10000);
