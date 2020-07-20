@@ -15,7 +15,6 @@ const help = {
 
     embed
       .setTitle('**Commands**')
-      .setDescription(`<> = required arguments, [] = optional.`)
       .setColor(16711684)
       .setAuthor(user.username, user.avatarURL() || "")
       .setThumbnail(user.avatarURL() || "")
@@ -32,12 +31,13 @@ const help = {
         return;
       }
       embed.setTitle(`**${args[0].toUpperCase()} commands**`);
-
+      let commands = `***<> = required arguments, [] = optional.***\n\n`;
       for (const func of client.commands.values()) {
         if(func.type === args[0]) {
-          embed.addField(`**${client.config.PREFIX}${func.name} ${func.args}**`, `${func.desc}`);
+          commands += `**${client.config.PREFIX}${func.name} ${func.args}** - ${func.desc}\n`;
         }
       }
+      embed.setDescription(commands);
     }
 
     message.channel.send({ embed });

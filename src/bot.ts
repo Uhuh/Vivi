@@ -44,7 +44,8 @@ export default class BowBot extends Discord.Client {
   config: any;
   commands: Discord.Collection<string, Command>;
   reactMessages: string[];
-  bannedWords: string[];
+  bannedWords: RegExp[];
+  bannedStrings: string[];
   caseCount: number = 0;
   muteRole = '732816563664715846';
   reactRoles: Discord.Collection<string, ReactRole>;
@@ -56,6 +57,7 @@ export default class BowBot extends Discord.Client {
     this.reactRoles = new Discord.Collection();
     this.reactMessages = [];
     this.bannedWords = [];
+    this.bannedStrings = [];
     commandHandler(this);
     this.once('ready', () => {
       console.log(`[Started]: ${new Date()}\n`);
@@ -140,7 +142,7 @@ export default class BowBot extends Discord.Client {
     if (!user) return console.log("Client dead?");
 
     const presArr = [
-      `over Lovesick <3`,
+      `over LoveLetter <3`,
       `out for senpai`,
       `Waiting to be loved`
     ];
@@ -166,8 +168,11 @@ export default class BowBot extends Discord.Client {
     /**
      * Loop through all the users words, check if they're in the banned list
      */
-    for(const word of message.content.split(' ')) {
-      if(this.bannedWords.find(w => word.toLowerCase() === w.toLowerCase())) {
+    const content = message.content.toLowerCase();
+    for(const reg of this.bannedWords) {
+      const match = reg.exec(content);
+      if(match) {
+        const [, id] = match;
         switch (numWarns) {
           case 3: // If they're at three strikes they get banned on the 4th :)
             message.channel.send(`Banned ${message.author.username} for getting more than 3 strikes.`);
@@ -177,9 +182,9 @@ export default class BowBot extends Discord.Client {
             return;
           default:
             message.reply(`warning. You gained a strike. You have ${++numWarns}/3 strikes.`);
-            SET_WARN(message.author.id, `Saying a banned word.`, this.user?.id || '731987022008418334');
-            this.logIssue('AutoMod: Warn', `Warned for saying a banned word. ||${word}||`, this.user!, message.author);
-            message.author.send(`You have been warned!\n**Reason:** Warned for saying a banned word. ${word}`)
+            SET_WARN(message.author.id, `Saying a banned word. ${id}`, this.user?.id || '731987022008418334');
+            this.logIssue('AutoMod: Warn', `Warned for saying a banned word. ||${id}||`, this.user!, message.author);
+            message.author.send(`You have been warned!\n**Reason:** Warned for saying a banned word. ${id}`)
             .catch(() => console.error(`Can't DM user, probably has friends on.`));
             message.delete().catch(() => console.error(`Issues deleting the message!`));
         }
@@ -218,7 +223,8 @@ export default class BowBot extends Discord.Client {
   loadBannedWords = () => {
     const words = GET_WORDS();
     console.log(words);
-    this.bannedWords = words.map(w => w.word) || [];
+    this.bannedWords = words.map(w => new RegExp(`(${w.word})`, 'g')) || [];
+    this.bannedStrings = words.map(w => w.word) || [];
   }
 
 /* This is disabled for now

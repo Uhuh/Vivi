@@ -34,7 +34,7 @@ const warnings = {
 
     embed
       .setTitle(`**Warnings - User : ${userId}**`)
-      .setDescription(`**Total:** \`${userWarnings.length}\``);
+      .setDescription(`**Total:** \`${userWarnings.length}\`**IDs**: ${userWarnings.map(w => w.id).join(', ')}`);
 
     for (const warn of userWarnings) {
       const user = message.guild?.members.cache.get(warn.reporter);
