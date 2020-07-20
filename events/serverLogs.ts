@@ -38,6 +38,11 @@ export const UserJoin = (client: BowBot, member: Discord.GuildMember | Discord.P
 export const MessageDelete = (client: BowBot, message: DMsg) => {
   const embed = new Discord.MessageEmbed();
   const channel = client.guilds.cache.get(GUILD)?.channels.cache.get(SERVER_LOGS) as Discord.TextChannel;
+  if (message.attachments?.size) {
+    for(const [, att] of message.attachments) {
+      channel.send(att.proxyURL);
+    }
+  }
   embed
     .setTitle('**Message Deleted**')
     .setAuthor(message.author?.tag, message.author?.avatarURL() || '')
