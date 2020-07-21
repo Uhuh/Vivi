@@ -80,18 +80,26 @@ export default class BowBot extends Discord.Client {
     this.on("messageReactionAdd", (reaction, user) => this.handleReaction(reaction, user, 'add'));
     this.on("messageReactionRemove", (reaction, user) => this.handleReaction(reaction, user, 'remove'));
     this.on("messageDelete", message => {
-      if (message.author?.bot) return;
-      MessageDelete(this, message);
+      try {
+        if (message.author?.bot) return;
+        MessageDelete(this, message);
+      } catch {
+        console.error(`Error on message delete!`);
+      }
     });
     this.on("messageUpdate", (oldMsg, newMsg) => {
-      if (oldMsg.author?.bot) return;
-      MessageEdit(this, oldMsg, newMsg);
-      if(
-        newMsg.channel?.type !== 'dm' && 
-        !newMsg.author?.bot &&
-        !newMsg.member?.hasPermission('MANAGE_MESSAGES')
-      ) {
-        this.filterWords(newMsg as Discord.Message);
+      try {
+        if (oldMsg.author?.bot) return;
+        MessageEdit(this, oldMsg, newMsg);
+        if(
+          newMsg.channel?.type !== 'dm' && 
+          !newMsg.author?.bot &&
+          !newMsg.member?.hasPermission('MANAGE_MESSAGES')
+        ) {
+          this.filterWords(newMsg as Discord.Message);
+        }
+      } catch {
+        console.error(`Error on message update!`);
       }
     });
     this.on("guildMemberAdd", member => UserJoin(this, member));
