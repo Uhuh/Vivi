@@ -250,7 +250,7 @@ export default class BowBot extends Discord.Client {
           mute.user_id,
           setTimeout(() => {
             REMOVE_MUTE(mute.user_id);
-            this.logIssue('AutoMod: Unmute', `Time's up`, member.user, this.user || 'Bow Bot');
+            this.logIssue('AutoMod: Unmute', `Time's up`, this.user!, member.user);
             member.roles.remove(muteId)
               .catch(() => console.error(`Unable to remove mute role from member. Maybe they left?`));
           }, (Number(mute.unmute_date)-now)*1000)

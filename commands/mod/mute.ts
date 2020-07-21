@@ -71,7 +71,7 @@ const mute = {
           userId,
           setTimeout(() => {
             REMOVE_MUTE(user.id);
-            client.logIssue('AutoMod: Unmute', `Time's up`, user.user, client.user || 'Bow Bot');
+            client.logIssue('AutoMod: Unmute', `Time's up`, client.user!, user.user);
             user.roles.remove(muteId)
               .catch(() => console.error(`Unable to remove mute role from user. Maybe they left?`));
           }, (unmuteTime-now)*1000)
