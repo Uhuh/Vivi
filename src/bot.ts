@@ -267,7 +267,6 @@ export default class BowBot extends Discord.Client {
   };*/
 
   async start() {
-    console.log(this.config.TOKEN)
     await this.login(this.config.TOKEN);
     this.loadReactRoles();
     this.loadBannedWords();
