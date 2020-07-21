@@ -68,12 +68,21 @@ export const MessageEdit = (client: BowBot, oldMsg: DMsg, newMsg: DMsg) => {
     .setTitle('**Message Edited**')
     .setAuthor(newMsg.author?.tag, newMsg.author?.avatarURL() || '')
     .setDescription((oldMsg?.content === '' ? 'BowBot: Empty!' : oldMsg.content) || 'BowBot: Empty!')
-    .addField('**After edit**', newMsg.content === '' ? 'BowBot: Empty!' : newMsg.content)
     .addField('**---**',
       `**Message author:** <@${newMsg.author?.id}>\n**Channel:** <#${newMsg.channel?.id}>\n[Jump to message](${newMsg.url})`
     )
     .setFooter(`ID: ${newMsg.id}`)
-    .setTimestamp(new Date());
+    .setTimestamp(new Date())
+
+  const content = newMsg.content || 'BowBot: Empty!';
+
+  for(const line of split(content, 1024)) {
+    embed.addField(`**After edit**`, line);
+  }
   
   channel.send(embed);
+}
+
+function split(input: string, len: number): string[] {
+  return input.match(new RegExp('.{1,' + len + '}(?=(.{' + len + '})+(?!.))|.{1,' + len + '}$', 'g')) || ['Nothing!']
 }
