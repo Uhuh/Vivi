@@ -180,8 +180,9 @@ export default class BowBot extends Discord.Client {
           case 3: // If they're at three strikes they get banned on the 4th :)
             message.channel.send(`Banned ${message.author.username} for getting more than 3 strikes.`);
             message.delete().catch(() => console.error(`Issues deleting the message!`));
+            SET_WARN(message.author.id, `Saying a banned word. ${id}`, this.user?.id || '731987022008418334');
             message.member?.ban().catch(() => message.channel.send(`Issues banning user.`));
-            this.logIssue('AutoMod: Ban', `Strike! You're out!`, this.user!, message.author)
+            this.logIssue('AutoMod: Ban', `Strike! You're out! (Banned word: ||${id}||)`, this.user!, message.author)
             return;
           default:
             message.reply(`warning. You gained a strike. You have ${++numWarns}/3 strikes.`);
