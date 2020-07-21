@@ -82,11 +82,19 @@ function checkDataBase() {
 
 checkDataBase();
 
-export const MUTE_USER = (user_id: string, date_muted: string, unmute_date: string) =>
+export const MUTE_USER = (user_id: string, date_muted: number, unmute_date: number) =>
   db.prepare(
-    `INSERT OR REPLACE INTO mutes (user_id, date_muted, unmute_date) VALUES (@user_id, @mute_date, @unmute_date)`
+    `INSERT OR REPLACE INTO mutes (user_id, date_muted, unmute_date) VALUES (@user_id, @date_muted, @unmute_date)`
   )
   .run({ user_id, date_muted, unmute_date });
+
+export const REMOVE_MUTE = (user_id: string) =>
+  db.prepare(`DELETE FROM mutes WHERE user_id = @user_id`)
+  .run({ user_id });
+
+export const GET_MUTES = () =>
+  db.prepare(`SELECT * FROM mutes`)
+  .all();
 
 export const SET_WARN = (
   user_id: string, 

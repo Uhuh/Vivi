@@ -67,9 +67,6 @@ export const MessageEdit = (client: BowBot, oldMsg: DMsg, newMsg: DMsg) => {
     .setTitle('**Message Edited**')
     .setAuthor(newMsg.author?.tag, newMsg.author?.avatarURL() || '')
     .setDescription((oldMsg?.content === '' ? 'BowBot: Empty!' : oldMsg.content) || 'BowBot: Empty!')
-    .addField('**---**',
-      `**Message author:** <@${newMsg.author?.id}>\n**Channel:** <#${newMsg.channel?.id}>\n[Jump to message](${newMsg.url})`
-    )
     .setFooter(`ID: ${newMsg.id}`)
     .setTimestamp(new Date())
 
@@ -78,6 +75,10 @@ export const MessageEdit = (client: BowBot, oldMsg: DMsg, newMsg: DMsg) => {
   for(const line of split(content, 1024)) {
     embed.addField(`**After edit**`, line);
   }
+
+  embed.addField('**---**',
+    `**Message author:** <@${newMsg.author?.id}>\n**Channel:** <#${newMsg.channel?.id}>\n[Jump to message](${newMsg.url})`
+  );
   
   channel.send(embed);
 }

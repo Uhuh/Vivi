@@ -4,9 +4,10 @@ dotenv.config();
 import msg from '../events/message';
 import * as config from './vars'
 import commandHandler from '../commands/commandHandler';
-import { GET_REACTS, GET_WORDS, GET_USER_WARN, SET_WARN } from './setup_tables';
+import { GET_REACTS, GET_WORDS, GET_USER_WARN, SET_WARN, GET_MUTES, REMOVE_MUTE } from './setup_tables';
 import { handle_packet } from '../events/rawPacket';
 import { MessageDelete, MessageEdit } from '../events/serverLogs';
+import * as moment from 'moment';
 
 //TODO
 /*
@@ -46,16 +47,18 @@ export default class BowBot extends Discord.Client {
   reactMessages: string[];
   bannedWords: RegExp[];
   bannedStrings: { id: string, word: string }[];
+  mutes: Discord.Collection<string, NodeJS.Timeout>;
   caseCount: number = 0;
   muteRole = '732816563664715846';
   reactRoles: Discord.Collection<string, ReactRole>;
   constructor() {
     super();
     this.config = config;
+    this.mutes = new Discord.Collection();
     this.commands = new Discord.Collection();
     this.reactRoles = new Discord.Collection();
-    this.reactMessages = [];
     this.bannedWords = [];
+    this.reactMessages = [];
     this.bannedStrings = [];
     commandHandler(this);
     this.once('ready', () => {
@@ -235,6 +238,27 @@ export default class BowBot extends Discord.Client {
     this.bannedStrings = words || [];
   }
 
+  loadMutes = async () => {
+    const muteId = '733341358693285979';
+    const mutes = GET_MUTES();
+    const now = moment().unix();
+    const guild = this.guilds.cache.get(this.config.GUILD);
+    for(const mute of mutes) {
+      const member = await guild?.members.fetch(mute.user_id);
+      if(member) {
+        this.mutes.set(
+          mute.user_id,
+          setTimeout(() => {
+            REMOVE_MUTE(mute.user_id);
+            this.logIssue('AutoMod: Unmute', `Time's up`, member.user, this.user || 'Bow Bot');
+            member.roles.remove(muteId)
+              .catch(() => console.error(`Unable to remove mute role from member. Maybe they left?`));
+          }, (Number(mute.unmute_date)-now)*1000)
+        );
+      }
+    }
+  }
+
 /* This is disabled for now
   gainCoins = (message: Discord.Message) => {
     //Coin Handling
@@ -270,5 +294,6 @@ export default class BowBot extends Discord.Client {
     await this.login(this.config.TOKEN);
     this.loadReactRoles();
     this.loadBannedWords();
+    this.loadMutes();
   }
 }
