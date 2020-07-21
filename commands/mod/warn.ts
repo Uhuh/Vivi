@@ -36,20 +36,18 @@ const warn = {
 
     const reason = args.join(' ').trim() === '' ? 'No reason provided.' : args.join(' ').trim();
 
-    switch (numWarns) {
-      case 3: // If they're at three strikes they get banned on the 4th :)
-        message.channel.send(`Banned ${user.displayName} for getting more than 3 strikes.`);
-        user.ban().catch(() => message.channel.send(`Issues banning user.`));
-        SET_WARN(user.id, reason, message.author.id);
-        client.logIssue('AutoMod: Ban', `Strike! You're out! **Reason:** ${reason}`, client.user!, user.user)
-        return;
-      default:
-        message.channel.send(`<@${user.id}> You've been warned for \`${reason}\`. You have ${++numWarns} strike${numWarns > 1 ? 's' : ''} now.`);
-        SET_WARN(user.id, reason, message.author.id);
-        client.logIssue('Warn', reason, message.author, user.user);
-        user.send(`You have been warned!\n**Reason:** ${reason}`)
-          .catch(() => console.error(`Can't DM user, probably has friends on.`));
-        message.delete().catch(() => console.error(`Issues deleting the message!`));
+    if (numWarns > 3) {
+      message.channel.send(`Banned ${user.displayName} for getting more than 3 strikes.`);
+      user.ban().catch(() => message.channel.send(`Issues banning user.`));
+      SET_WARN(user.id, reason, message.author.id);
+      client.logIssue('AutoMod: Ban', `Strike! You're out! **Reason:** ${reason}`, client.user!, user.user)
+    } else {
+      message.channel.send(`<@${user.id}> You've been warned for \`${reason}\`. You have ${++numWarns} strike${numWarns > 1 ? 's' : ''} now.`);
+      SET_WARN(user.id, reason, message.author.id);
+      client.logIssue('Warn', reason, message.author, user.user);
+      user.send(`You have been warned!\n**Reason:** ${reason}`)
+        .catch(() => console.error(`Can't DM user, probably has friends on.`));
+      message.delete().catch(() => console.error(`Issues deleting the message!`));
     }
 
     return;
