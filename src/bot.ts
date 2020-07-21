@@ -6,7 +6,7 @@ import * as config from './vars'
 import commandHandler from '../commands/commandHandler';
 import { GET_REACTS, GET_WORDS, GET_USER_WARN, SET_WARN } from './setup_tables';
 import { handle_packet } from '../events/rawPacket';
-import { MessageDelete, MessageEdit, UserJoin } from '../events/serverLogs';
+import { MessageDelete, MessageEdit } from '../events/serverLogs';
 
 //TODO
 /*
@@ -102,7 +102,7 @@ export default class BowBot extends Discord.Client {
         console.error(`Error on message update!`);
       }
     });
-    this.on("guildMemberAdd", member => UserJoin(this, member));
+    //this.on("guildMemberAdd", member => UserJoin(this, member));
   }
 
   handleReaction = async (reaction: Discord.MessageReaction, user: Discord.User | Discord.PartialUser, type: string) => {
