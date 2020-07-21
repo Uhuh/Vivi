@@ -96,6 +96,10 @@ export const GET_MUTES = () =>
   db.prepare(`SELECT * FROM mutes`)
   .all();
 
+export const GET_USER_MUTE = (user_id: string) =>
+  db.prepare(`SELECT * FROM mutes WHERE user_id = @user_id`)
+  .get({ user_id });
+
 export const SET_WARN = (
   user_id: string, 
   reason: string, 
