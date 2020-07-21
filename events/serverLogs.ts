@@ -67,8 +67,8 @@ export const MessageEdit = (client: BowBot, oldMsg: DMsg, newMsg: DMsg) => {
   embed
     .setTitle('**Message Edited**')
     .setAuthor(newMsg.author?.tag, newMsg.author?.avatarURL() || '')
-    .setDescription(oldMsg.content)
-    .addField('**After edit**', newMsg.content)
+    .setDescription((oldMsg?.content === '' ? 'BowBot: Empty!' : oldMsg.content) || 'BowBot: Empty!')
+    .addField('**After edit**', newMsg.content === '' ? 'BowBot: Empty!' : newMsg.content)
     .addField('**---**',
       `**Message author:** <@${newMsg.author?.id}>\n**Channel:** <#${newMsg.channel?.id}>\n[Jump to message](${newMsg.url})`
     )
