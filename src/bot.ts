@@ -140,8 +140,6 @@ export default class BowBot extends Discord.Client {
             member.roles.remove(msg.role_id)
               .catch(() => console.error(`Could not remove user role : ${msg.role_id}`));
         }
-      } else {
-        reaction.users.remove(user.id);
       }
     } catch (e) {
       console.error(e);
@@ -269,6 +267,7 @@ export default class BowBot extends Discord.Client {
   };*/
 
   async start() {
+    console.log(this.config.TOKEN)
     await this.login(this.config.TOKEN);
     this.loadReactRoles();
     this.loadBannedWords();

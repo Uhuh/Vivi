@@ -31,11 +31,11 @@ export const UserJoin = (client: BowBot, member: Discord.GuildMember | Discord.P
         `\`\`\`asciidocs\n${warnings}\`\`\``
       )
   }
-  if (member.send) {
+  /* if (member.send) {
     member.send(
       `Welcome to LoveLetter! Please take some time to read our <#732961554005229639> and <#729135006018175077> while you wait for the 10minute cooldown! After that you can react in <#733193403877294106> and gain access to the server!`
     ).catch(() => console.error(`Couldn't send to user! :(`));
-  }
+  } */
 
   channel.send(embed);
 }
