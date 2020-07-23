@@ -42,6 +42,21 @@ const warn = {
       message.channel.send(`Banned ${user.displayName} for getting more than 3 strikes.`);
       await user.send('https://cdn.discordapp.com/attachments/735579928208212038/735579976597897236/you_were_banned.mp4')
         .catch(() => console.error(`ISsues trying to send banned meme`));
+      await user.send(
+`
+Your account has been terminated from our server with reason: "${reason}".
+If you would like to appeal your account's termination, you may do so at \`loveletterappeal@gmail.com\` with the following format:
+Subject: "Ban appeal [User ID]"
+Content: [Inquiry, apology or complaint]
+Your message may contain attachments for evidence.
+
+= = = Warn list = = =
+${userWarnings.map(w => `  - ID: ${w.id} | Reason: ${w.reason}\n`).join('')}
+
+Thank you for your understanding,
+  -LLMTF Staff
+`
+        ).catch(() => console.error('Issue sending ban appeal message to user. Oh well?'));
       user.ban().catch(() => message.channel.send(`Issues banning user.`));
       SET_WARN(user.id, reason, message.author.id);
       client.logIssue('AutoMod: Ban', `Strike! You're out! **Reason:** ${reason}`, client.user!, user.user)

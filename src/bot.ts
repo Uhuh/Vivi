@@ -169,7 +169,7 @@ export default class BowBot extends Discord.Client {
       .catch(console.error);
   };
 
-  filterWords = (message: Discord.Message) => {
+  filterWords = async (message: Discord.Message) => {
     let userWarnings = GET_USER_WARN(message.author.id)
 
     if(!userWarnings) userWarnings = [];
@@ -188,6 +188,21 @@ export default class BowBot extends Discord.Client {
           message.channel.send(`Banned ${message.author.username} for getting more than 3 strikes.`);
           message.delete().catch(() => console.error(`Issues deleting the message!`));
           SET_WARN(message.author.id, `Saying a banned word. ${id}`, this.user?.id || '731987022008418334');
+          await message.member?.send(
+`
+Your account has been terminated from our server automatically by me!
+If you would like to appeal your account's termination, you may do so at \`loveletterappeal@gmail.com\` with the following format:
+Subject: "Ban appeal [User ID]"
+Content: [Inquiry, apology or complaint]
+Your message may contain attachments for evidence.
+
+= = = Warn list = = =
+${userWarnings.map(w => `  - ID: ${w.id} | Reason: ${w.reason}\n`).join('')}
+
+Thank you for your understanding,
+  -LLMTF Staff
+`
+            ).catch(() => console.error('Issue sending ban appeal message to user. Oh well?'));
           message.member?.ban().catch(() => message.channel.send(`Issues banning user.`));
           this.logIssue('AutoMod: Ban', `Strike! You're out! (Banned word: ||${id}||)`, this.user!, message.author);
         } else {
