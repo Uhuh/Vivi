@@ -23,4 +23,4 @@ const topic = {
 	}
 }
 
-export default topic
+export default topic;

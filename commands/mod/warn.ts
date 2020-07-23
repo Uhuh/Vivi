@@ -7,7 +7,7 @@ const warn = {
 	name: 'warn',
 	args: '<user id> <reason>',
 	type: 'admin',
-	run: (message: Message, args: string[], client: BowBot) => {
+	run: async (message: Message, args: string[], client: BowBot) => {
     if (!message.member?.hasPermission("MANAGE_MESSAGES")) { return message.react('❌') }
     if (!args.length) {
       return message.reply(`you forgot some arguements. \`${client.config.PREFIX}warn <user id> <reason>\``)
@@ -40,6 +40,8 @@ const warn = {
     console.log()
     if (numWarns > 3) {
       message.channel.send(`Banned ${user.displayName} for getting more than 3 strikes.`);
+      await user.send('https://cdn.discordapp.com/attachments/735579928208212038/735579976597897236/you_were_banned.mp4')
+        .catch(() => console.error(`ISsues trying to send banned meme`));
       user.ban().catch(() => message.channel.send(`Issues banning user.`));
       SET_WARN(user.id, reason, message.author.id);
       client.logIssue('AutoMod: Ban', `Strike! You're out! **Reason:** ${reason}`, client.user!, user.user)

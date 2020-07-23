@@ -70,7 +70,6 @@ export default class BowBot extends Discord.Client {
     //CMD Handling
     this.on("raw", packet => handle_packet(packet, this));
     this.on('message', message => {
-      //this.gainCoins(message); //Turned off for now
       msg(this, message as Discord.Message);
       if(
         message.channel?.type !== 'dm' && 
@@ -258,37 +257,6 @@ export default class BowBot extends Discord.Client {
       }
     }
   }
-
-/* This is disabled for now
-  gainCoins = (message: Discord.Message) => {
-    //Coin Handling
-    if (message.author.bot) return;
-    if (!coins[message.author.id]) {
-      coins[message.author.id] = {
-        coins: 0
-      };
-    }
-
-    let coinAmt = Math.floor(Math.random() * 50) + 1;
-    let baseAmt = Math.floor(Math.random() * 50) + 1;
-    //console.log(`${message.author.username} : ${coinAmt} ; ${baseAmt}`);
-
-    if (coinAmt === baseAmt) {
-      coins[message.author.id] = {
-        coins: coins[message.author.id].coins + coinAmt
-      };
-      fs.writeFile("./coins.json", JSON.stringify(coins), (err) => {
-        if (err) console.log(err);
-      });
-
-      let coinMSG = `**${message.author.username}**\n💰${coinAmt} Bow-Bucks Acquired! You now have ${coins[message.author.id].coins}`;
-
-      message.channel.send(coinMSG)
-        .then(msg => {
-          msg.delete({ timeout: 5000 })
-        });
-    }
-  };*/
 
   async start() {
     await this.login(this.config.TOKEN);

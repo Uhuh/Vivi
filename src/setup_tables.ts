@@ -3,6 +3,23 @@ import * as DB from 'better-sqlite3';
 const db = new DB('bowbot.db');
 
 function checkDataBase() {
+  const tagCheck = db.prepare(`
+    SELECT count(*) FROM sqlite_master WHERE type='table' AND name='tags';
+  `).get();
+
+  if (!tagCheck['count(*)']) {
+    console.log(`WARNING: Tags table missing; generating`);
+    const sqlInit = `
+      CREATE TABLE tags (
+        id INTEGER PRIMARY KEY,
+        tag TEXT,
+        tag_text TEXT
+      );
+    `;
+
+    db.exec(sqlInit);
+  }
+
   const muteCheck = db.prepare(`
     SELECT count(*) FROM sqlite_master WHERE type='table' AND name='mutes';
   `).get();

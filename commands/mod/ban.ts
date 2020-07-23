@@ -6,7 +6,7 @@ const ban = {
 	name: 'ban',
 	args: '<user id> <reason>',
 	type: 'admin',
-	run: (message: Message, args: string[], client: BowBot) => {
+	run: async (message: Message, args: string[], client: BowBot) => {
     if (!message.member?.hasPermission('BAN_MEMBERS')) { return message.react('👎') }
     if (!args.length) {
       return message.reply(`you forgot some arguements.`)
@@ -24,10 +24,12 @@ const ban = {
 
     const reason = args.join(' ').trim() === '' ? 'No reason provided.' : args.join(' ').trim();
 
+    const embed = new MessageEmbed();
     if (user) {
+      await user.send('https://cdn.discordapp.com/attachments/735579928208212038/735579976597897236/you_were_banned.mp4')
+        .catch(() => console.error(`Issue sending you're banned meme.`));
       user.ban({ reason })
         .then(() => {
-          const embed = new MessageEmbed();
           client.logIssue('Ban', reason, message.author, user?.user || userId || 'User');
           embed.setTitle(`**Banned** ${user?.user.tag || 'User'} (<@${userId}>)`);
           message.channel.send(embed);
@@ -36,7 +38,6 @@ const ban = {
     } else {
       message.guild?.members.ban(userId || '')
       .then(() => {
-        const embed = new MessageEmbed();
         client.logIssue('Ban', reason, message.author, userId || 'User');
         embed.setTitle(`**Banned** User (<@${userId}>)`);
         message.channel.send(embed);
