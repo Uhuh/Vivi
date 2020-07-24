@@ -6,14 +6,21 @@ export default {
   name: 'userinfo',
   args: '',
   type: 'general',
-  run: async function (message: Message, _args: string[], client: BowBot) {
+  run: async function (message: Message, args: string[], client: BowBot) {
     const { user } = client;
 
     if (!user || !message.mentions || !message.mentions.members) return;
 
-    // There is some issues with discord and cached users so if someone hasn't sent a message this command won't
-    // work for said user. Assuming the person mentions a new user.
-    const member = message.mentions.members.find(val => val.id !== user.id) || message.member;
+    /**
+     * If they mention the user then use that otherwise they should've sent the user id
+     * args.shift() returns the first element and pops it out of the array.
+     */
+    const userId = message.mentions.members?.first()?.id || args.shift() || message.author.id;
+
+    if(message.mentions.members?.first()) args.shift();
+
+    // Ensure the user is in the guild
+    const member = message.guild?.members.cache.get(userId || '');
 
     if (!member) return;
 
