@@ -29,7 +29,7 @@ const unmute = {
     const user = message.guild?.members.cache.get(userId || '');
 
     if (!user) {
-      return console.error(`Issue getting user on guild. User ID: ${userId}`);
+      return message.reply(`couldn't find that user, check that the ID is correct.`);
     }
 
     const reason = args.join(' ').trim() === '' ? 'No reason provided.' : args.join(' ').trim();
