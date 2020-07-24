@@ -188,6 +188,8 @@ export default class BowBot extends Discord.Client {
           message.channel.send(`Banned ${message.author.username} for getting more than 3 strikes.`);
           message.delete().catch(() => console.error(`Issues deleting the message!`));
           SET_WARN(message.author.id, `Saying a banned word. ${id}`, this.user?.id || '731987022008418334');
+          await message.member?.send('https://cdn.discordapp.com/attachments/735579928208212038/735579976597897236/you_were_banned.mp4')
+            .catch(() => console.error(`Issues sending video to user`))
           await message.member?.send(
 `
 Your account has been terminated from our server automatically by me!
