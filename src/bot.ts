@@ -207,6 +207,7 @@ Thank you for your understanding,
             ).catch(() => console.error('Issue sending ban appeal message to user. Oh well?'));
           message.member?.ban().catch(() => message.channel.send(`Issues banning user.`));
           this.logIssue('AutoMod: Ban', `Strike! You're out! (Banned word: ||${id}||)`, this.user!, message.author);
+          return;
         } else {
           message.reply(`warning. You gained a strike. You have ${++numWarns}/3 strikes.`);
           SET_WARN(message.author.id, `Saying a banned word. ${id}`, this.user?.id || '731987022008418334');
