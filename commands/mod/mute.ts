@@ -35,7 +35,7 @@ const mute = {
 
     const words = args.join(' ').trim() === '' ? 'No reason provided.' : args.join(' ').trim();
 
-    const [reason, time] = words.split('|');
+    let [reason, time] = words.split('|');
 
     // Default is infinite
     const now = moment().unix();
@@ -53,7 +53,7 @@ const mute = {
         case 'm': case 'h': case 'd': case 'w': case 'y':
           unmuteTime = moment().add(Number(num), timeFormat).unix();
       }
-    }
+    } else time = '1h';
 
     const embed = new MessageEmbed();
     MUTE_USER(userId, now, unmuteTime);
