@@ -40,8 +40,6 @@ const warn = {
     console.log()
     if (numWarns > 3) {
       message.channel.send(`Banned ${user.displayName} for getting more than 3 strikes.`);
-      await user.send('https://cdn.discordapp.com/attachments/735579928208212038/735579976597897236/you_were_banned.mp4')
-        .catch(() => console.error(`ISsues trying to send banned meme`));
       await user.send(
 `
 Your account has been terminated from our server with reason: "${reason}".

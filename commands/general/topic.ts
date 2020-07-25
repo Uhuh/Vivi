@@ -8,6 +8,11 @@ const topic = {
 	run: (message: Message) => {
 		const responses = [
 			'How tall are you?',
+			'What is your favorite fast food chain?',
+			'What is your favorite Pokemon?',
+			'What pottermore house are you in?',
+			'What is your zodiac?',
+			'🔫 Put your hands up! 🔫',
 			'What is your favorite game?',
 			'What is your opinion on math?',
 			'What is your favorite painting?',

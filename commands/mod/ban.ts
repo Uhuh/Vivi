@@ -26,8 +26,6 @@ const ban = {
 
     const embed = new MessageEmbed();
     if (user) {
-      await user.send('https://cdn.discordapp.com/attachments/735579928208212038/735579976597897236/you_were_banned.mp4')
-        .catch(() => console.error(`Issue sending you're banned meme.`));
       await user.send(
 `
 Your account has been terminated from our server with reason: "${reason}".
