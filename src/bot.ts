@@ -184,6 +184,7 @@ export default class BowBot extends Discord.Client {
       const match = reg.exec(content);
       if(match) {
         const [, id] = match;
+        numWarns++;
         if (numWarns > 3) {
           message.channel.send(`Banned ${message.author.username} for getting more than 3 strikes.`);
           message.delete().catch(() => console.error(`Issues deleting the message!`));
@@ -207,7 +208,7 @@ Thank you for your understanding,
           this.logIssue('AutoMod: Ban', `Strike! You're out! (Banned word: ||${id}||)`, this.user!, message.author);
           return;
         } else {
-          message.reply(`warning. You gained a strike. You have ${++numWarns}/3 strikes.`);
+          message.reply(`warning. You gained a strike. You have ${numWarns}/3 strikes.`);
           SET_WARN(message.author.id, `Saying a banned word. ${id}`, this.user?.id || '731987022008418334');
           this.logIssue('AutoMod: Warn', `Warned for saying a banned word. ||${id}||`, this.user!, message.author);
           message.author.send(`You have been warned!\n**Reason:** Warned for saying a banned word. ${id}`)
