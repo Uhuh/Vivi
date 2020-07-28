@@ -130,6 +130,10 @@ export const DELETE_WARN = (id: string) =>
   db.prepare(`DELETE FROM warnings WHERE id = @id`)
   .run({ id });
 
+export const GET_WARNS = () =>
+  db.prepare(`SELECT * FROM warnings`)
+  .all();
+
 export const GET_USER_WARN = (user_id: string) =>
   db.prepare(`SELECT * FROM warnings WHERE user_id = @user_id`)
   .all({ user_id });

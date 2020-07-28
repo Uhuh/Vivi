@@ -4,7 +4,7 @@ dotenv.config();
 import msg from '../events/message';
 import * as config from './vars'
 import commandHandler from '../commands/commandHandler';
-import { GET_REACTS, GET_WORDS, GET_USER_WARN, SET_WARN, GET_MUTES, REMOVE_MUTE } from './setup_tables';
+import { GET_REACTS, GET_WORDS, GET_USER_WARN, SET_WARN, GET_MUTES, REMOVE_MUTE, GET_WARNS, DELETE_WARN } from './setup_tables';
 import { handle_packet } from '../events/rawPacket';
 import { MessageDelete, MessageEdit, UserJoin } from '../events/serverLogs';
 import * as moment from 'moment';
@@ -240,7 +240,6 @@ Thank you for your understanding,
 
   loadReactRoles = () => {
     const reactRoles = GET_REACTS();
-    console.log(reactRoles);
     this.reactMessages = reactRoles.map(r => r.message_id);
     for (const row of reactRoles) {
       this.reactRoles.set(row.message_id, { role_id: row.role_id, emoji: row.emoji })
@@ -249,7 +248,6 @@ Thank you for your understanding,
 
   loadBannedWords = () => {
     const words = GET_WORDS();
-    console.log(words);
     this.bannedWords = words.map(w => new RegExp(`(${w.word})`, 'g')) || [];
     this.bannedStrings = words || [];
   }
@@ -275,10 +273,27 @@ Thank you for your understanding,
     }
   }
 
+  /**
+   * Auto clear warns if they're over a week old.
+   */
+  warnsInterval = async () => {
+    setInterval(() => {
+      const warns = GET_WARNS();
+      const WEEK_OLD = moment().subtract(7, 'days').startOf('day');
+
+      for(const warn of warns) {
+        if (moment.unix(warn.date).isBefore(WEEK_OLD)) {
+          DELETE_WARN(warn.id);
+        }
+      }
+    }, 24 * 60 * 1000);
+  }
+
   async start() {
     await this.login(this.config.TOKEN);
     this.loadReactRoles();
     this.loadBannedWords();
     this.loadMutes();
+    this.warnsInterval();
   }
 }

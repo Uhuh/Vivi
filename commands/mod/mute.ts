@@ -55,6 +55,8 @@ const mute = {
       }
     } else time = '1h';
 
+    message.delete().catch(() => console.error(`Issues deleting mute message`));
+
     const embed = new MessageEmbed();
     MUTE_USER(userId, now, unmuteTime);
     client.logIssue('Mute', `${reason}\n\nMuted for ${time}`, message.author, user.user);
