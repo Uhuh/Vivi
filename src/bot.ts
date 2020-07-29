@@ -93,7 +93,7 @@ export default class BowBot extends Discord.Client {
     });
     this.on("messageUpdate", (oldMsg, newMsg) => {
       try {
-        if (oldMsg.author?.bot || message.channel?.type === 'dm') return;
+        if (oldMsg.author?.bot || oldMsg.channel?.type === 'dm') return;
         MessageEdit(this, oldMsg, newMsg);
         if(
           newMsg.channel?.type !== 'dm' && 
