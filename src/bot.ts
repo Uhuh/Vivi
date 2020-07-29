@@ -189,7 +189,6 @@ export default class BowBot extends Discord.Client {
     const userJoinTime = moment(member.joinedTimestamp);
 
     if (now.diff(userJoinTime, 'minutes') < 10) return;
-    console.log(now.diff(userJoinTime, 'minutes'));
 
     switch(words) {
       case 'bbverify':

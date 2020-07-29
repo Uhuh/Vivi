@@ -13,7 +13,7 @@ const msg = (client: BowBot, message: Message) => {
     //If the command isn't in the big ol' list.
     const clientCommand = client.commands.get(command.toLowerCase());
     if (!clientCommand)
-      return console.log("Command DNE");
+      return;
 
     try {
       // Find the command and run it.
