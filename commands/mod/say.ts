@@ -5,11 +5,10 @@ const say = {
 	name: "say",
 	args: "",
 	type: "owner",
-	run: (message: Message, args: string[]) => {
-		if (args.length > 0 && message.member?.hasPermission(["MANAGE_MESSAGES"])) {
+	run: (message: Message) => {
+		if (message.member?.hasPermission(["MANAGE_MESSAGES"])) {
 			message.delete();
-			const toSay = args.join(' ');
-			message.channel.send(toSay);
+			message.channel.send(message.content.slice(5) || 'Nothing to say!');
 		}
 	}
 }

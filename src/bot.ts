@@ -70,13 +70,15 @@ export default class BowBot extends Discord.Client {
     //CMD Handling
     this.on("raw", packet => handle_packet(packet, this));
     this.on('message', message => {
+      if (message.author?.bot) return;
       msg(this, message as Discord.Message);
       if(
-        message.channel?.type !== 'dm' && 
-        !message.author?.bot &&
+        message.channel?.type !== 'dm' &&
         !message.member?.hasPermission('MANAGE_MESSAGES')
       ) {
         this.filterWords(message as Discord.Message);
+      } else if (message.channel?.type === 'dm') {
+        this.serverRoles(message as Discord.Message);
       }
     });
     this.on("messageReactionAdd", (reaction, user) => this.handleReaction(reaction, user, 'add'));
@@ -168,6 +170,66 @@ export default class BowBot extends Discord.Client {
       })
       .catch(console.error);
   };
+
+  serverRoles = async (message: Discord.Message) => {
+    const words = message.content.split(' ').join('');
+    const guild = this.guilds.cache.get(this.config.GUILD);
+    if(!guild) return;
+    let member = await guild.members.cache.get(message.author.id);
+    if (!member) {
+      console.log(`Failed to get member from cache for DMs. Going to fetch and retry....`);
+      await guild.members.fetch(message.author.id);
+      member = guild.members.cache.get(message.author.id);
+    }
+
+    if (!member) 
+      return message.reply(`Sorry! I had issues getting you from the LoveLetter server. Please alert a mod of admin of this.`);
+
+    const now = moment();
+    const userJoinTime = moment(member.joinedTimestamp);
+
+    if (now.diff(userJoinTime, 'minutes') < 10) return;
+    console.log(now.diff(userJoinTime, 'minutes'));
+
+    switch(words) {
+      case 'bbverify':
+        const studentId = '729709012253278268';
+        if (member.roles.cache.has(studentId)) {
+          return;
+        }
+
+        member.roles.add(studentId)
+          .then(() => message.reply(`Congrats! You now have access to the server`))
+          .catch(() => message.reply(`You should already have access! If this isn't true show this to a mod or admin.`));
+        break;
+      case 'bbgame':
+        const gameId = '733758723406692393';
+        if (!member.roles.cache.has(gameId)) {
+          member.roles.add(gameId)
+            .then(() => message.reply(`Congrats! You will now be updated about the game!`))
+            .catch(() => message.reply(`I encountered an issue, show this to a mod or admin to add the game role.`));
+        } else {
+          member.roles.remove(gameId)
+            .then(() => message.reply(`I removed the game updates role for you.`))
+            .catch(() => message.reply(`I encountered an issue, show this to a mod or admin to remove the game role.`));
+        }
+        break;
+      case 'bbserver':
+        const serverId = '733758719992791051';
+        if (!member.roles.cache.has(serverId)) {
+          member.roles.add(serverId)
+            .then(() => message.reply(`Congrats! You will now be updated about the server!`))
+            .catch(() => message.reply(`I encountered an issue, show this to a mod or admin to add the server role.`));
+        } else {
+          member.roles.remove(serverId)
+            .then(() => message.reply(`I removed the server updates role for you.`))
+            .catch(() => message.reply(`I encountered an issue, show this to a mod or admin to remove the server role.`));
+        }
+        break;
+    }
+
+    return;
+  }
 
   filterWords = async (message: Discord.Message) => {
     let userWarnings = GET_USER_WARN(message.author.id)
