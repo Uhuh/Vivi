@@ -85,7 +85,7 @@ export default class BowBot extends Discord.Client {
     this.on("messageReactionRemove", (reaction, user) => this.handleReaction(reaction, user, 'remove'));
     this.on("messageDelete", message => {
       try {
-        if (message.author?.bot) return;
+        if (message.author?.bot || message.channel?.type === 'dm') return;
         MessageDelete(this, message);
       } catch {
         console.error(`Error on message delete!`);
@@ -93,7 +93,7 @@ export default class BowBot extends Discord.Client {
     });
     this.on("messageUpdate", (oldMsg, newMsg) => {
       try {
-        if (oldMsg.author?.bot) return;
+        if (oldMsg.author?.bot || message.channel?.type === 'dm') return;
         MessageEdit(this, oldMsg, newMsg);
         if(
           newMsg.channel?.type !== 'dm' && 
