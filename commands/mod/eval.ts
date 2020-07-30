@@ -1,11 +1,13 @@
-import * as Discord from "discord.js";
+import * as Discord from "discord.js"
+import BowBot from "../../src/bot"
 
 export default {
   desc: '',
   name: 'eval',
   args: '',
   type: 'owner',
-  run: async (message: Discord.Message, args: string[]) => {
+  //@ts-ignore
+  run: async (message: Discord.Message, args: string[], client: BowBot) => {
     if (message.author.id !== '125492204234997761') return;
 
     const clean = (text: string) => {
