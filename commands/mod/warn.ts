@@ -1,6 +1,7 @@
 import { Message } from "discord.js";
 import BowBot from "../../src/bot";
 import { GET_USER_WARN, SET_WARN } from "../../src/setup_tables";
+import * as moment from 'moment';
 
 const warn = {
 	desc: 'warn a user',
@@ -32,13 +33,19 @@ const warn = {
 
     if(!userWarnings) userWarnings = [];
 
-    let numWarns = userWarnings.length;
+    const WEEK_OLD = moment().subtract(8, 'days').startOf('day');
+    let activeWarns = 0;
 
-    ++numWarns;
+    for (const warn of userWarnings) {
+      if (moment.unix(warn.date).isBefore(WEEK_OLD)) continue;
+      activeWarns++;
+    }
+
+    ++activeWarns;
 
     const reason = args.join(' ').trim() === '' ? 'No reason provided.' : args.join(' ').trim();
     console.log()
-    if (numWarns > 3) {
+    if (activeWarns > 3) {
       message.channel.send(`Banned ${user.displayName} for getting more than 3 strikes.`);
       await user.send(
 `
@@ -56,10 +63,10 @@ Thank you for your understanding,
 `
         ).catch(() => console.error('Issue sending ban appeal message to user. Oh well?'));
       user.ban().catch(() => message.channel.send(`Issues banning user.`));
-      SET_WARN(user.id, reason, message.author.id);
-      client.logIssue('AutoMod: Ban', `Strike! You're out! **Reason:** ${reason}`, client.user!, user.user)
+      SET_WARN(user.id, reason, message.author.id, WEEK_OLD.unix());
+      client.logIssue('AutoMod: Ban', `Strike! You're out! **Reason:** ${reason}`, message.author, user.user)
     } else {
-      message.channel.send(`<@${user.id}> You've been warned for \`${reason}\`. You have ${numWarns} strike${numWarns > 1 ? 's' : ''} now.`);
+      message.channel.send(`<@${user.id}> You've been warned for \`${reason}\`. You have ${activeWarns} strike${activeWarns > 1 ? 's' : ''} now.`);
       SET_WARN(user.id, reason, message.author.id);
       client.logIssue('Warn', reason, message.author, user.user);
       user.send(`You have been warned!\n**Reason:** ${reason}`)

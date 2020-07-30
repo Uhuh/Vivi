@@ -3,16 +3,15 @@ import { GET_USER_WARN } from "../../src/setup_tables";
 import * as moment from 'moment';
 
 const warnings = {
-	desc: 'List a users warnings',
+	desc: 'List a users warnings, get their active warnings by using the active tag after the id',
 	name: 'warnings',
-	args: '<user id>',
+	args: '<user id> [active]',
 	type: 'admin',
 	run: (message: Message, args: string[]) => {
     if (!args.length) {
       return message.reply(`please supply a user id.`);
     }
     
-
     /**
      * If they mention the user then use that otherwise they should've sent the user id
      * args.shift() returns the first element and pops it out of the array.
@@ -29,14 +28,15 @@ const warnings = {
 
     const userWarnings = GET_USER_WARN(userId);
     const embed = new MessageEmbed();
-
-    console.log(userWarnings);
+    const active = args.shift() || 'not';
+    const WEEK_OLD = moment().subtract(7, 'days').startOf('day');
 
     embed
-      .setTitle(`**Warnings - User : ${userId}**`)
+      .setTitle(`**${active.includes('active')?'Active':'All'} Warnings - User : ${userId}**`)
       .setDescription(`**Total:** \`${userWarnings.length}\`**IDs**: ${userWarnings.map(w => w.id).join(', ')}`);
 
     for (const warn of userWarnings) {
+      if(active.includes('active') && moment.unix(warn.date).isBefore(WEEK_OLD)) continue;
       const user = message.guild?.members.cache.get(warn.reporter);
       embed.addField(`#${warn.id}: \`${
         moment.unix(warn.date).format('MMMM Do YYYY, h:mm:ss a')
