@@ -62,8 +62,8 @@ export default class BowBot extends Discord.Client {
     this.bannedStrings = [];
     commandHandler(this);
     this.once('ready', () => {
-      console.log(`[Started]: ${new Date()}\n`);
-      console.log('Bow-Bot is ready!');
+      console.info(`[Started]: ${new Date()}\n`);
+      console.info('Bow-Bot is ready!');
       setInterval(() => this.randomPres(), 10000);
     })
 
@@ -172,7 +172,7 @@ export default class BowBot extends Discord.Client {
   };
 
   serverRoles = async (message: Discord.Message) => {
-    const words = message.content.split(' ').join('');
+    const words = message.content.split(' ').join('').toLowerCase();
     const guild = this.guilds.cache.get(this.config.GUILD);
     if(!guild) return;
     let member = await guild.members.cache.get(message.author.id);
@@ -188,7 +188,10 @@ export default class BowBot extends Discord.Client {
     const now = moment();
     const userJoinTime = moment(member.joinedTimestamp);
 
-    if (now.diff(userJoinTime, 'minutes') < 10) return;
+    if (now.diff(userJoinTime, 'minutes') < 10) {
+      return message.reply(`You still have ${10-now.diff(userJoinTime, 'minutes')} minutes to go before you can claim any roles!`)
+        .catch(() => console.error('Issues DMing user verification wait time.'));
+    }
 
     switch(words) {
       case 'bbverify':
