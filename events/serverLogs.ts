@@ -14,7 +14,7 @@ export const UserJoin = (member: Discord.GuildMember | Discord.PartialGuildMembe
       .catch(() => console.error(`Couldn't mute the user on join.`));
   } else if(member instanceof Discord.GuildMember) {
     member.send(
-      `Welcome to the LoveLetter community! Please wait 10 minutes for me to get ready then I can help you out! In the meantime please read our rules and FAQ until I'm ready.`
+      `Welcome to the Love Letter community!\nPlease wait 10 minutes until I can help you get verified. In the meantime make sure to read the <#732961554005229639> and look at the <#729135006018175077>.`
     ).catch(() => console.error(`Couldn't DM user welcome message.`));
   }
 }
