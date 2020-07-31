@@ -7,9 +7,10 @@ const removeWarn = {
 	args: '<warn id>',
 	type: 'admin',
 	run: (message: Message, args: string[]) => {
+    if (!message.member?.hasPermission("MANAGE_MESSAGES")) { return message.react('❌') }
     if (!args.length) {
       return message.reply(`please supply a warn id. They're shown in the \`warnings\` command`);
-    } else if (Number.isNaN(args[0])) {
+    } else if (Number.isNaN(Number(args[0]))) {
       return message.reply(`invalid warn id, make sure it's a number shown in the warnings command.`)
     }
     
