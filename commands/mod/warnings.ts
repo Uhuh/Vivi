@@ -8,6 +8,7 @@ const warnings = {
 	args: '<user id> [active]',
 	type: 'admin',
 	run: (message: Message, args: string[]) => {
+    if (!message.member?.hasPermission("MANAGE_MESSAGES")) { return message.react('❌') }
     if (!args.length) {
       return message.reply(`please supply a user id.`);
     }
