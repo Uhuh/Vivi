@@ -238,7 +238,15 @@ export default class BowBot extends Discord.Client {
 
     if(!userWarnings) userWarnings = [];
 
-    let numWarns = userWarnings.length;
+    const WEEK_OLD = moment().subtract(8, 'days').startOf('day');
+    let activeWarns = 0;
+
+    for (const warn of userWarnings) {
+      if (moment.unix(warn.date).isBefore(WEEK_OLD)) continue;
+      activeWarns++;
+    }
+
+    ++activeWarns;
 
     /**
      * Loop through all the users words, check if they're in the banned list
@@ -248,8 +256,8 @@ export default class BowBot extends Discord.Client {
       const match = reg.exec(content);
       if(match) {
         const [, id] = match;
-        numWarns++;
-        if (numWarns > 3) {
+        activeWarns++;
+        if (activeWarns > 3) {
           message.channel.send(`Banned ${message.author.username} for getting more than 3 strikes.`);
           message.delete().catch(() => console.error(`Issues deleting the message!`));
           SET_WARN(message.author.id, `Saying a banned word. ${id}`, this.user?.id || '731987022008418334');
@@ -272,7 +280,7 @@ Thank you for your understanding,
           this.logIssue('AutoMod: Ban', `Strike! You're out! (Banned word: ||${id}||)`, this.user!, message.author);
           return;
         } else {
-          message.reply(`warning. You gained a strike. You have ${numWarns}/3 strikes.`);
+          message.reply(`warning. You gained a strike. You have ${activeWarns}/3 strikes.`);
           SET_WARN(message.author.id, `Saying a banned word. ${id}`, this.user?.id || '731987022008418334');
           this.logIssue('AutoMod: Warn', `Warned for saying a banned word. ||${id}||`, this.user!, message.author);
           message.author.send(`You have been warned!\n**Reason:** Warned for saying a banned word. ${id}`)
