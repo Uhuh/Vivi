@@ -12,6 +12,10 @@ export const UserJoin = (member: Discord.GuildMember | Discord.PartialGuildMembe
   if (user) {
     member.roles?.add(muteId)
       .catch(() => console.error(`Couldn't mute the user on join.`));
+  } else if(member instanceof Discord.GuildMember) {
+    member.send(
+      `Welcome to the LoveLetter community! Please wait 10 minutes for me to get ready then I can help you out! In the meantime please read our rules and FAQ until I'm ready.`
+    ).catch(() => console.error(`Couldn't DM user welcome message.`));
   }
 }
 
