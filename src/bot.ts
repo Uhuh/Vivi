@@ -246,8 +246,6 @@ export default class BowBot extends Discord.Client {
       activeWarns++;
     }
 
-    ++activeWarns;
-
     /**
      * Loop through all the users words, check if they're in the banned list
      */
