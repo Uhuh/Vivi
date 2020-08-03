@@ -311,7 +311,8 @@ Thank you for your understanding,
       let member = await guild?.members.cache.get(mute.user_id);
       if (!member) {
         console.log(`Failed to get member from cache for MUTE. Going to fetch and retry....`);
-        await guild?.members.fetch(mute.user_id);
+        await guild?.members.fetch(mute.user_id)
+          .catch(() => console.error(`Error fetching user. Most likely not in the server.`))
         member = guild?.members.cache.get(mute.user_id);
       }
 
