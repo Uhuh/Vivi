@@ -307,18 +307,21 @@ Thank you for your understanding,
     const now = moment().unix();
     const guild = this.guilds.cache.get(this.config.GUILD);
     for(const mute of mutes) {
-      const member = await guild?.members.fetch(mute.user_id);
-      if(member) {
-        this.mutes.set(
-          mute.user_id,
-          setTimeout(() => {
-            REMOVE_MUTE(mute.user_id);
-            this.logIssue('AutoMod: Unmute', `Time's up`, this.user!, member.user);
+      const member = await guild?.members.fetch(mute.user_id)
+        .catch(() => console.error(`Unable to get user for mute. Most likely not in the server.`));
+
+      this.mutes.set(
+        mute.user_id,
+        setTimeout(() => {
+          REMOVE_MUTE(mute.user_id);
+          this.logIssue('AutoMod: Unmute', `Time's up`, this.user!, member ? member.user : mute.user_id);
+
+          if (member) {
             member.roles.remove(muteId)
               .catch(() => console.error(`Unable to remove mute role from member. Maybe they left?`));
-          }, (Number(mute.unmute_date)-now)*1000)
-        );
-      }
+          }
+        }, (Number(mute.unmute_date)-now)*1000)
+      );
     }
   }
 
