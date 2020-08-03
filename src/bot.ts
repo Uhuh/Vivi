@@ -307,8 +307,13 @@ Thank you for your understanding,
     const now = moment().unix();
     const guild = this.guilds.cache.get(this.config.GUILD);
     for(const mute of mutes) {
-      const member = await guild?.members.fetch(mute.user_id)
-        .catch(() => console.error(`Unable to get user for mute. Most likely not in the server.`));
+      
+      let member = await guild?.members.cache.get(mute.user_id);
+      if (!member) {
+        console.log(`Failed to get member from cache for MUTE. Going to fetch and retry....`);
+        await guild?.members.fetch(mute.user_id);
+        member = guild?.members.cache.get(mute.user_id);
+      }
 
       this.mutes.set(
         mute.user_id,
