@@ -1,12 +1,12 @@
 import { Message, MessageEmbed } from "discord.js";
-import BowBot from "../../src/bot";
+import SetsuBot from "../../src/bot";
 
 export default {
   desc: 'Information about user.',
   name: 'userinfo',
   args: '',
   type: 'general',
-  run: async function (message: Message, args: string[], client: BowBot) {
+  run: async function (message: Message, args: string[], client: SetsuBot) {
     const { user } = client;
 
     if (!user || !message.mentions || !message.mentions.members) return;

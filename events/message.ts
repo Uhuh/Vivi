@@ -1,7 +1,7 @@
 import { Message } from 'discord.js';
-import BowBot from '../src/bot';
+import SetsuBot from '../src/bot';
 
-const msg = (client: BowBot, message: Message) => {
+const msg = (client: SetsuBot, message: Message) => {
   // Ignore bots
   if (message.author.bot) return;
 

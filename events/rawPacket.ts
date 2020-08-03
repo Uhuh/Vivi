@@ -1,7 +1,7 @@
 import { TextChannel } from 'discord.js'
-import BowBot from '../src/bot';
+import SetsuBot from '../src/bot';
 
-const handle_packet = async (packet: any, client: BowBot) => {
+const handle_packet = async (packet: any, client: SetsuBot) => {
   if (!packet.t || 
       (packet.t !== 'MESSAGE_REACTION_ADD' && 
       packet.t !== 'MESSAGE_REACTION_REMOVE')

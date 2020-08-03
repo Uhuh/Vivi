@@ -1,12 +1,12 @@
 import { Message, MessageEmbed } from "discord.js";
-import BowBot from "../../src/bot";
+import SetsuBot from "../../src/bot";
 
 const help = {
   desc: 'Sends a list of all available commands.',
   name: 'help',
   args: '',
   type: '',
-  run: async function (message: Message, args: string[], client: BowBot) {
+  run: async function (message: Message, args: string[], client: SetsuBot) {
     const embed = new MessageEmbed();
 
     const {user} = client;

@@ -1,7 +1,7 @@
-import BowBot from "../src/bot";
+import SetsuBot from "../src/bot";
 import * as fs from 'fs';
 
-const commandHandler = (client: BowBot) => {
+const commandHandler = (client: SetsuBot) => {
   const helpCommands: string[] = [];
   const modCommands: string[] = [];
   fs.readdirSync("commands/general/").forEach(file =>

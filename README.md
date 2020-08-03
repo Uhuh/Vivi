@@ -1,5 +1,5 @@
 # Welcome
-Welcome to the BowBot team. This README is for the TypeScript version of the bot.  
+Welcome to the SetsuBot team. This README is for the TypeScript version of the bot.  
 If you see this and are *_not_* using TypeScript you're in the wrong spot.
 
 This guide was written by [Dylan Warren (Panku#0721)](https://github.com/uhuh).

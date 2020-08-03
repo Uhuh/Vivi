@@ -1,5 +1,5 @@
 import { Message, TextChannel } from "discord.js";
-import BowBot from "../../src/bot";
+import SetsuBot from "../../src/bot";
 import { SET_REACT } from "../../src/setup_tables";
 
 const reactmsg = {
@@ -7,7 +7,7 @@ const reactmsg = {
   name: 'reactmsg',
   args: '<Message ID> <Role ID> <Emoji> <Channel ID>',
   type: 'admin',
-  run: async (message: Message, args: string[], client: BowBot) => {
+  run: async (message: Message, args: string[], client: SetsuBot) => {
     if (!message.guild || !message.member?.hasPermission(["MANAGE_GUILD"])) return;
     //msgID, RoleID, Emoji, channel id
     if (args.length < 4) return;

@@ -1,5 +1,5 @@
 import * as Discord from "discord.js"
-import BowBot from "../../src/bot"
+import SetsuBot from "../../src/bot"
 
 export default {
   desc: '',
@@ -7,7 +7,7 @@ export default {
   args: '',
   type: 'owner',
   //@ts-ignore
-  run: async (message: Discord.Message, args: string[], client: BowBot) => {
+  run: async (message: Discord.Message, args: string[], client: SetsuBot) => {
     if (message.author.id !== '125492204234997761') return;
 
     const clean = (text: string) => {

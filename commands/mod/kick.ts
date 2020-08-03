@@ -1,12 +1,12 @@
 import { Message, MessageEmbed } from "discord.js";
-import BowBot from "../../src/bot";
+import SetsuBot from "../../src/bot";
 
 const kick = {
 	desc: 'Kick a user',
 	name: 'kick',
 	args: '<user id> <reason>',
 	type: 'admin',
-	run: (message: Message, args: string[], client: BowBot) => {
+	run: (message: Message, args: string[], client: SetsuBot) => {
     if (!message.member?.hasPermission('KICK_MEMBERS')) { return message.react('❌') }
     if (!args.length) {
       return message.reply(`you forgot some arguements. \`${client.config.PREFIX}kick <user id> <reason>\``)

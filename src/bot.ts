@@ -5,28 +5,8 @@ import msg from '../events/message';
 import * as config from './vars'
 import commandHandler from '../commands/commandHandler';
 import { GET_REACTS, GET_WORDS, GET_USER_WARN, SET_WARN, GET_MUTES, REMOVE_MUTE } from './setup_tables';
-import { handle_packet } from '../events/rawPacket';
 import { MessageDelete, MessageEdit, UserJoin } from '../events/serverLogs';
 import * as moment from 'moment';
-
-//TODO
-/*
-    * Mod Mail
-    * Wholesomeness
-    * Bonk Horny People
-    * React to "senpai"
-    * Easy Reaction Role Setup
-    * Kicking/Banning + Track User
-    * Custom Anon Embeds
-    * Logging / Basic Auto Mod
-    * 
-    * Fun User Features:
-    *   Economy
-    *   Level System
-    * 
-    * INTEGRATE REP SYSTEM WITH STUDENT ROLES
-    * Make rep system usable only by moderators
-*/
 
 interface Command {
   desc: string,
@@ -41,7 +21,7 @@ interface ReactRole {
   emoji: string;
 };
 
-export default class BowBot extends Discord.Client {
+export default class SetsuBot extends Discord.Client {
   config: any;
   commands: Discord.Collection<string, Command>;
   reactMessages: string[];
@@ -63,12 +43,11 @@ export default class BowBot extends Discord.Client {
     commandHandler(this);
     this.once('ready', () => {
       console.info(`[Started]: ${new Date()}\n`);
-      console.info('Bow-Bot is ready!');
+      console.info('Setsu reporting for duty!');
       setInterval(() => this.randomPres(), 10000);
     })
 
     //CMD Handling
-    this.on("raw", packet => handle_packet(packet, this));
     this.on('message', message => {
       if (message.author?.bot) return;
       msg(this, message as Discord.Message);

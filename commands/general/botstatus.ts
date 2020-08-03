@@ -1,13 +1,13 @@
 import { Message, MessageEmbed } from "discord.js";
 import * as OS from "os";
-import BowBot from "../../src/bot";
+import SetsuBot from "../../src/bot";
 
 export default {
   desc: 'Gives a list of things about the bot',
   name: 'botstatus',
   args: '',
   type: 'general',
-  run: async function (message: Message, _args: string[], client: BowBot) {
+  run: async function (message: Message, _args: string[], client: SetsuBot) {
 
     const {user} = client;
 

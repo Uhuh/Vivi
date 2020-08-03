@@ -1,12 +1,12 @@
 import { Message, MessageEmbed } from "discord.js";
-import BowBot from "../../src/bot";
+import SetsuBot from "../../src/bot";
 
 const ban = {
 	desc: 'Ban a user',
 	name: 'ban',
 	args: '<user id> <reason>',
 	type: 'admin',
-	run: async (message: Message, args: string[], client: BowBot) => {
+	run: async (message: Message, args: string[], client: SetsuBot) => {
     if (!message.member?.hasPermission('BAN_MEMBERS')) { return message.react('👎') }
     if (!args.length) {
       return message.reply(`you forgot some arguements.`)

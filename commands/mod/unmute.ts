@@ -1,5 +1,5 @@
 import { Message, MessageEmbed } from "discord.js";
-import BowBot from "../../src/bot";
+import SetsuBot from "../../src/bot";
 import { REMOVE_MUTE } from "../../src/setup_tables";
 
 const unmute = {
@@ -7,7 +7,7 @@ const unmute = {
 	name: 'unmute',
 	args: '<user id or mention> <reason>',
 	type: 'admin',
-	run: (message: Message, args: string[], client: BowBot) => {
+	run: (message: Message, args: string[], client: SetsuBot) => {
     if (!message.member?.hasPermission('BAN_MEMBERS')) { return message.react('👎') }
     if (!args.length) {
       return message.reply(`you forgot some arguements. \`${client.config.PREFIX}unmute <user id> <reason>\``)

@@ -1,5 +1,5 @@
 import { Message, MessageEmbed } from "discord.js";
-import BowBot from "../../src/bot";
+import SetsuBot from "../../src/bot";
 import * as moment from 'moment';
 import { MUTE_USER, REMOVE_MUTE } from "../../src/setup_tables";
 
@@ -8,7 +8,7 @@ const mute = {
 	name: 'mute',
 	args: '<user id or mention> <reason> | [number {m,h,d,w,y}]',
 	type: 'admin',
-	run: (message: Message, args: string[], client: BowBot) => {
+	run: (message: Message, args: string[], client: SetsuBot) => {
     if (!message.member?.hasPermission('BAN_MEMBERS')) { return message.react('👎') }
     if (!args.length) {
       return message.reply(`you forgot some arguements. Example usage: \`${client.config.PREFIX}mute <user id> Annoying! | 5m\``)
