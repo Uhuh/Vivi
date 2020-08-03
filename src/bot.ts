@@ -172,44 +172,45 @@ export default class SetsuBot extends Discord.Client {
         .catch(() => console.error('Issues DMing user verification wait time.'));
     }
 
-    switch(words) {
-      case 'bbverify':
-        const studentId = '729709012253278268';
-        if (member.roles.cache.has(studentId)) {
-          return;
-        }
+    /**
+     * Because people are stupid and can't read just give them roles if the start 
+     * of their message has any of these. Sigh.
+     */
 
-        member.roles.add(studentId)
-          .then(() => message.reply(`Congrats! You now have access to the server`))
-          .catch(() => message.reply(`You should already have access! If this isn't true show this to a mod or admin.`));
-        break;
-      case 'bbgame':
-        const gameId = '733758723406692393';
-        if (!member.roles.cache.has(gameId)) {
-          member.roles.add(gameId)
-            .then(() => message.reply(`Congrats! You will now be updated about the game!`))
-            .catch(() => message.reply(`I encountered an issue, show this to a mod or admin to add the game role.`));
-        } else {
-          member.roles.remove(gameId)
-            .then(() => message.reply(`I removed the game updates role for you.`))
-            .catch(() => message.reply(`I encountered an issue, show this to a mod or admin to remove the game role.`));
-        }
-        break;
-      case 'bbserver':
-        const serverId = '733758719992791051';
-        if (!member.roles.cache.has(serverId)) {
-          member.roles.add(serverId)
-            .then(() => message.reply(`Congrats! You will now be updated about the server!`))
-            .catch(() => message.reply(`I encountered an issue, show this to a mod or admin to add the server role.`));
-        } else {
-          member.roles.remove(serverId)
-            .then(() => message.reply(`I removed the server updates role for you.`))
-            .catch(() => message.reply(`I encountered an issue, show this to a mod or admin to remove the server role.`));
-        }
-        break;
+    if (words.startsWith('bbverify')) {
+      // Verify user into the server
+      const studentId = '729709012253278268';
+      if (member.roles.cache.has(studentId)) {
+        return;
+      }
+      member.roles.add(studentId)
+        .then(() => message.reply(`Congrats! You now have access to the server`))
+        .catch(() => message.reply(`You should already have access! If this isn't true show this to a mod or admin.`));
+    } else if (words.startsWith('bbgame')) {
+      // Give game updates role
+      const gameId = '733758723406692393';
+      if (!member.roles.cache.has(gameId)) {
+        member.roles.add(gameId)
+          .then(() => message.reply(`Congrats! You will now be updated about the game!`))
+          .catch(() => message.reply(`I encountered an issue, show this to a mod or admin to add the game role.`));
+      } else {
+        member.roles.remove(gameId)
+          .then(() => message.reply(`I removed the game updates role for you.`))
+          .catch(() => message.reply(`I encountered an issue, show this to a mod or admin to remove the game role.`));
+      }
+    } else if (words.startsWith('bbserver')) {
+      // Give server updates role
+      const serverId = '733758719992791051';
+      if (!member.roles.cache.has(serverId)) {
+        member.roles.add(serverId)
+          .then(() => message.reply(`Congrats! You will now be updated about the server!`))
+          .catch(() => message.reply(`I encountered an issue, show this to a mod or admin to add the server role.`));
+      } else {
+        member.roles.remove(serverId)
+          .then(() => message.reply(`I removed the server updates role for you.`))
+          .catch(() => message.reply(`I encountered an issue, show this to a mod or admin to remove the server role.`));
+      }
     }
-
-    return;
   }
 
   filterWords = async (message: Discord.Message) => {
