@@ -22,6 +22,10 @@ const ban = {
     // Ensure the user is in the guild
     const user = message.guild?.members.cache.get(userId || '');
 
+    if (user?.hasPermission('BAN_MEMBERS')) {
+      return message.reply(`you can't ban them lol.`);
+    }
+
     const reason = args.join(' ').trim() === '' ? 'No reason provided.' : args.join(' ').trim();
 
     const embed = new MessageEmbed();
