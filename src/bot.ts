@@ -242,10 +242,7 @@ export default class SetsuBot extends Discord.Client {
           await message.member?.send(
 `
 Your account has been terminated from our server automatically by me!
-If you would like to appeal your account's termination, you may do so at \`loveletterappeal@gmail.com\` with the following format:
-Subject: "Ban appeal [User ID]"
-Content: [Inquiry, apology or complaint]
-Your message may contain attachments for evidence.
+If you would like to appeal your account's termination, you may do so at \`https://forms.gle/vUNc5jDAGRopchFf6\`.
 
 = = = Warn list = = =
 ${userWarnings.map(w => `  - ID: ${w.id} | Reason: ${w.reason}\n`).join('')}
