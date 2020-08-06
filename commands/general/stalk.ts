@@ -9,12 +9,12 @@ const stalk = {
     const user = message.mentions.members?.first();
     
     if (!user) {
-      return message.reply(`you can't stalk nothing.. :SetsuConfused:`);
+      return message.reply(`you can't stalk nothing.. <:SetsuConfused:739980857615319151>`);
     } else if (user === message.member) {
-      return message.reply(`you can't stalk yourself. :SetsuCry:`);
+      return message.reply(`you can't stalk yourself. <:SetsuCry:740056013369245756>`);
     }
 
-    return message.reply(`you stalked <@${user.id}> :SetsuKnife:`);
+    return message.reply(`you stalked <@${user.id}> <:SetsuKnife:739600586995138604>`);
 	}
 }
 
