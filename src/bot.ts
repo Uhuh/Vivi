@@ -183,6 +183,11 @@ export default class SetsuBot extends Discord.Client {
       if (member.roles.cache.has(studentId)) {
         return;
       }
+      const verifyHours = 48
+      if (Date.now() - member.user.createdAt < verifyHours*60*60*1000) {
+        message.reply(`I'm sorry, your Discord account must be over ` + verifyHours.toString() + ` hours old to be able to use the server.`);
+        return;
+      }
       member.roles.add(studentId)
         .then(() => message.reply(`Congrats! You now have access to the server`))
         .catch(() => message.reply(`You should already have access! If this isn't true show this to a mod or admin.`));
