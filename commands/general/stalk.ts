@@ -9,7 +9,7 @@ const stalk = {
     const user = message.mentions.members?.first();
     
     if (!user) {
-      return message.reply(`you can't stalk nothing.. <:SetsuConfused:739980857615319151>`);
+      return message.reply(`you sneak around the chat looking for senpai. <:SetsuGaze:739980857468649605>`);
     } else if (user === message.member) {
       return message.reply(`you can't stalk yourself. <:SetsuCry:740056013369245756>`);
     }
