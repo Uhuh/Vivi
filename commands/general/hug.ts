@@ -22,7 +22,7 @@ const hug = {
       return message.reply(`the only person I'll hug is senpai <:SetsuAww:739638857263349882>`);
     }
     const emote = hugEmotes[Math.floor(Math.random() * hugEmotes.length)];
-    return message.reply(`you hugged <@${user.id}> <@${emote}>`);
+    return message.reply(`you hugged <@${user.id}> ${emote}`);
 	}
 }
 
