@@ -51,6 +51,10 @@ export default class SetsuBot extends Discord.Client {
     this.on('message', message => {
       if (message.author?.bot) return;
       msg(this, message as Discord.Message);
+      // Verify user message into the server.
+      if(message.channel?.id === config.VERIFY_CH) {
+        this.verifyChannel(message as Discord.Message);
+      }
       if(
         message.channel?.type !== 'dm' &&
         !message.member?.hasPermission('MANAGE_MESSAGES')
@@ -150,9 +154,37 @@ export default class SetsuBot extends Discord.Client {
       .catch(console.error);
   };
 
+  verifyChannel = async (message: Discord.Message) => {
+    const words = message.content.split(' ').join('').toLowerCase();
+
+    message.delete()
+      .catch(() => console.error(`Issue deleting verification message`));
+
+    // If the user didn't send the verify message, ignore.
+    if (!words.startsWith('bbverify')) return;
+    
+    const { guild } = message;
+
+    if(!guild) return;
+    
+    let member = guild.members.cache.get(message.author.id);
+    
+    if (!member) {
+      console.log(`Failed to get member from cache for verification. Going to fetch and retry....`);
+      await guild.members.fetch(message.author.id);
+      member = guild.members.cache.get(message.author.id);
+    }
+
+    if (!member) return console.error(`Issue getting member for verification.`);
+
+    // Verify user into the server
+    return member.roles.add(config.STUDENT_ROLE)
+      .catch(() => console.error(`Issues verifying member.`));
+  }
+
   serverRoles = async (message: Discord.Message) => {
     const words = message.content.split(' ').join('').toLowerCase();
-    const guild = this.guilds.cache.get(this.config.GUILD);
+    const guild = this.guilds.cache.get(config.GUILD);
     if(!guild) return;
     let member = await guild.members.cache.get(message.author.id);
     if (!member) {
@@ -164,12 +196,11 @@ export default class SetsuBot extends Discord.Client {
     if (!member) 
       return message.reply(`Sorry! I had issues getting you from the LoveLetter server. Please alert a mod of admin of this.`);
 
-    const now = moment();
-    const userJoinTime = moment(member.joinedTimestamp);
-
-    if (now.diff(userJoinTime, 'minutes') < 10) {
-      return message.reply(`You still have ${10-now.diff(userJoinTime, 'minutes')} minutes to go before you can claim any roles!`)
-        .catch(() => console.error('Issues DMing user verification wait time.'));
+    if (
+      (words.startsWith('bbgame') || words.startsWith('bbserver')) &&
+      !member.roles.cache.has(config.STUDENT_ROLE)
+    ) {
+      return message.reply(`You need to verify on the server first before getting other roles. Check out <#741102101618229319>`);
     }
 
     /**
@@ -177,45 +208,31 @@ export default class SetsuBot extends Discord.Client {
      * of their message has any of these. Sigh.
      */
 
-    if (words.startsWith('bbverify')) {
-      // Verify user into the server
-      const studentId = '729709012253278268';
-      if (member.roles.cache.has(studentId)) {
-        return;
-      }
-      const verifyHours = 48
-      if (Date.now() - member.user.createdAt < verifyHours*60*60*1000) {
-        message.reply(`I'm sorry, your Discord account must be over ` + verifyHours.toString() + ` hours old to be able to use the server.`);
-        return;
-      }
-      member.roles.add(studentId)
-        .then(() => message.reply(`Congrats! You now have access to the server`))
-        .catch(() => message.reply(`You should already have access! If this isn't true show this to a mod or admin.`));
-    } else if (words.startsWith('bbgame')) {
+    if (words.startsWith('bbgame')) {
       // Give game updates role
-      const gameId = '733758723406692393';
-      if (!member.roles.cache.has(gameId)) {
-        member.roles.add(gameId)
+      if (!member.roles.cache.has(config.GAME_ROLE)) {
+        member.roles.add(config.GAME_ROLE)
           .then(() => message.reply(`Congrats! You will now be updated about the game!`))
           .catch(() => message.reply(`I encountered an issue, show this to a mod or admin to add the game role.`));
       } else {
-        member.roles.remove(gameId)
+        member.roles.remove(config.GAME_ROLE)
           .then(() => message.reply(`I removed the game updates role for you.`))
           .catch(() => message.reply(`I encountered an issue, show this to a mod or admin to remove the game role.`));
       }
     } else if (words.startsWith('bbserver')) {
       // Give server updates role
-      const serverId = '733758719992791051';
-      if (!member.roles.cache.has(serverId)) {
-        member.roles.add(serverId)
+      if (!member.roles.cache.has(config.SERVER_ROLE)) {
+        member.roles.add(config.SERVER_ROLE)
           .then(() => message.reply(`Congrats! You will now be updated about the server!`))
           .catch(() => message.reply(`I encountered an issue, show this to a mod or admin to add the server role.`));
       } else {
-        member.roles.remove(serverId)
+        member.roles.remove(config.SERVER_ROLE)
           .then(() => message.reply(`I removed the server updates role for you.`))
           .catch(() => message.reply(`I encountered an issue, show this to a mod or admin to remove the server role.`));
       }
     }
+
+    return;
   }
 
   filterWords = async (message: Discord.Message) => {
@@ -318,6 +335,8 @@ Thank you for your understanding,
           .catch(() => console.error(`Error fetching user. Most likely not in the server.`))
         member = guild?.members.cache.get(mute.user_id);
       }
+
+      if (!member) continue;
 
       this.mutes.set(
         mute.user_id,
