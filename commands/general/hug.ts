@@ -1,10 +1,12 @@
 import { Message } from "discord.js";
 
-const hugEmotes = [ "<a:SetsuSparkleRou:741026907960901697>","<a:SetsuSparkle:741026998117335181>", "<:BowkunLove:735140120067571802>",
-                    "<:SetsuEpic:739605281943584859>", "<:SetsuAww:739638857263349882>", "<:SetsUwU:740031361427177482>",
-                    "<:SetsuWow:739980858382876712>", "<a:SetsuBounceRou:740807323261337640>", "<a:SetsuBounce:740807275748262018>",
-                    "<:SetsuComfy:740299379641942128>", "<:SetsuComfyRou:740233879507435701>", "<:SetsuFlushed:740354191423307919>",
-                    "<:SetsuEyes:740260660134543381>", "<:SetsuGaze:739980857468649605>" ];
+const hugEmotes = [ 
+  "<a:SetsuSparkleRou:741026907960901697>","<a:SetsuSparkle:741026998117335181>", "<:BowkunLove:735140120067571802>",
+  "<:SetsuEpic:739605281943584859>", "<:SetsuAww:739638857263349882>", "<:SetsUwU:740031361427177482>",
+  "<:SetsuWow:739980858382876712>", "<a:SetsuBounceRou:740807323261337640>", "<a:SetsuBounce:740807275748262018>",
+  "<:SetsuComfy:740299379641942128>", "<:SetsuComfyRou:740233879507435701>", "<:SetsuFlushed:740354191423307919>",
+  "<:SetsuEyes:740260660134543381>", "<:SetsuGaze:739980857468649605>" 
+];
 
 const hug = {
 	desc: "Hug a user.",
