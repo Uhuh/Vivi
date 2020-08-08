@@ -1,15 +1,29 @@
 {
   "name": "bow-bot",
   "version": "1.0.0",
-  "description": "",
+  "description": "Bow Bot is designed for the game Discord server LoveSick",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc",
+    "prestart": "yarn build",
+    "start": "node build/src/index.js",
+    "tslint": "tslint --project ./tsconfig.json --fix"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "discord.js": "^12.2.0"
+    "@types/better-sqlite3": "^5.4.0",
+    "@types/moment": "^2.13.0",
+    "@types/node": "^14.0.23",
+    "@types/ws": "^7.2.6",
+    "better-sqlite3": "^7.1.0",
+    "discord.js": "12.0.0",
+    "dotenv": "^8.2.0",
+    "fs": "^0.0.1-security",
+    "moment": "^2.27.0",
+    "time-ago": "^0.2.1",
+    "tslint": "^6.1.2",
+    "typescript": "^3.9.7"
   }
 }
