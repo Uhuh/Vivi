@@ -50,7 +50,7 @@ const warn = {
       await user.send(
 `
 Your account has been terminated from our server with reason: "${reason}".
-If you would like to appeal your account's termination, you may do so at \`https://forms.gle/vUNc5jDAGRopchFf6\`.
+If you would like to appeal your account's termination, you may do so at \`https://docs.google.com/forms/d/e/1FAIpQLSfuZinDPm61CkPAoHghBKBkuOobD6V2n0lb_4aXcXIRnpjsIA/viewform?usp=sf_link\`.
 
 = = = Warn list = = =
 ${userWarnings.map(w => `  - ID: ${w.id} | Reason: ${w.reason}\n`).join('')}

@@ -242,7 +242,7 @@ export default class SetsuBot extends Discord.Client {
           await message.member?.send(
 `
 Your account has been terminated from our server automatically by me!
-If you would like to appeal your account's termination, you may do so at \`https://forms.gle/vUNc5jDAGRopchFf6\`.
+If you would like to appeal your account's termination, you may do so at \`https://docs.google.com/forms/d/e/1FAIpQLSfuZinDPm61CkPAoHghBKBkuOobD6V2n0lb_4aXcXIRnpjsIA/viewform\`.
 
 = = = Warn list = = =
 ${userWarnings.map(w => `  - ID: ${w.id} | Reason: ${w.reason}\n`).join('')}
