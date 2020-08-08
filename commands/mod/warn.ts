@@ -60,7 +60,7 @@ Thank you for your understanding,
 `
         ).catch(() => console.error('Issue sending ban appeal message to user. Oh well?'));
       user.ban().catch(() => message.channel.send(`Issues banning user.`));
-      SET_WARN(user.id, reason, message.author.id, WEEK_OLD.unix());
+      SET_WARN(user.id, reason, message.author.id);
       client.logIssue('AutoMod: Ban', `Strike! You're out! **Reason:** ${reason}`, message.author, user.user)
     } else {
       message.channel.send(`<@${user.id}> You've been warned for \`${reason}\`. You have ${activeWarns} strike${activeWarns > 1 ? 's' : ''} now.`);
