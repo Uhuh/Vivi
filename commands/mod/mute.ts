@@ -1,4 +1,4 @@
-import { Message, MessageEmbed } from "discord.js";
+import { Message } from "discord.js";
 import SetsuBot from "../../src/bot";
 import * as moment from 'moment';
 import { MUTE_USER, REMOVE_MUTE } from "../../src/setup_tables";
@@ -57,12 +57,9 @@ const mute = {
 
     message.delete().catch(() => console.error(`Issues deleting mute message`));
 
-    const embed = new MessageEmbed();
     MUTE_USER(userId, now, unmuteTime);
     client.logIssue('Mute', `${reason}\n\nMuted for ${time}`, message.author, user.user);
-    embed.setTitle(`**Muted** ${user.user.tag} (<@${user.id}>)`);
-    message.channel.send(embed);
-
+    message.channel.send(`<@${user.id}> You've been muted for \`${reason}\`. Duration is ${time}.`);
     /**
      * Mute user and set up timer to unmute them when the time is right.
      */
@@ -80,7 +77,6 @@ const mute = {
         );
       })
       .catch(() => message.reply(`I was unable to give that user the mute role!`));
-
     
     return;
 	}
