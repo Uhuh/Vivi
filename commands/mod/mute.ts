@@ -24,6 +24,12 @@ const mute = {
       return message.reply(`missing the user id argument!`);
     }
 
+    const existingMute = client.mutes.get(userId);
+
+    if (existingMute) {
+      return message.reply(`they're already muted. Check <#733863945852551289>`);
+    }
+
     if(message.mentions.members?.first()) args.shift();
 
     // Ensure the user is in the guild
@@ -65,7 +71,9 @@ const mute = {
      */
     const muteId = '733341358693285979';
     user.roles.add(muteId)
-      .then(() => {
+      .then(async () => {
+        await user.send(`You've been muted for \`${reason}\`. Duration is ${time}.`)
+          .catch(() => console.error(`Issue sending mute reason to user. Oh well?`));
         client.mutes.set(
           userId,
           setTimeout(() => {
