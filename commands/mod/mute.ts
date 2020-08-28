@@ -77,6 +77,7 @@ const mute = {
         client.mutes.set(
           userId,
           setTimeout(() => {
+            client.mutes.delete(userId);
             REMOVE_MUTE(user.id);
             client.logIssue('AutoMod: Unmute', `Time's up`, client.user!, user.user);
             user.roles.remove(muteId)

@@ -341,6 +341,7 @@ Thank you for your understanding,
       this.mutes.set(
         mute.user_id,
         setTimeout(() => {
+          this.mutes.delete(mute.user_id);
           REMOVE_MUTE(mute.user_id);
           this.logIssue('AutoMod: Unmute', `Time's up`, this.user!, member ? member.user : mute.user_id);
 
