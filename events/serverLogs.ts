@@ -64,5 +64,5 @@ export const MessageEdit = (client: SetsuBot, oldMsg: DMsg, newMsg: DMsg) => {
 }
 
 function split(input: string, len: number): string[] {
-  return input.match(new RegExp('.{1,' + len + '}(?=(.{' + len + '})+(?!.))|.{1,' + len + '}$', 'g')) || ['Nothing!']
+  return input.match(new RegExp('.{1,' + len + '}(?=(.{' + len + '})+(?!.))|.{1,' + len + '}$', 'g')) || [input]
 }

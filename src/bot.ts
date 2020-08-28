@@ -338,8 +338,6 @@ Thank you for your understanding,
         member = guild?.members.cache.get(mute.user_id);
       }
 
-      console.log('Okay mute time go brr: ', (Number(mute.unmute_date)-now)*1000);
-
       this.mutes.set(
         mute.user_id,
         setTimeout(() => {
