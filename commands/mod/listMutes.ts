@@ -12,10 +12,16 @@ const listMutes = {
     const G_MUTES = GET_MUTES();
     const mutes = G_MUTES.map(m => `\`ID: ${m.user_id} --- Unmute date: ${moment.unix(m.unmute_date)}\`\n`).join('');
 
-		message.channel.send(
-			`Remove by using the appropriate User ID\n${mutes === '' ? 'No current mutes.' : mutes}`
-		);
+    for(const mute of split(mutes, 1990)) {
+      message.channel.send(
+        `Remove by using the appropriate User ID\n${mute === '' ? 'No current mutes.' : mute}`
+      );
+    }
 	}
+}
+
+function split(input: string, len: number): string[] {
+  return input.match(new RegExp('.{1,' + len + '}(?=(.{' + len + '})+(?!.))|.{1,' + len + '}$', 'g')) || ['Nothing!']
 }
 
 export default listMutes;
