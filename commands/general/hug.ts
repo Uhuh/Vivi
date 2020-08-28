@@ -15,6 +15,7 @@ const hug = {
 	type: "general",
 	run: (message: Message) => {
     const user = message.mentions.members?.first();
+    message.delete();
     
     if (!user) {
       return message.reply(`I only accept hugs from senpai <:SetsuAww:739638857263349882>`);

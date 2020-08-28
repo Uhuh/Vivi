@@ -49,12 +49,12 @@ export default class SetsuBot extends Discord.Client {
 
     //CMD Handling
     this.on('message', message => {
+      if(message.channel?.id === config.VERIFY_CH) {
+        return this.verifyChannel(message as Discord.Message);
+      }
       if (message.author?.bot) return;
       msg(this, message as Discord.Message);
       // Verify user message into the server.
-      if(message.channel?.id === config.VERIFY_CH) {
-        this.verifyChannel(message as Discord.Message);
-      }
       if(
         message.channel?.type !== 'dm' &&
         !message.member?.hasPermission('MANAGE_MESSAGES')
@@ -63,6 +63,8 @@ export default class SetsuBot extends Discord.Client {
       } else if (message.channel?.type === 'dm') {
         this.serverRoles(message as Discord.Message);
       }
+
+      return;
     });
     this.on("messageReactionAdd", (reaction, user) => this.handleReaction(reaction, user, 'add'));
     this.on("messageReactionRemove", (reaction, user) => this.handleReaction(reaction, user, 'remove'));
