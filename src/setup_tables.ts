@@ -80,9 +80,6 @@ function checkDataBase() {
 
     db.exec(sqlInit);
   }
-
-  db.exec(`ALTER TABLE mod_cases ADD type TEXT`);
-  db.exec(`ALTER TABLE mod_cases ADD message_id TEXT`);
 }
 
 checkDataBase();
