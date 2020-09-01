@@ -9,7 +9,7 @@ const mute = {
 	args: '<user id or mention> <reason> | [number {m,h,d,w,y}]',
 	type: 'admin',
 	run: (message: Message, args: string[], client: SetsuBot) => {
-    if (!message.member?.hasPermission('BAN_MEMBERS')) { return message.react('👎') }
+    if (!message.member?.hasPermission('MANAGE_MESSAGES')) { return message.react('👎') }
     if (!args.length) {
       return message.reply(`you forgot some arguements. Example usage: \`${client.config.PREFIX}mute <user id> Annoying! | 5m\``)
     }
@@ -20,7 +20,7 @@ const mute = {
      */
     const userId = message.mentions.members?.first()?.id || args.shift();
 
-    if(!userId) {
+    if (!userId) {
       return message.reply(`missing the user id argument!`);
     }
 
@@ -47,7 +47,7 @@ const mute = {
     const now = moment().unix();
     let unmuteTime = moment().add(1, 'h').unix();
     
-    if(time && time !== '') {
+    if (time && time !== '') {
       const timeFormat = time[time.length-1];
       const num = time.slice(0, -1);
 
@@ -73,7 +73,7 @@ const mute = {
     user.roles.add(muteId)
       .then(async () => {
         await user.send(`You've been muted for \`${reason}\`. Duration is ${time}.`)
-          .catch(() => console.error(`Issue sending mute reason to user. Oh well?`));
+          .catch((e) => console.error(`Issue sending mute reason to user. Oh well? ${e}\n`));
         client.mutes.set(
           userId,
           setTimeout(() => {

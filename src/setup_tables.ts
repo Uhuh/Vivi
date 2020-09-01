@@ -20,6 +20,25 @@ function checkDataBase() {
     db.exec(sqlInit);
   }
 
+  const caseCheck = db.prepare(`
+    SELECT count(*) FROM sqlite_master WHERE type='table' AND name='mod_cases';
+  `).get();
+
+  if (!caseCheck['count(*)']) {
+    console.log(`WARNING: Cases table missing; generating`);
+    const sqlInit = `
+      CREATE TABLE mod_cases (
+        id INTEGER PRIMARY KEY,
+        message_id TEXT,
+        user_id TEXT,
+        mod_id TEXT,
+        type TEXT
+      );
+    `;
+
+    db.exec(sqlInit);
+  }
+
   const muteCheck = db.prepare(`
     SELECT count(*) FROM sqlite_master WHERE type='table' AND name='mutes';
   `).get();
@@ -39,41 +58,15 @@ function checkDataBase() {
   }
 
   const dbCheck = db.prepare(`
-    SELECT count(*) FROM sqlite_master WHERE type='table' AND name='react_roles';
+    SELECT count(*) FROM sqlite_master WHERE type='table' AND name='warnings';
   `).get();
 
   if (!dbCheck['count(*)']) {
     console.log(`WARNING: Database appears empty; initializing it.`);
     const sqlInit = `
-      CREATE TABLE react_roles (
-        id INTEGER PRIMARY KEY,
-        message_id TEXT,
-        role_id TEXT,
-        channel_id TEXT,
-        emoji TEXT
-      );
-
-      CREATE TABLE user_rep (
-        id INTEGER PRIMARY KEY,
-        user_id TEXT,
-        reputation INTEGER
-      );
-
-      CREATE TABLE coins (
-        id INTEGER PRIMARY KEY,
-        user_id TEXT,
-        coins INTEGER
-      );
-
       CREATE TABLE banned_words (
         id INTEGER PRIMARY KEY,
         word TEXT
-      );
-
-      CREATE TABLE rules (
-        id INTEGER PRIMARY KEY,
-        rule_position INTEGER,
-        rule TEXT
       );
 
       CREATE TABLE warnings (
@@ -83,25 +76,37 @@ function checkDataBase() {
         reason TEXT,
         date TEXT
       );
-
-      CREATE TABLE mod_cases (
-        id INTEGER PRIMARY KEY,
-        user_id TEXT,
-        mod_id TEXT,
-        reason TEXT,
-        date TEXT
-      );
     `;
 
     db.exec(sqlInit);
   }
+
+  db.exec(`ALTER TABLE mod_cases ADD type TEXT`);
+  db.exec(`ALTER TABLE mod_cases ADD message_id TEXT`);
 }
 
 checkDataBase();
 
+export const NEW_CASE = (
+  mod_id: string, 
+  user_id: string, 
+  message_id: string,
+  type: string
+) => 
+  db.prepare(`INSERT OR REPLACE INTO mod_cases (mod_id, user_id, message_id, type) VALUES (@mod_id, @user_id, @message_id, @type)`)
+  .run({ mod_id, user_id, message_id, type });
+
+export const GET_CASE = (id: string) =>
+  db.prepare(`SELECT * FROM mod_cases WHERE id = @id`)
+  .get({ id });
+
+export const GET_NEW_CASE = () =>
+  db.prepare(`SELECT * FROM mod_cases ORDER BY id DESC LIMIT 1`)
+  .get();
+
 export const MUTE_USER = (user_id: string, date_muted: number, unmute_date: number) =>
   db.prepare(
-    `INSERT OR REPLACE INTO mutes (user_id, date_muted, unmute_date) VALUES (@user_id, @date_muted, @unmute_date)`
+    `INSERT INTO mutes (user_id, date_muted, unmute_date) VALUES (@user_id, @date_muted, @unmute_date)`
   )
   .run({ user_id, date_muted, unmute_date });
 
@@ -165,13 +170,3 @@ export const SET_REP = (rep: {id: number, user_id: string, reputation: number}) 
 export const GET_COINS = (user_id: string) => 
   db.prepare(`SELECT * FROM coins WHERE user_id = @user_id`)
   .get({user_id});
-
-export const GET_REACTS = () => 
-  db.prepare(`SELECT * FROM react_roles`)
-  .all();
-
-export const SET_REACT = (m: string, r: string, e: string, c: string) => 
-  db.prepare(`
-    INSERT OR REPLACE INTO react_roles (message_id, role_id, emoji, channel_id)
-    VALUES (@m, @r, @e, @c)
-  `).run({ m, r, e, c });

@@ -65,7 +65,7 @@ Thank you for your understanding,
     } else {
       message.channel.send(`<@${user.id}> You've been warned for \`${reason}\`. You have ${activeWarns} strike${activeWarns > 1 ? 's' : ''} now.`);
       SET_WARN(user.id, reason, message.author.id);
-      client.logIssue('Warn', reason, message.author, user.user);
+      client.logIssue('Warn', reason === 'No reason provided.' ? '' : reason, message.author, user.user);
       user.send(`You have been warned!\n**Reason:** ${reason}`)
         .catch(() => console.error(`Can't DM user, probably has friends on.`));
       message.delete().catch(() => console.error(`Issues deleting the message!`));

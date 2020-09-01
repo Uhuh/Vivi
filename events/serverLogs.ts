@@ -48,7 +48,7 @@ export const MessageEdit = (client: SetsuBot, oldMsg: DMsg, newMsg: DMsg) => {
     .setAuthor(newMsg.author?.tag, newMsg.author?.avatarURL() || '')
     .setDescription((oldMsg?.content === '' ? 'Setsu: Empty!' : oldMsg.content) || 'Setsu: Empty!')
     .setFooter(`ID: ${newMsg.id}`)
-    .setTimestamp(new Date())
+    .setTimestamp(new Date());
 
   const content = newMsg.content || 'Setsu: Empty!';
 

@@ -4,7 +4,7 @@ dotenv.config();
 import msg from '../events/message';
 import * as config from './vars'
 import commandHandler from '../commands/commandHandler';
-import { GET_REACTS, GET_WORDS, GET_USER_WARN, SET_WARN, GET_MUTES, REMOVE_MUTE } from './setup_tables';
+import { GET_WORDS, GET_USER_WARN, SET_WARN, GET_MUTES, REMOVE_MUTE, NEW_CASE, GET_NEW_CASE } from './setup_tables';
 import { MessageDelete, MessageEdit, UserJoin } from '../events/serverLogs';
 import * as moment from 'moment';
 
@@ -16,11 +16,6 @@ interface Command {
   run: Function
 };
 
-interface ReactRole {
-  role_id: string;
-  emoji: string;
-};
-
 export default class SetsuBot extends Discord.Client {
   config: any;
   commands: Discord.Collection<string, Command>;
@@ -30,13 +25,11 @@ export default class SetsuBot extends Discord.Client {
   mutes: Discord.Collection<string, NodeJS.Timeout>;
   caseCount: number = 0;
   muteRole = '732816563664715846';
-  reactRoles: Discord.Collection<string, ReactRole>;
   constructor() {
     super();
     this.config = config;
     this.mutes = new Discord.Collection();
     this.commands = new Discord.Collection();
-    this.reactRoles = new Discord.Collection();
     this.bannedWords = [];
     this.reactMessages = [];
     this.bannedStrings = [];
@@ -66,8 +59,6 @@ export default class SetsuBot extends Discord.Client {
 
       return;
     });
-    this.on("messageReactionAdd", (reaction, user) => this.handleReaction(reaction, user, 'add'));
-    this.on("messageReactionRemove", (reaction, user) => this.handleReaction(reaction, user, 'remove'));
     this.on("messageDelete", message => {
       try {
         if (message.author?.bot || message.channel?.type === 'dm') return;
@@ -92,47 +83,6 @@ export default class SetsuBot extends Discord.Client {
       }
     });
     this.on("guildMemberAdd", member => UserJoin(member));
-  }
-
-  handleReaction = async (reaction: Discord.MessageReaction, user: Discord.User | Discord.PartialUser, type: string) => {
-    try {
-      if (!reaction) return;
-      const msg = this.reactRoles.get(reaction.message.id);
-      // If DNE ignore
-      if (!msg) return;
-
-      const { message, emoji } = reaction;
-
-      if (!message || !message.guild) return;
-
-      const emojiId = emoji.id || emoji.name;
-
-      if (emojiId === msg.emoji) {
-        let member = message.guild.members.cache.get(user.id);
-        if (!member) {
-          console.log(`Role ${type} - Failed to get member from cache. Going to fetch and retry....`);
-          await message.guild.members.fetch(user.id);
-          member = message.guild.members.cache.get(user.id);
-        }
-
-        // If they're still not there after forcing cache throw error
-        if (!member) {
-          throw new Error(`Member not found: ${user.username} - ${user.id}`);
-        }
-
-        switch (type) {
-          case 'add':
-            member.roles.add(msg.role_id)
-              .catch(() => console.error(`Could not give user role : ${msg.role_id}`));
-            break;
-          case 'remove':
-            member.roles.remove(msg.role_id)
-              .catch(() => console.error(`Could not remove user role : ${msg.role_id}`));
-        }
-      }
-    } catch (e) {
-      console.error(e);
-    }
   }
 
   randomPres = () => {
@@ -290,30 +240,35 @@ Thank you for your understanding,
     }
   }
 
-  logIssue = (type: string, reason = 'No reason provided.', mod: Discord.User, user: Discord.User | string) => {
+  logIssue = (type: string, reason: string, mod: Discord.User, user: Discord.User | string) => {
     const channel = this.guilds.cache.get(this.config.GUILD)?.channels.cache.get(this.config.MOD_LOGS);
     const embed = new Discord.MessageEmbed();
-    embed.setTitle(`${type}`)
+
+    const modCase = GET_NEW_CASE() || { id: 0 };
+
+    let color = 15158332;
+    switch(type.toLowerCase()) {
+      case 'ban': color = 15158332; break;
+      case 'mute': color = 15844367; break;
+      case 'unmute': case 'unban': color = 3066993; break;
+    }
+
+    embed.setTitle(`${type} | Case #${modCase.id + 1}`)
       .addField(`**User**`, `${(typeof user === 'string' ? user : user?.tag) } (<@${(typeof user === 'string' ? user : user.id)}>)`, true)
       .addField(`**Moderator**`, mod?.tag === '' ? 'Unknown' : mod.tag, true)
-      .addField(`**Reason**`, reason === '' ? 'No reason provided' : reason)
-      .setColor(15158332)
+      .addField(`**Reason**`, reason === '' ? `Mod please do \`bbreason ${modCase.id+1} <reason>\`` : reason)
+      .setColor(color)
       .setTimestamp(new Date());
     
     try {
       if(channel && channel instanceof Discord.TextChannel) {
-        channel.send(embed);
+        channel.send(embed)
+          .then(m => {
+            NEW_CASE(mod.id, (typeof user === 'string' ? user : user.id), m.id, type);
+          });
       }
     } catch {
       console.error(`Issue when trying to write log case`)
-    }
-  }
-
-  loadReactRoles = () => {
-    const reactRoles = GET_REACTS();
-    this.reactMessages = reactRoles.map(r => r.message_id);
-    for (const row of reactRoles) {
-      this.reactRoles.set(row.message_id, { role_id: row.role_id, emoji: row.emoji })
     }
   }
 
@@ -356,7 +311,6 @@ Thank you for your understanding,
 
   async start() {
     await this.login(this.config.TOKEN);
-    this.loadReactRoles();
     this.loadBannedWords();
     this.loadMutes();
   }
