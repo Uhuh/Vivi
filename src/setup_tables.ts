@@ -32,6 +32,7 @@ function checkDataBase() {
         message_id TEXT,
         user_id TEXT,
         mod_id TEXT,
+        warn_id TEXT,
         type TEXT
       );
     `;
@@ -80,6 +81,8 @@ function checkDataBase() {
 
     db.exec(sqlInit);
   }
+  
+  db.exec(`ALTER TABLE mod_cases ADD warn_id TEXT`);
 }
 
 checkDataBase();
@@ -88,10 +91,11 @@ export const NEW_CASE = (
   mod_id: string, 
   user_id: string, 
   message_id: string,
-  type: string
+  type: string,
+  warn_id: string
 ) => 
-  db.prepare(`INSERT OR REPLACE INTO mod_cases (mod_id, user_id, message_id, type) VALUES (@mod_id, @user_id, @message_id, @type)`)
-  .run({ mod_id, user_id, message_id, type });
+  db.prepare(`INSERT OR REPLACE INTO mod_cases (mod_id, user_id, message_id, type, warn_id) VALUES (@mod_id, @user_id, @message_id, @type, @warn_id)`)
+  .run({ mod_id, user_id, message_id, type, warn_id });
 
 export const GET_CASE = (id: string) =>
   db.prepare(`SELECT * FROM mod_cases WHERE id = @id`)
@@ -131,6 +135,14 @@ export const SET_WARN = (
 export const DELETE_WARN = (id: string) =>
   db.prepare(`DELETE FROM warnings WHERE id = @id`)
   .run({ id });
+
+export const GET_LAST_WARN = () =>
+  db.prepare(`SELECT * FROM warnings ORDER BY id DESC LIMIT 1`)
+  .get();
+
+export const WARN_REASON = (id: string, reason: string) =>
+  db.prepare(`UPDATE warnings SET reason = @reason WHERE id = @id`)
+  .run({ id, reason });
 
 export const GET_WARNS = () =>
   db.prepare(`SELECT * FROM warnings`)

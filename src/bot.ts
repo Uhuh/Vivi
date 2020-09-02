@@ -4,7 +4,7 @@ dotenv.config();
 import msg from '../events/message';
 import * as config from './vars'
 import commandHandler from '../commands/commandHandler';
-import { GET_WORDS, GET_USER_WARN, SET_WARN, GET_MUTES, REMOVE_MUTE, NEW_CASE, GET_NEW_CASE } from './setup_tables';
+import { GET_WORDS, GET_USER_WARN, SET_WARN, GET_MUTES, REMOVE_MUTE, NEW_CASE, GET_NEW_CASE, GET_LAST_WARN } from './setup_tables';
 import { MessageDelete, MessageEdit, UserJoin } from '../events/serverLogs';
 import * as moment from 'moment';
 
@@ -264,7 +264,8 @@ Thank you for your understanding,
       if(channel && channel instanceof Discord.TextChannel) {
         channel.send(embed)
           .then(m => {
-            NEW_CASE(mod.id, (typeof user === 'string' ? user : user.id), m.id, type);
+            const warn = GET_LAST_WARN();
+            NEW_CASE(mod.id, (typeof user === 'string' ? user : user.id), m.id, type, type === 'Warn' ? warn.id : 'null');
           });
       }
     } catch {

@@ -1,6 +1,6 @@
-import { Message, MessageEmbed, TextChannel } from "discord.js";
+import { Message, MessageEmbed, TextChannel, User } from "discord.js";
 import SetsuBot from "../../src/bot";
-import { GET_CASE, GET_USER_MUTE, REMOVE_MUTE, MUTE_USER } from '../../src/setup_tables';
+import { GET_CASE, GET_USER_MUTE, REMOVE_MUTE, MUTE_USER, WARN_REASON } from '../../src/setup_tables';
 import * as moment from 'moment';
 
 const reason = {
@@ -44,13 +44,19 @@ const reason = {
     await message.guild.members.fetch(modCase.user_id).catch(() => console.error(`User is not in guild.`));
     await message.guild.members.fetch(modCase.mod_id).catch(() => console.error(`Mod not in guild ????`));
 
-    const user = message.guild.members.cache.get(modCase.user_id)?.user || modCase.user_id;
-    const mod = message.guild.members.cache.get(modCase.mod_id)?.user || modCase.mod_id;
+    const user: User | string = message.guild.members.cache.get(modCase.user_id)?.user || modCase.user_id;
+    const mod: User | string = message.guild.members.cache.get(modCase.mod_id)?.user || modCase.mod_id;
 
     let color = 15158332;
 
     switch(modCase.type.toLowerCase()) {
       case 'ban': color = 15158332; break;
+      case 'warn':
+        WARN_REASON(modCase.warn_id, args.join(' ').trim());
+        if (user instanceof User) {
+          user.send(`Your warning (ID: ${modCase.warn_id}) has a new reason: ${args.join(' ').trim()}`);
+        }
+        break;
       case 'mute': 
         color = 15844367; 
         muteDurationChange(modCase.user_id, args.join(' '), message, client);
@@ -60,7 +66,7 @@ const reason = {
 
     embed.setTitle(`${modCase.type} | Case #${modCase.id}`)
       .addField(`**User**`, `${(typeof user === 'string' ? user : user?.tag) } (<@${(typeof user === 'string' ? user : user.id)}>)`, true)
-      .addField(`**Moderator**`, mod?.tag === '' ? 'Unknown' : mod.tag, true)
+      .addField(`**Moderator**`, mod instanceof User ? mod.tag : `<@${mod}>`, true)
       .addField(`**Reason**`, reason === '' ? 'Mod please do `bbreason <case #> <reason>`' : reason)
       .setColor(color)
       .setTimestamp(new Date());

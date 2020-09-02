@@ -32,7 +32,7 @@ const unmute = {
       return message.reply(`couldn't find that user, check that the ID is correct.`);
     }
 
-    const reason = args.join(' ').trim() === '' ? 'No reason provided.' : args.join(' ').trim();
+    const reason = args.join(' ').trim() === '' ? '' : args.join(' ').trim();
 
     const embed = new MessageEmbed();
     const mute = client.mutes.get(userId);
