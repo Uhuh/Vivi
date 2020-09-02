@@ -81,8 +81,6 @@ function checkDataBase() {
 
     db.exec(sqlInit);
   }
-  
-  db.exec(`ALTER TABLE mod_cases ADD warn_id TEXT`);
 }
 
 checkDataBase();
