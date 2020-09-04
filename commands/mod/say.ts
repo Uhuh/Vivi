@@ -8,7 +8,7 @@ const say = {
 	run: (message: Message) => {
 		if (message.member?.hasPermission(["MANAGE_MESSAGES"])) {
 			message.delete();
-			message.channel.send(message.content.slice(5) || 'Nothing to say!');
+			message.channel.send(message.content.slice(5).replace('@everyone', '@​everyone').replace('@here', '@​here') || 'Nothing to say!');
 		}
 	}
 }
