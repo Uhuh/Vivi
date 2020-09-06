@@ -5,12 +5,24 @@ const say = {
 	name: "say",
 	args: "",
 	type: "owner",
-	run: (message: Message) => {
-		if (message.member?.hasPermission(["MANAGE_MESSAGES"])) {
-			message.delete();
-			message.channel.send(message.content.slice(5).replace('@everyone', '@​everyone').replace('@here', '@​here') || 'Nothing to say!');
+	run: (message: Message, args: string[]) => {
+		if (!message.member?.hasPermission(["MANAGE_MESSAGES"])) return;
+		const channel = message.mentions.channels.first();
+		if (channel) args.shift();
+
+		let image = message.attachments.first();
+
+		if (channel) {
+			if(image) {
+				return channel.send(image.proxyURL);
+			}
+
+			return channel.send(args.join(' '))
 		}
+
+		message.delete();
+		return message.channel.send(message.content.slice(5) || 'Nothing to say!');
 	}
 }
 
-export default say
+export default say;
