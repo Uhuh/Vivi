@@ -40,7 +40,7 @@ Thank you for your understanding,
 `
       ).catch(() => console.error('Issue sending ban appeal message to user. Oh well?'));
 
-      user.ban({ reason, days: 7 })
+      user.ban({ reason })
         .then(() => {
           client.logIssue('Ban', reason, message.author, user?.user || userId || 'User');
           embed.setTitle(`**Banned** ${user?.user.tag || 'User'} (<@${userId}>)`);
