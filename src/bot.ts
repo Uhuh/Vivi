@@ -23,7 +23,7 @@ export default class SetsuBot extends Discord.Client {
   bannedStrings: { id: string, word: string }[];
   mutes: Discord.Collection<string, NodeJS.Timeout>;
   caseCount: number = 0;
-  muteRole = '732816563664715846';
+  muteRole = '756900919521837196';
   constructor() {
     super();
     this.config = config;
@@ -86,16 +86,15 @@ export default class SetsuBot extends Discord.Client {
     if (!user) return console.log("Client dead?");
 
     const presArr = [
-      `over LoveLetter <3`,
-      `out for senpai`,
-      `Waiting to be loved`
+      `with dolphins`,
+      `with food`
     ];
 
     user.setPresence(
       {
         activity: {
           name: presArr[Math.floor(Math.random() * presArr.length)],
-          type: "WATCHING"
+          type: "PLAYING"
         },
         status: "online"
       })
