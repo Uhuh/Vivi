@@ -7,7 +7,7 @@ import { GET_USER_MUTE } from '../src/setup_tables';
 type DMsg =  Discord.Message | Discord.PartialMessage;
 
 export const UserJoin = (member: Discord.GuildMember | Discord.PartialGuildMember) => {
-  const muteId = '733341358693285979';
+  const muteId = '756900919521837196';
   const user = GET_USER_MUTE(member.id);
   if (user) {
     member.roles?.add(muteId)

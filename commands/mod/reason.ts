@@ -115,11 +115,10 @@ const muteDurationChange = async (userId: string, words: string, message: Messag
   return client.mutes.set(
     userId,
     setTimeout(() => {
-      const muteId = '733341358693285979';
       client.mutes.delete(userId);
         REMOVE_MUTE(userId);
         client.logIssue('AutoMod: Unmute', `Time's up`, client.user!, user?.user || userId);
-        user?.roles.remove(muteId)
+        user?.roles.remove(client.muteRole)
           .catch(() => console.error(`Unable to remove mute role from user. Maybe they left?`));
     }, (unmuteTime-timeMuted)*1000)
   );

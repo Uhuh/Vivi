@@ -41,13 +41,12 @@ const unmute = {
       return message.reply(`couldn't find a mute case for that user... are they muted? Check the ID.`);
     }
 
-    const muteId = '733341358693285979';
     client.mutes.delete(userId);
     clearTimeout(mute);
     client.logIssue('Unmuted', reason, message.author, user.user);
     embed.setTitle(`**Unmuted** ${user.user.tag} (<@${user.id}>)`);
     REMOVE_MUTE(user.id);
-    user.roles.remove(muteId)
+    user.roles.remove(client.muteRole)
       .catch(() => console.error(`Unable to remove mute role from user. Maybe they left?`));
 
   

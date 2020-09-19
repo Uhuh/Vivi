@@ -222,7 +222,6 @@ Thank you for your understanding,
   }
 
   loadMutes = async () => {
-    const muteId = '733341358693285979';
     const mutes = GET_MUTES();
     const now = moment().unix();
     const guild = this.guilds.cache.get(this.config.GUILD);
@@ -244,7 +243,7 @@ Thank you for your understanding,
           this.logIssue('AutoMod: Unmute', `Time's up`, this.user!, member ? member.user : mute.user_id);
 
           if (member) {
-            member.roles.remove(muteId)
+            member.roles.remove(this.muteRole)
               .catch(() => console.error(`Unable to remove mute role from member. Maybe they left?`));
           }
         }, (Number(mute.unmute_date)-now)*1000)

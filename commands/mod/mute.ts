@@ -69,8 +69,7 @@ const mute = {
     /**
      * Mute user and set up timer to unmute them when the time is right.
      */
-    const muteId = '733341358693285979';
-    user.roles.add(muteId)
+    user.roles.add(client.muteRole)
       .then(async () => {
         await user.send(`You've been muted for \`${reason}\`. Duration is ${time}.`)
           .catch((e) => console.error(`Issue sending mute reason to user. Oh well? ${e}\n`));
@@ -80,7 +79,7 @@ const mute = {
             client.mutes.delete(userId);
             REMOVE_MUTE(user.id);
             client.logIssue('AutoMod: Unmute', `Time's up`, client.user!, user.user);
-            user.roles.remove(muteId)
+            user.roles.remove(client.muteRole)
               .catch(() => console.error(`Unable to remove mute role from user. Maybe they left?`));
           }, (unmuteTime-now)*1000)
         );
