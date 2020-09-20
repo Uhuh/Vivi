@@ -35,8 +35,7 @@ const ban = {
 Your account has been terminated from our server with reason: "${reason}".
 If you would like to appeal your account's termination, you may do so at \`https://forms.gle/vUNc5jDAGRopchFf6\`.
 
-Thank you for your understanding,
-  -LLMTF Staff
+Thank you for your understanding.
 `
       ).catch(() => console.error('Issue sending ban appeal message to user. Oh well?'));
 
