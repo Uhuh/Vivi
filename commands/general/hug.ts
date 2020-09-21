@@ -1,8 +1,8 @@
 import { Message } from "discord.js";
 
-const hug = {
-	desc: "Hug a user.",
-	name: "hug",
+const splash = {
+	desc: "Splash a user with water.",
+	name: "splash",
 	args: "<user mention>",
 	type: "general",
 	run: (message: Message) => {
@@ -10,12 +10,11 @@ const hug = {
     message.delete();
     
     if (!user) {
-      return message.reply(`It's kinda lonely...`);
+      return message.channel.send(`But nothing happened!`); //yknow, like magikarp. haha funny
     } else if (user === message.member) {
-      return message.reply(`do you think this is funny?`);
+      return message.channel.send(`<:vivismol:757245413790056608>`);
     }
-    return message.reply(`you hugged <@${user.id}>`);
-	}
+    return message.reply(`you splash <@${user.id}> with water 💦`);
 }
 
-export default hug;
+export default splash;
