@@ -15,6 +15,7 @@ const splash = {
       return message.channel.send(`<:vivismol:757245413790056608>`);
     }
     return message.reply(`you splash <@${user.id}> with water 💦`);
+  }
 }
 
 export default splash;
