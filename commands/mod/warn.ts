@@ -44,7 +44,7 @@ const warn = {
     ++activeWarns;
 
     const reason = args.join(' ').trim() === '' ? 'No reason provided.' : args.join(' ').trim();
-    console.log()
+
     if (activeWarns > 3) {
       message.channel.send(`Banned ${user.displayName} for getting more than 3 strikes.`);
       await user.send(

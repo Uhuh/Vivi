@@ -21,8 +21,6 @@ export default {
 
     const {owner} = guild;
 
-    console.log(guild.iconURL())
-
     embed.setColor(16772864)
       .setThumbnail(guild.iconURL({ dynamic: true }) || '')
       .setDescription(`**Server information for _${guild.name}_**`);

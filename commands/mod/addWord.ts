@@ -13,11 +13,9 @@ const addword = {
     
     for(const word of words) {
 			SET_WORD(word);
-			console.log(word);
 			const newWord = GET_NEW_WORD();
 			client.bannedWords.push(new RegExp(`(${word})`, 'g'));
 			client.bannedStrings.push(newWord);
-			console.log(client.bannedWords);
     }
 
     message.reply(`successfully added the words to the banned list.`);

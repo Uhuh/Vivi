@@ -17,7 +17,6 @@ const msg = (client: SetsuBot, message: Message) => {
 
     try {
       // Find the command and run it.
-      //console.log(args);
       clientCommand.run(message, args, client);
     } catch(e) {
       message.reply('something went wrong!', e);
