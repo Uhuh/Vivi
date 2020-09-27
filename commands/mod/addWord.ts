@@ -1,5 +1,5 @@
 import { Message } from "discord.js";
-import SetsuBot from "../../src/bot";
+import ViviBot from "../../src/bot";
 import { SET_WORD, GET_NEW_WORD } from "../../src/setup_tables";
 
 const addword = {
@@ -7,7 +7,7 @@ const addword = {
 	name: 'addWord',
 	args: '<list of regex separated by a ->',
 	type: 'admin',
-	run: (message: Message, args: string[], client: SetsuBot) => {
+	run: (message: Message, args: string[], client: ViviBot) => {
 		if (!message.guild || !message.member?.hasPermission(["MANAGE_CHANNELS"])) return;
     const words = args.join('').split('-');
     

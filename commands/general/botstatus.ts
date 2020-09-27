@@ -1,13 +1,13 @@
 import { Message, MessageEmbed } from "discord.js";
 import * as OS from "os";
-import SetsuBot from "../../src/bot";
+import ViviBot from "../../src/bot";
 
 export default {
   desc: 'Gives a list of things about the bot',
   name: 'botstatus',
   args: '',
   type: 'general',
-  run: async function (message: Message, _args: string[], client: SetsuBot) {
+  run: async function (message: Message, _args: string[], client: ViviBot) {
 
     const {user} = client;
 

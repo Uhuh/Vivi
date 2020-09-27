@@ -16,7 +16,7 @@ interface Command {
   run: Function
 };
 
-export default class SetsuBot extends Discord.Client {
+export default class ViviBot extends Discord.Client {
   config: any;
   commands: Discord.Collection<string, Command>;
   bannedWords: RegExp[];
@@ -34,7 +34,7 @@ export default class SetsuBot extends Discord.Client {
     commandHandler(this);
     this.once('ready', () => {
       console.info(`[Started]: ${new Date()}\n`);
-      console.info('Setsu reporting for duty!');
+      console.info('Vivi reporting for duty!');
       setInterval(() => this.randomPres(), 10000);
     })
 

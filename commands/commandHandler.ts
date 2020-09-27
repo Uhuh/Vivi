@@ -1,7 +1,7 @@
-import SetsuBot from "../src/bot";
+import ViviBot from "../src/bot";
 import * as fs from 'fs';
 
-const commandHandler = (client: SetsuBot) => {
+const commandHandler = (client: ViviBot) => {
   const helpCommands: string[] = [];
   const modCommands: string[] = [];
   fs.readdirSync("commands/general/").forEach(file =>

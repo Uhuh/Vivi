@@ -1,12 +1,12 @@
 import { Message, MessageEmbed } from "discord.js";
-import SetsuBot from "../../src/bot";
+import ViviBot from "../../src/bot";
 
 const unban = {
 	desc: 'Unban a user',
 	name: 'unban',
 	args: '<user id> <reason>',
 	type: 'admin',
-	run: (message: Message, args: string[], client: SetsuBot) => {
+	run: (message: Message, args: string[], client: ViviBot) => {
     if (!message.member?.hasPermission('BAN_MEMBERS')) { return message.react('👎') }
     if (!args.length) {
       return message.reply(`you forgot some arguements.`)

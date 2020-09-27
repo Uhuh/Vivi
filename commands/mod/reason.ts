@@ -1,5 +1,5 @@
 import { Message, MessageEmbed, TextChannel, User } from "discord.js";
-import SetsuBot from "../../src/bot";
+import ViviBot from "../../src/bot";
 import { GET_CASE, GET_USER_MUTE, REMOVE_MUTE, MUTE_USER, WARN_REASON } from '../../src/setup_tables';
 import * as moment from 'moment';
 
@@ -8,7 +8,7 @@ const reason = {
 	name: 'reason',
 	args: '<case #> <reason>',
 	type: 'admin',
-	run: async (message: Message, args: string[], client: SetsuBot) => {
+	run: async (message: Message, args: string[], client: ViviBot) => {
     if (!message.guild || !message.member?.hasPermission(["MANAGE_MESSAGES"])) return;
 
     message.delete()
@@ -77,7 +77,7 @@ const reason = {
 	}
 }
 
-const muteDurationChange = async (userId: string, words: string, message: Message, client: SetsuBot) => {
+const muteDurationChange = async (userId: string, words: string, message: Message, client: ViviBot) => {
   let [, time] = words.split('|');
 
   // Default is infinite

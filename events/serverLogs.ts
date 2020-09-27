@@ -1,5 +1,5 @@
 import * as Discord from 'discord.js';
-import SetsuBot from "../src/bot";
+import ViviBot from "../src/bot";
 import { SERVER_LOGS, GUILD } from '../src/vars';
 import { GET_USER_MUTE } from '../src/setup_tables';
 
@@ -19,7 +19,7 @@ export const UserJoin = (member: Discord.GuildMember | Discord.PartialGuildMembe
   }
 }
 
-export const MessageDelete = (client: SetsuBot, message: DMsg) => {
+export const MessageDelete = (client: ViviBot, message: DMsg) => {
   const embed = new Discord.MessageEmbed();
   const channel = client.guilds.cache.get(GUILD)?.channels.cache.get(SERVER_LOGS) as Discord.TextChannel;
   if (message.attachments?.size) {
@@ -30,7 +30,7 @@ export const MessageDelete = (client: SetsuBot, message: DMsg) => {
   embed
     .setTitle('**Message Deleted**')
     .setAuthor(message.author?.tag, message.author?.avatarURL() || '')
-    .setDescription(message.content === '' ? 'Setsu: Empty' : message.content)
+    .setDescription(message.content === '' ? 'Vivi: Empty' : message.content)
     .addField('**---**',
       `**Message author:** <@${message.author?.id}>\n**Channel:** <#${message.channel?.id}>`
     )
@@ -40,17 +40,17 @@ export const MessageDelete = (client: SetsuBot, message: DMsg) => {
     channel.send(embed);
 }
 
-export const MessageEdit = (client: SetsuBot, oldMsg: DMsg, newMsg: DMsg) => {
+export const MessageEdit = (client: ViviBot, oldMsg: DMsg, newMsg: DMsg) => {
   const embed = new Discord.MessageEmbed();
   const channel = client.guilds.cache.get(GUILD)?.channels.cache.get(SERVER_LOGS) as Discord.TextChannel;
   embed
     .setTitle('**Message Edited**')
     .setAuthor(newMsg.author?.tag, newMsg.author?.avatarURL() || '')
-    .setDescription((oldMsg?.content === '' ? 'Setsu: Empty!' : oldMsg.content) || 'Setsu: Empty!')
+    .setDescription((oldMsg?.content === '' ? 'Vivi: Empty!' : oldMsg.content) || 'Vivi: Empty!')
     .setFooter(`ID: ${newMsg.id}`)
     .setTimestamp(new Date());
 
-  const content = newMsg.content || 'Setsu: Empty!';
+  const content = newMsg.content || 'Vivi: Empty!';
 
   for(const line of split(content, 1024)) {
     embed.addField(`**After edit**`, line);

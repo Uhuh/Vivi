@@ -1,5 +1,5 @@
 import { Message, MessageEmbed } from "discord.js";
-import SetsuBot from "../../src/bot";
+import ViviBot from "../../src/bot";
 import * as moment from 'moment';
 import { GET_USER_WARN } from "../../src/setup_tables";
 
@@ -8,7 +8,7 @@ export default {
   name: 'userinfo',
   args: '',
   type: 'general',
-  run: async function (message: Message, args: string[], client: SetsuBot) {
+  run: async function (message: Message, args: string[], client: ViviBot) {
     const { user } = client;
 
     if (!user || !message.mentions || !message.mentions.members) return;

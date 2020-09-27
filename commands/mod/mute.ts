@@ -1,5 +1,5 @@
 import { Message } from "discord.js";
-import SetsuBot from "../../src/bot";
+import ViviBot from "../../src/bot";
 import * as moment from 'moment';
 import { MUTE_USER, REMOVE_MUTE } from "../../src/setup_tables";
 
@@ -8,7 +8,7 @@ const mute = {
 	name: 'mute',
 	args: '<user id or mention> <reason> | [number {m,h,d,w,y}]',
 	type: 'admin',
-	run: (message: Message, args: string[], client: SetsuBot) => {
+	run: (message: Message, args: string[], client: ViviBot) => {
     if (!message.member?.hasPermission('MANAGE_MESSAGES')) { return message.react('👎') }
     if (!args.length) {
       return message.reply(`you forgot some arguements. Example usage: \`${client.config.PREFIX}mute <user id> Annoying! | 5m\``)

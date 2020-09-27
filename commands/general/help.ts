@@ -1,12 +1,12 @@
 import { Message, MessageEmbed } from "discord.js";
-import SetsuBot from "../../src/bot";
+import ViviBot from "../../src/bot";
 
 const help = {
   desc: 'Sends a list of all available commands.',
   name: 'help',
   args: '',
   type: '',
-  run: async function (message: Message, args: string[], client: SetsuBot) {
+  run: async function (message: Message, args: string[], client: ViviBot) {
     const embed = new MessageEmbed();
 
     const {user} = client;

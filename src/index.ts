@@ -1,6 +1,6 @@
 import BB from './bot';
 
-const SetsuBot = new BB();
+const ViviBot = new BB();
 
-SetsuBot.start()
+ViviBot.start()
 	.catch((e) => console.error(`Caught an error!\n${e}`));

@@ -1,7 +1,7 @@
 import { TextChannel } from 'discord.js'
-import SetsuBot from '../src/bot';
+import ViviBot from '../src/bot';
 
-const handle_packet = async (packet: any, client: SetsuBot) => {
+const handle_packet = async (packet: any, client: ViviBot) => {
   if (!packet.t || 
       (packet.t !== 'MESSAGE_REACTION_ADD' && 
       packet.t !== 'MESSAGE_REACTION_REMOVE')

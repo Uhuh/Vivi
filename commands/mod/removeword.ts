@@ -1,5 +1,5 @@
 import { Message } from "discord.js";
-import SetsuBot from "../../src/bot";
+import ViviBot from "../../src/bot";
 import { REMOVE_WORD } from "../../src/setup_tables";
 
 const listWords = {
@@ -7,7 +7,7 @@ const listWords = {
 	name: 'removeword',
 	args: '<list of IDs found in the listwords command>',
 	type: 'admin',
-	run: (message: Message, args: string[], client: SetsuBot) => {
+	run: (message: Message, args: string[], client: ViviBot) => {
 		if (!message.guild || !message.member?.hasPermission(["MANAGE_CHANNELS"])) return;
 		const IDs = args.join('').split(',').map(id => Number(id));
 		
