@@ -24,8 +24,8 @@ export default class ViviBot extends Discord.Client {
   mutes: Discord.Collection<string, NodeJS.Timeout>;
   caseCount: number = 0;
   muteRole = '756900919521837196';
-  constructor() {
-    super();
+  constructor(intents: Discord.WebSocketOptions) {
+    super({ ws: intents });
     this.config = config;
     this.mutes = new Discord.Collection();
     this.commands = new Discord.Collection();
@@ -36,13 +36,10 @@ export default class ViviBot extends Discord.Client {
       console.info(`[Started]: ${new Date()}\n`);
       console.info('Vivi reporting for duty!');
       setInterval(() => this.randomPres(), 10000);
-    })
+    });
 
     //CMD Handling
     this.on('message', message => {
-      if(message.channel?.id === config.VERIFY_CH) {
-        return this.verifyChannel(message as Discord.Message);
-      }
       if (message.author?.bot) return;
       msg(this, message as Discord.Message);
       // Verify user message into the server.
@@ -55,7 +52,7 @@ export default class ViviBot extends Discord.Client {
 
       return;
     });
-    this.on("messageDelete", message => {
+    this.on('messageDelete', message => {
       try {
         if (message.author?.bot || message.channel?.type === 'dm') return;
         MessageDelete(this, message);
@@ -63,7 +60,7 @@ export default class ViviBot extends Discord.Client {
         console.error(`Error on message delete!`);
       }
     });
-    this.on("messageUpdate", (oldMsg, newMsg) => {
+    this.on('messageUpdate', (oldMsg, newMsg) => {
       try {
         if (oldMsg.author?.bot || oldMsg.channel?.type === 'dm') return;
         MessageEdit(this, oldMsg, newMsg);
@@ -78,7 +75,7 @@ export default class ViviBot extends Discord.Client {
         console.error(`Error on message update!`);
       }
     });
-    this.on("guildMemberAdd", member => UserJoin(member));
+    this.on('guildMemberAdd', member => UserJoin(member));
   }
 
   randomPres = () => {

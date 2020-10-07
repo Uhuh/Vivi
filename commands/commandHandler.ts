@@ -13,13 +13,13 @@ const commandHandler = (client: ViviBot) => {
   );
 
   for (const file of helpCommands) {
-    const command = require(`./general/${file}`)
-    client.commands.set(command.default.name.toLowerCase(), command.default)
+    const command = require(`./general/${file}`);
+    client.commands.set(command.default.name.toLowerCase(), command.default);
   }
 
   for (const file of modCommands) {
-    const command = require(`./mod/${file}`)
-    client.commands.set(command.default.name.toLowerCase(), command.default)
+    const command = require(`./mod/${file}`);
+    client.commands.set(command.default.name.toLowerCase(), command.default);
   }
 }
 

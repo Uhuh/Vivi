@@ -55,8 +55,7 @@ If you would like to appeal your account's termination, you may do so at \`https
 = = = Warn list = = =
 ${userWarnings.map(w => `  - ID: ${w.id} | Reason: ${w.reason}\n`).join('')}
 
-Thank you for your understanding,
-  -LLMTF Staff
+Thank you for your understanding.
 `
         ).catch(() => console.error('Issue sending ban appeal message to user. Oh well?'));
       user.ban().catch(() => message.channel.send(`Issues banning user.`));
