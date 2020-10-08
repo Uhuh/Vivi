@@ -76,11 +76,11 @@ const opinion = {
 
     if (!user) {
       return message.reply(`Who am I giving an opinion on?`);
-    } 
+    }
     const opinions = viviOpinions[Math.floor(Math.random() * viviOpinions.length)];
-      if (user === message.member) {
-        return message.reply(`<@${user.id}> my opinion on you is that you are ${opinions}`);
-      }
+    if (user === message.member) {
+      return message.reply(`<@${user.id}> my opinion on you is that you are ${opinions}`);
+    }
     return message.reply(`My opinion on <@${user.id}> is that they are ${opinions}`);
   }
 }

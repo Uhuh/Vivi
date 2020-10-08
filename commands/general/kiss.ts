@@ -1,14 +1,14 @@
 import { Message } from "discord.js";
 
 const kiss = {
-	desc: "Kiss a user.",
-	name: "kiss",
-	args: "<user mention>",
-	type: "general",
-	run: (message: Message) => {
+  desc: "Kiss a user.",
+  name: "kiss",
+  args: "<user mention>",
+  type: "general",
+  run: (message: Message) => {
     const user = message.mentions.members?.first();
     message.delete();
-    
+
     if (!user) {
       return message.reply(`I rather not kiss you... Cooties <:vivicringe:757245413072830486>`);
     } else if (user === message.member) {

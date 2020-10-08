@@ -9,7 +9,7 @@ export default {
   type: 'general',
   run: async function (message: Message, _args: string[], client: ViviBot) {
 
-    const {user} = client;
+    const { user } = client;
 
     if (!user) return;
 

@@ -26,9 +26,8 @@ export default {
 
     for (const warn of userWarnings) {
       const user = message.guild?.members.cache.get(warn.reporter);
-      embed.addField(`#${warn.id}: ${moment.unix(warn.date).isBefore(WEEK_OLD)?'❌':'✅'} \`${
-        moment.unix(warn.date).format('MMMM Do YYYY, h:mm:ss a')
-      }\` - By: **${user?.user.tag || 'Unknown'}** (${warn.reporter})`, `**Reason:** ${warn.reason}`);
+      embed.addField(`#${warn.id}: ${moment.unix(warn.date).isBefore(WEEK_OLD) ? '❌' : '✅'} \`${moment.unix(warn.date).format('MMMM Do YYYY, h:mm:ss a')
+        }\` - By: **${user?.user.tag || 'Unknown'}** (${warn.reporter})`, `**Reason:** ${warn.reason}`);
     }
 
     return message.author.send(embed)

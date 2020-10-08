@@ -19,13 +19,13 @@ export default {
       else if (channel.type === 'voice') { voiceC++; }
     }
 
-    const {owner} = guild;
+    const { owner } = guild;
 
     embed.setColor(16772864)
       .setThumbnail(guild.iconURL({ dynamic: true }) || '')
       .setDescription(`**Server information for _${guild.name}_**`);
 
-    if(owner)
+    if (owner)
       embed.addField(`**Owner**`, `\`${owner.user.tag}\``);
 
     embed.addField(`**OwnerID**`, `\`${guild.ownerID}\``)
