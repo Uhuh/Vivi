@@ -45,7 +45,16 @@ const modsadscrabs = [
     "VeiledProduct80#9197",
     "Min#1118",
     "Yuun#6345",
-    
+
+    //Orca
+    "Minty#1977",
+    "WadaNugs#0420",
+
+    //Hammer Shark
+    "T0lstoyInSpac3#2559",
+    "cloud#2197",
+    "El pumpkino#7698",
+
     //special
     "Laurissss#9488",
     "Tatsu#8792",
