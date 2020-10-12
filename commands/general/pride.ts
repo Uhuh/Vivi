@@ -53,5 +53,5 @@ const pride = {
     return message.reply(`${resources}`)
   }
 }
-        
+
 export default pride
