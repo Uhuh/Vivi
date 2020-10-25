@@ -1,23 +1,16 @@
 import { Message } from 'discord.js';
-import ViviBot from '../../src/bot';
+import { GET_BANNED_WORDS } from '../../src/database/database';
 
 const listWords = {
   desc: 'List of currently banned words. (Trigger warning)',
   name: 'listwords',
   args: '',
   type: 'admin',
-  run: (message: Message, _args: string[], client: ViviBot) => {
+  run: async (message: Message) => {
     if (!message.guild || !message.member?.hasPermission(['MANAGE_CHANNELS']))
       return;
-    const words = client.bannedStrings
-      .map((w) => `\`ID: ${w.id} --- Regex: ${w.word}\`\n`)
-      .join('');
 
-    message.channel.send(
-      `Remove by using the appropriate ID\n${
-        words === '' ? 'No banned words.' : words
-      }`
-    );
+    message.channel.send(await GET_BANNED_WORDS(message.guild.id));
   },
 };
 

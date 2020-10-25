@@ -3,7 +3,7 @@ import CaseModel from './cases';
 import MuteModel from './mutes';
 import WarnModel from './warnings';
 
-export type CaseType = 'unmute' | 'mute' | 'warn' | 'ban' | 'kick';
+export type CaseType = 'unmute' | 'mute' | 'warn' | 'ban' | 'unban' | 'kick';
 
 export const GET_GUILD_CONFIG = async (guildId: string) => {
   return await ConfigModel.findOne({ guildId });
@@ -24,7 +24,7 @@ export const NEW_CASE = async (
   userId: string,
   messageId: string,
   type: CaseType,
-  warnId?: string
+  warnId?: number
 ) => {
   const config = await ConfigModel.findOne({ guildId });
   if (!config) return console.error(`Could not find guild config`);
@@ -103,10 +103,8 @@ export const CREATE_WARN = async (
  * Delete a users warning.
  * @param id ID from mongoose.
  */
-export const DELETE_WARN = (guildId: string, warnId: number) => {
-  WarnModel.findOneAndDelete({ guildId, warnId })
-    .then(() => console.log(`Successfully deleted warning: ${warnId}`))
-    .catch(() => console.error(`Error deleting warning: ${warnId}`));
+export const DELETE_WARN = async (guildId: string, warnId: number) => {
+  return WarnModel.findOneAndDelete({ guildId, warnId });
 };
 
 /**
@@ -114,8 +112,12 @@ export const DELETE_WARN = (guildId: string, warnId: number) => {
  * @param id ID from mongoose.
  * @param reason Updated warn reason.
  */
-export const UPDATE_WARN_REASON = (warnId: string, reason: string) => {
-  WarnModel.findByIdAndUpdate({ warnId }, { reason })
+export const UPDATE_WARN_REASON = (
+  guildId: string,
+  warnId: number,
+  reason: string
+) => {
+  WarnModel.findOneAndUpdate({ guildId, warnId }, { reason })
     .then((warn) => {
       console.log('Updated warn with new reason');
       console.log(warn);
@@ -261,7 +263,7 @@ export const SET_WARN_EXPIRE = (guildId: string, warnLifeSpan: number) => {
  * !!TODO Redo mute system so that 23days isn't the limit.
  */
 
-export const ALL_MUTES = async (guildId: string) => {
+export const GET_GUILD_MUTES = async (guildId: string) => {
   return await MuteModel.find({ guildId });
 };
 
@@ -276,10 +278,18 @@ export const MUTE_USER = (
   );
 };
 
-export const UNMUTE_USER = (guildId: string, userId: string) => {
-  MuteModel.findOneAndDelete({ guildId, userId }).catch(() =>
-    console.error(`Error unmuting user[${userId}] fro guild[${guildId}]`)
+export const UPDATE_USER_MUTE = (
+  guildId: string,
+  userId: string,
+  unMuteDate: number
+) => {
+  MuteModel.findOneAndUpdate({ guildId, userId }, { unMuteDate }).catch(() =>
+    console.error(`Error on updating user[${userId}] mute time[${unMuteDate}]`)
   );
+};
+
+export const UNMUTE_USER = async (guildId: string, userId: string) => {
+  return MuteModel.findOneAndDelete({ guildId, userId });
 };
 
 export const GET_USER_MUTE = async (guildId: string, userId: string) => {

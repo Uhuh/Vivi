@@ -1,20 +1,35 @@
 import { Message } from 'discord.js';
 import ViviBot from '../../src/bot';
 import * as moment from 'moment';
-import { MUTE_USER, REMOVE_MUTE } from '../../src/setup_tables';
+import {
+  GET_GUILD_CONFIG,
+  GET_USER_MUTE,
+  MUTE_USER,
+} from '../../src/database/database';
 
 const mute = {
   desc: 'Mute a user',
   name: 'mute',
   args: '<user id or mention> <reason> | [number {m,h,d,w,y}]',
   type: 'admin',
-  run: (message: Message, args: string[], client: ViviBot) => {
+  run: async (message: Message, args: string[], client: ViviBot) => {
     if (!message.member?.hasPermission('MANAGE_MESSAGES')) {
       return message.react('👎');
     }
     if (!args.length) {
       return message.reply(
         `you forgot some arguements. Example usage: \`${client.config.PREFIX}mute <user id> Annoying! | 5m\``
+      );
+    }
+
+    const { guild } = message;
+    if (!guild) return;
+    const config = await GET_GUILD_CONFIG(guild.id);
+    if (!config) return;
+
+    if (!config.muteRole) {
+      return message.reply(
+        `there is no mute role configured for this server. Try \`${config.prefix}setMute <mute roleId/mention>\``
       );
     }
 
@@ -28,12 +43,10 @@ const mute = {
       return message.reply(`missing the user id argument!`);
     }
 
-    const existingMute = client.mutes.get(userId);
+    const existingMute = await GET_USER_MUTE(guild.id, userId);
 
     if (existingMute) {
-      return message.reply(
-        `they're already muted. Check <#733863945852551289>`
-      );
+      return message.reply(`they're already muted. Check <#${config.modLog}>`);
     }
 
     if (message.mentions.members?.first()) args.shift();
@@ -52,7 +65,7 @@ const mute = {
         ? 'No reason provided.'
         : args.join(' ').trim();
 
-    let [reason, time] = words.split('|');
+    let [reason, time] = words.split('|').map((t) => t.trim());
 
     // Default is infinite
     const now = moment().unix();
@@ -78,9 +91,11 @@ const mute = {
 
     message.delete().catch(() => console.error(`Issues deleting mute message`));
 
-    MUTE_USER(userId, now, unmuteTime);
+    MUTE_USER(guild.id, userId, now, unmuteTime);
+
     client.logIssue(
-      'Mute',
+      message.guild!.id,
+      'mute',
       `${reason}\n\nMuted for ${time}`,
       message.author,
       user.user
@@ -92,33 +107,15 @@ const mute = {
      * Mute user and set up timer to unmute them when the time is right.
      */
     user.roles
-      .add(client.muteRole)
+      .add(config.muteRole)
       .then(async () => {
         await user
           .send(`You've been muted for \`${reason}\`. Duration is ${time}.`)
           .catch((e) =>
-            console.error(`Issue sending mute reason to user. Oh well? ${e}\n`)
+            console.error(
+              `Guild[${guild.id}] - Issue sending mute reason to user. Oh well? ${e}\n`
+            )
           );
-        client.mutes.set(
-          userId,
-          setTimeout(() => {
-            client.mutes.delete(userId);
-            REMOVE_MUTE(user.id);
-            client.logIssue(
-              'AutoMod: Unmute',
-              `Time's up`,
-              client.user!,
-              user.user
-            );
-            user.roles
-              .remove(client.muteRole)
-              .catch(() =>
-                console.error(
-                  `Unable to remove mute role from user. Maybe they left?`
-                )
-              );
-          }, (unmuteTime - now) * 1000)
-        );
       })
       .catch(() =>
         message.reply(`I was unable to give that user the mute role!`)

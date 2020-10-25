@@ -6,7 +6,7 @@ const Cases = new Schema({
   messageId: { type: String, required: true, default: null },
   userId: { type: String, required: true, default: null },
   modId: { type: String, required: true, default: null },
-  warnId: { type: String, default: null },
+  warnId: { type: Number, default: null },
   type: { type: String, required: true, default: null },
 });
 
@@ -16,7 +16,7 @@ export interface ICases {
   messageId: string;
   userId: string;
   modId: string;
-  warnId?: string;
+  warnId?: number;
   type: string;
 }
 

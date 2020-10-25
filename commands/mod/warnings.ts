@@ -30,7 +30,7 @@ const warnings = {
       return message.reply(`user ids are numbers. Please try again.`);
     }
 
-    const warns = await GET_USER_WARNS(userId);
+    const warns = await GET_USER_WARNS(message.guild?.id!, userId);
 
     const embed = new MessageEmbed();
     const active = args.shift() || 'not';

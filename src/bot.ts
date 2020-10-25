@@ -4,7 +4,6 @@ dotenv.config();
 import msg from '../events/message';
 import * as config from './vars';
 import commandHandler from '../commands/commandHandler';
-import { GET_MUTES, REMOVE_MUTE } from './setup_tables';
 import { MessageDelete, MessageEdit, UserJoin } from '../events/serverLogs';
 import * as moment from 'moment';
 import * as mongoose from 'mongoose';
@@ -12,8 +11,10 @@ import {
   CREATE_WARN,
   GET_BANNED_WORDS,
   GET_GUILD_CONFIG,
+  GET_GUILD_MUTES,
   GET_USER_WARNS,
   NEW_CASE,
+  UNMUTE_USER,
 } from './database/database';
 
 interface Command {
@@ -36,13 +37,9 @@ export default class ViviBot extends Discord.Client {
   config: any;
   commands: Discord.Collection<string, Command>;
   bannedWords: Discord.Collection<string, string[]>;
-  mutes: Discord.Collection<string, NodeJS.Timeout>;
-  caseCount: number = 0;
-  muteRole = '756900919521837196';
   constructor(intents: Discord.WebSocketOptions) {
     super({ ws: intents });
     this.config = config;
-    this.mutes = new Discord.Collection();
     this.commands = new Discord.Collection();
     this.bannedWords = new Discord.Collection();
     commandHandler(this);
@@ -69,7 +66,7 @@ export default class ViviBot extends Discord.Client {
     this.on('messageDelete', (message) => {
       try {
         if (message.author?.bot || message.channel?.type === 'dm') return;
-        MessageDelete(this, message);
+        MessageDelete(message);
       } catch {
         console.error(`Error on message delete!`);
       }
@@ -77,7 +74,7 @@ export default class ViviBot extends Discord.Client {
     this.on('messageUpdate', (oldMsg, newMsg) => {
       try {
         if (oldMsg.author?.bot || oldMsg.channel?.type === 'dm') return;
-        MessageEdit(this, oldMsg, newMsg);
+        MessageEdit(oldMsg, newMsg);
         if (
           newMsg.channel?.type !== 'dm' &&
           !newMsg.author?.bot &&
@@ -109,38 +106,6 @@ export default class ViviBot extends Discord.Client {
       .catch(console.error);
   };
 
-  verifyChannel = async (message: Discord.Message) => {
-    const words = message.content.split(' ').join('').toLowerCase();
-
-    message
-      .delete()
-      .catch(() => console.error(`Issue deleting verification message`));
-
-    // If the user didn't send the verify message, ignore.
-    if (!words.startsWith('bbverify')) return;
-
-    const { guild } = message;
-
-    if (!guild) return;
-
-    let member = guild.members.cache.get(message.author.id);
-
-    if (!member) {
-      console.log(
-        `Failed to get member from cache for verification. Going to fetch and retry....`
-      );
-      await guild.members.fetch(message.author.id);
-      member = guild.members.cache.get(message.author.id);
-    }
-
-    if (!member) return console.error(`Issue getting member for verification.`);
-
-    // Verify user into the server
-    return member.roles
-      .add(config.STUDENT_ROLE)
-      .catch(() => console.error(`Issues verifying member.`));
-  };
-
   filterWords = async (message: Discord.Message) => {
     const { guild } = message;
 
@@ -149,8 +114,10 @@ export default class ViviBot extends Discord.Client {
      * Loop through all the users words, check if they're in the banned list
      */
     const content = message.content.toLowerCase();
-    for (const word of this.bannedWords) {
-      const reg = new RegExp(`(\b${word}\b)`);
+    const words = this.bannedWords.get(guild.id);
+    if (!words) return;
+    for (const word of words) {
+      const reg = new RegExp(word, 'g');
       const match = reg.exec(content);
       /**
        * Only get users warnings IF they match a banned word so that the bot doesn't query for each users warns
@@ -158,10 +125,14 @@ export default class ViviBot extends Discord.Client {
        */
       if (match) {
         let userWarnings = await GET_USER_WARNS(guild.id, message.author.id);
+        const config = await GET_GUILD_CONFIG(guild.id);
+        if (!config) return;
 
         if (!userWarnings) userWarnings = [];
 
-        const WEEK_OLD = moment().subtract(8, 'days').startOf('day');
+        const WEEK_OLD = moment()
+          .subtract(config.warnLifeSpan, 'days')
+          .startOf('day');
         let activeWarns = 0;
 
         for (const warn of userWarnings) {
@@ -169,18 +140,19 @@ export default class ViviBot extends Discord.Client {
           activeWarns++;
         }
 
-        const [, id] = match;
+        const id = match[0];
+
         activeWarns++;
-        if (activeWarns > 3) {
+        if (activeWarns > config.maxWarns!) {
           message.channel.send(
-            `Banned ${message.author.username} for getting more than 3 strikes.`
+            `Banned ${message.author.username} for getting more than ${config.maxWarns} strikes.`
           );
           message
             .delete()
             .catch(() => console.error(`Issues deleting the message!`));
 
           CREATE_WARN(
-            message.guild!.id,
+            guild.id,
             message.author.id,
             this.user?.id || '731987022008418334',
             `Saying a banned word. ${id}`
@@ -188,15 +160,7 @@ export default class ViviBot extends Discord.Client {
 
           await message.member
             ?.send(
-              `
-Your account has been terminated from our server automatically by me!
-If you would like to appeal your account's termination, you may do so at \`https://forms.gle/vUNc5jDAGRopchFf6\`.
-
-= = = Warn list = = =
-${userWarnings.map((w) => `  - ID: ${w.id} | Reason: ${w.reason}\n`).join('')}
-
-Thank you for your understanding.
-`
+              config.banMessage || `You've been banned from ${guild.name}.`
             )
             .catch(() =>
               console.error(
@@ -216,7 +180,7 @@ Thank you for your understanding.
           return;
         } else {
           message.reply(
-            `warning. You gained a strike. You have ${activeWarns}/3 strikes.`
+            `warning. You gained a warn. You have ${activeWarns}/${config.maxWarns} warns.`
           );
 
           CREATE_WARN(
@@ -250,11 +214,11 @@ Thank you for your understanding.
 
   logIssue = async (
     guildId: string,
-    type: 'mute' | 'warn' | 'ban' | 'kick',
+    type: 'mute' | 'warn' | 'ban' | 'kick' | 'unban' | 'unmute',
     reason: string,
     mod: Discord.User,
     user: Discord.User | string,
-    warnId?: string
+    warnId?: number
   ) => {
     const config = await GET_GUILD_CONFIG(guildId);
 
@@ -313,7 +277,7 @@ Thank you for your understanding.
             typeof user === 'string' ? user : user.id,
             m.id,
             type,
-            warnId || 'null'
+            warnId
           );
         });
       }
@@ -328,47 +292,26 @@ Thank you for your understanding.
     }
   };
 
-  loadMutes = async () => {
-    const mutes = GET_MUTES();
-    const now = moment().unix();
-    const guild = this.guilds.cache.get(this.config.GUILD);
-    for (const mute of mutes) {
-      let member = await guild?.members.cache.get(mute.user_id);
-      if (!member) {
-        console.log(
-          `Failed to get member from cache for MUTE. Going to fetch and retry....`
-        );
-        await guild?.members
-          .fetch(mute.user_id)
-          .catch(() =>
-            console.error(`Error fetching user. Most likely not in the server.`)
-          );
-        member = guild?.members.cache.get(mute.user_id);
-      }
-
-      this.mutes.set(
-        mute.user_id,
-        setTimeout(() => {
-          this.mutes.delete(mute.user_id);
-          REMOVE_MUTE(mute.user_id);
-          this.logIssue(
-            'AutoMod: Unmute',
-            `Time's up`,
-            this.user!,
-            member ? member.user : mute.user_id
-          );
-
+  /**
+   * Check every guild muted members and remove mute roles from them.
+   * Probably only check this every 10 minutes.
+   */
+  checkMutes = async () => {
+    for (const [id, guild] of this.guilds.cache) {
+      const config = await GET_GUILD_CONFIG(id);
+      // If the server mute role is not configured, ignore.
+      // Not sure how they muted without it.
+      if (!config?.muteRole) continue;
+      const mutes = await GET_GUILD_MUTES(id);
+      for (const m of mutes) {
+        if (moment(m.unMuteDate).isBefore(moment())) {
+          const member = guild.members.cache.get(m.userId);
           if (member) {
-            member.roles
-              .remove(this.muteRole)
-              .catch(() =>
-                console.error(
-                  `Unable to remove mute role from member. Maybe they left?`
-                )
-              );
+            member.roles.remove(config.muteRole);
           }
-        }, (Number(mute.unmute_date) - now) * 1000)
-      );
+          UNMUTE_USER(id, m.userId);
+        }
+      }
     }
   };
 
@@ -380,6 +323,5 @@ Thank you for your understanding.
     });
     await this.login(this.config.TOKEN);
     await this.loadBannedWords();
-    await this.loadMutes();
   }
 }

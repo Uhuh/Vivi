@@ -1,13 +1,12 @@
 import { Message, MessageEmbed, TextChannel, User } from 'discord.js';
 import ViviBot from '../../src/bot';
+import * as moment from 'moment';
 import {
   GET_CASE,
   GET_USER_MUTE,
-  REMOVE_MUTE,
-  MUTE_USER,
-  WARN_REASON,
-} from '../../src/setup_tables';
-import * as moment from 'moment';
+  UPDATE_USER_MUTE,
+  UPDATE_WARN_REASON,
+} from '../../src/database/database';
 
 const reason = {
   desc: 'Change the reason for a mod case in #mod-logs',
@@ -26,8 +25,14 @@ const reason = {
       return;
     }
 
+    if (Number.isNaN(Number(caseId))) {
+      return message.reply(
+        `make sure you entered a case ID. ${caseId} is not a proper number.`
+      );
+    }
+
     const reason = args.join(' ');
-    const modCase = GET_CASE(caseId);
+    const modCase = await GET_CASE(message.guild.id, Number(caseId));
     if (!modCase) {
       return message.channel.send(
         `Could not find a log with that case ID. - ${caseId}`
@@ -38,17 +43,17 @@ const reason = {
       client.config.MOD_LOGS
     ) as TextChannel;
 
-    let caseMessage = channel.messages.cache.get(modCase.message_id);
+    let caseMessage = channel.messages.cache.get(modCase.messageId);
 
     if (!caseMessage) {
       await channel.messages
-        .fetch(modCase.message_id)
+        .fetch(modCase.messageId)
         .catch(() =>
           console.error(
             `Failed to fetch mod log case message: Caase ID: ${modCase.id}`
           )
         );
-      caseMessage = channel.messages.cache.get(modCase.message_id);
+      caseMessage = channel.messages.cache.get(modCase.messageId);
 
       if (!caseMessage) return;
     }
@@ -57,16 +62,16 @@ const reason = {
 
     // Just get that stuff, it probably isn't cached.
     await message.guild.members
-      .fetch(modCase.user_id)
+      .fetch(modCase.userId)
       .catch(() => console.error(`User is not in guild.`));
     await message.guild.members
-      .fetch(modCase.mod_id)
+      .fetch(modCase.modId)
       .catch(() => console.error(`Mod not in guild ????`));
 
     const user: User | string =
-      message.guild.members.cache.get(modCase.user_id)?.user || modCase.user_id;
+      message.guild.members.cache.get(modCase.userId)?.user || modCase.userId;
     const mod: User | string =
-      message.guild.members.cache.get(modCase.mod_id)?.user || modCase.mod_id;
+      message.guild.members.cache.get(modCase.modId)?.user || modCase.modId;
 
     let color = 15158332;
 
@@ -75,18 +80,22 @@ const reason = {
         color = 15158332;
         break;
       case 'warn':
-        WARN_REASON(modCase.warn_id, args.join(' ').trim());
+        UPDATE_WARN_REASON(
+          message.guild.id,
+          modCase.warnId!,
+          args.join(' ').trim()
+        );
         if (user instanceof User) {
           user.send(
-            `Your warning (ID: ${
-              modCase.warn_id
-            }) has a new reason: ${args.join(' ').trim()}`
+            `Your warning (ID: ${modCase.warnId}) has a new reason: ${args
+              .join(' ')
+              .trim()}`
           );
         }
         break;
       case 'mute':
         color = 15844367;
-        muteDurationChange(modCase.user_id, args.join(' '), message, client);
+        muteDurationChange(modCase.userId, args.join(' '), message);
         break;
       case 'unmute':
       case 'unban':
@@ -95,7 +104,7 @@ const reason = {
     }
 
     embed
-      .setTitle(`${modCase.type} | Case #${modCase.id}`)
+      .setTitle(`${modCase.type} | Case #${modCase.caseId}`)
       .addField(
         `**User**`,
         `${typeof user === 'string' ? user : user?.tag} (<@${
@@ -124,14 +133,17 @@ const reason = {
 const muteDurationChange = async (
   userId: string,
   words: string,
-  message: Message,
-  client: ViviBot
+  message: Message
 ) => {
   let [, time] = words.split('|');
 
   // Default is infinite
-  const muteRow = GET_USER_MUTE(userId);
-  const timeMuted = moment.unix(muteRow.date_muted).unix();
+  const mutedUser = await GET_USER_MUTE(message.guild?.id!, userId);
+
+  if (!mutedUser) {
+    return message.reply(`that user is no longer muted. Remute them!`);
+  }
+
   let unmuteTime = moment().add(1, 'h').unix();
 
   if (time && time !== '') {
@@ -149,19 +161,13 @@ const muteDurationChange = async (
       case 'w':
       case 'y':
         unmuteTime = moment
-          .unix(muteRow.date_muted)
+          .unix(mutedUser.dateMuted)
           .add(Number(num), timeFormat)
           .unix();
     }
   } else time = '1h';
 
-  const userMute = client.mutes.get(userId);
-  if (!userMute) return;
-  clearTimeout(userMute);
-  client.mutes.delete(userId);
-  REMOVE_MUTE(userId);
-
-  MUTE_USER(userId, timeMuted, unmuteTime);
+  UPDATE_USER_MUTE(message.guild?.id!, userId, unmuteTime);
 
   await message.guild?.members.fetch(userId);
   const user = message.guild?.members.cache.get(userId);
@@ -171,26 +177,7 @@ const muteDurationChange = async (
       console.error(`Issues updating user on their mute duration change.`)
     );
 
-  return client.mutes.set(
-    userId,
-    setTimeout(() => {
-      client.mutes.delete(userId);
-      REMOVE_MUTE(userId);
-      client.logIssue(
-        'AutoMod: Unmute',
-        `Time's up`,
-        client.user!,
-        user?.user || userId
-      );
-      user?.roles
-        .remove(client.muteRole)
-        .catch(() =>
-          console.error(
-            `Unable to remove mute role from user. Maybe they left?`
-          )
-        );
-    }, (unmuteTime - timeMuted) * 1000)
-  );
+  return;
 };
 
 export default reason;

@@ -1,5 +1,5 @@
 import { Message } from 'discord.js';
-import { DELETE_WARN } from '../../src/setup_tables';
+import { DELETE_WARN } from '../../src/database/database';
 
 const removeWarn = {
   desc: 'Remove a warning from a user',
@@ -20,11 +20,17 @@ const removeWarn = {
       );
     }
 
-    DELETE_WARN(args[0]);
+    DELETE_WARN(message.guild?.id!, Number(args[0]))
+      .then(() =>
+        message.reply(
+          `done! ...if that warn ID existed at least. (Make sure to check!)`
+        )
+      )
+      .catch(() =>
+        message.reply(`issue removing that warn. Is the ID correct?`)
+      );
 
-    return message.reply(
-      `done! ...if that warn ID existed at least. (Make sure to check!)`
-    );
+    return;
   },
 };
 

@@ -1,8 +1,11 @@
 import { Message } from 'discord.js';
 import ViviBot from '../../src/bot';
-import { GET_USER_WARN } from '../../src/setup_tables';
 import * as moment from 'moment';
-import { CREATE_WARN } from '../../src/database/database';
+import {
+  CREATE_WARN,
+  GET_GUILD_CONFIG,
+  GET_USER_WARNS,
+} from '../../src/database/database';
 
 const warn = {
   desc: 'warn a user',
@@ -18,6 +21,11 @@ const warn = {
         `you forgot some arguements. \`${client.config.PREFIX}warn <user id> <reason>\``
       );
     }
+
+    const { guild } = message;
+    if (!guild) return;
+    const config = await GET_GUILD_CONFIG(guild.id);
+    if (!config) return;
 
     /**
      * If they mention the user then use that otherwise they should've sent the user id
@@ -36,7 +44,7 @@ const warn = {
       );
     }
 
-    let userWarnings = GET_USER_WARN(userId || '');
+    let userWarnings = await GET_USER_WARNS(guild.id, user.id);
 
     if (!userWarnings) userWarnings = [];
 
@@ -55,22 +63,14 @@ const warn = {
         ? 'No reason provided.'
         : args.join(' ').trim();
 
-    if (activeWarns > 3) {
+    if (activeWarns > config.maxWarns!) {
       message.channel.send(
-        `Banned ${user.displayName} for getting more than 3 strikes.`
+        `Banned ${user.displayName} for getting more than ${config.maxWarns} warns.`
       );
+      const banMessage =
+        config.banMessage || `You've been banned from ${guild.name}.`;
       await user
-        .send(
-          `
-Your account has been terminated from our server with reason: "${reason}".
-If you would like to appeal your account's termination, you may do so at \`https://forms.gle/vUNc5jDAGRopchFf6\`.
-
-= = = Warn list = = =
-${userWarnings.map((w) => `  - ID: ${w.id} | Reason: ${w.reason}\n`).join('')}
-
-Thank you for your understanding.
-`
-        )
+        .send(banMessage)
         .catch(() =>
           console.error('Issue sending ban appeal message to user. Oh well?')
         );
@@ -79,10 +79,12 @@ Thank you for your understanding.
       CREATE_WARN(message.guild!.id, user.id, message.author.id, reason);
 
       client.logIssue(
-        'AutoMod: Ban',
+        guild.id,
+        'ban',
         `Strike! You're out! **Reason:** ${reason}`,
         message.author,
-        user.user
+        user.user,
+        config.nextWarnId!
       );
     } else {
       message.channel.send(
@@ -96,10 +98,12 @@ Thank you for your understanding.
       CREATE_WARN(message.guild!.id, user.id, message.author.id, reason);
 
       client.logIssue(
-        'Warn',
+        guild.id,
+        'warn',
         reason === 'No reason provided.' ? '' : reason,
         message.author,
-        user.user
+        user.user,
+        config.nextWarnId!
       );
       user
         .send(`You have been warned!\n**Reason:** ${reason}`)

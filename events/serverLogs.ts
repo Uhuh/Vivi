@@ -1,29 +1,37 @@
 import * as Discord from 'discord.js';
-import ViviBot from "../src/bot";
-import { SERVER_LOGS, GUILD } from '../src/vars';
-import { GET_USER_MUTE } from '../src/setup_tables';
+import { GET_GUILD_CONFIG, GET_USER_MUTE } from '../src/database/database';
 
 // Discord Message
-type DMsg =  Discord.Message | Discord.PartialMessage;
+type DMsg = Discord.Message | Discord.PartialMessage;
 
-export const UserJoin = (member: Discord.GuildMember | Discord.PartialGuildMember) => {
-  const muteId = '756900919521837196';
-  const user = GET_USER_MUTE(member.id);
+export const UserJoin = async (
+  member: Discord.GuildMember | Discord.PartialGuildMember
+) => {
+  if (!member.guild) return;
+  const config = await GET_GUILD_CONFIG(member.guild.id);
+  if (!config?.muteRole) return;
+  const user = await GET_USER_MUTE(member.guild.id, member.id);
   if (user) {
-    member.roles?.add(muteId)
+    member.roles
+      ?.add(config?.muteRole)
       .catch(() => console.error(`Couldn't mute the user on join.`));
-  } else if(member instanceof Discord.GuildMember) {
+  } else if (member instanceof Discord.GuildMember) {
     /* member.send(
       `Welcome to the Love Letter community!\nPlease wait 10 minutes until I can help you get verified. In the meantime make sure to read the <#732961554005229639> and look at the <#729135006018175077>.`
     ).catch(() => console.error(`Couldn't DM user welcome message.`)); */
   }
-}
+};
 
-export const MessageDelete = (client: ViviBot, message: DMsg) => {
+export const MessageDelete = async (message: DMsg) => {
+  if (!message.guild) return;
   const embed = new Discord.MessageEmbed();
-  const channel = client.guilds.cache.get(GUILD)?.channels.cache.get(SERVER_LOGS) as Discord.TextChannel;
+  const config = await GET_GUILD_CONFIG(message.guild.id);
+  if (!config?.serverLog) return;
+  const channel = message.guild.channels.cache.get(
+    config?.serverLog
+  ) as Discord.TextChannel;
   if (message.attachments?.size) {
-    for(const [, att] of message.attachments) {
+    for (const [, att] of message.attachments) {
       channel.send(att.proxyURL);
     }
   }
@@ -31,38 +39,55 @@ export const MessageDelete = (client: ViviBot, message: DMsg) => {
     .setTitle('**Message Deleted**')
     .setAuthor(message.author?.tag, message.author?.avatarURL() || '')
     .setDescription(message.content === '' ? 'Vivi: Empty' : message.content)
-    .addField('**---**',
+    .addField(
+      '**---**',
       `**Message author:** <@${message.author?.id}>\n**Channel:** <#${message.channel?.id}>`
     )
     .setFooter(`ID: ${message.id}`)
     .setTimestamp(new Date());
 
-    channel.send(embed);
-}
+  channel.send(embed);
+};
 
-export const MessageEdit = (client: ViviBot, oldMsg: DMsg, newMsg: DMsg) => {
+export const MessageEdit = async (oldMsg: DMsg, newMsg: DMsg) => {
+  if (!oldMsg.guild) return;
   const embed = new Discord.MessageEmbed();
-  const channel = client.guilds.cache.get(GUILD)?.channels.cache.get(SERVER_LOGS) as Discord.TextChannel;
+  const config = await GET_GUILD_CONFIG(oldMsg.guild.id);
+  if (!config?.serverLog) return;
+  const channel = oldMsg.guild.channels.cache.get(
+    config?.serverLog
+  ) as Discord.TextChannel;
   embed
     .setTitle('**Message Edited**')
     .setAuthor(newMsg.author?.tag, newMsg.author?.avatarURL() || '')
-    .setDescription((oldMsg?.content === '' ? 'Vivi: Empty!' : oldMsg.content) || 'Vivi: Empty!')
+    .setDescription(
+      (oldMsg?.content === '' ? 'Vivi: Empty!' : oldMsg.content) ||
+        'Vivi: Empty!'
+    )
     .setFooter(`ID: ${newMsg.id}`)
     .setTimestamp(new Date());
 
   const content = newMsg.content || 'Vivi: Empty!';
 
-  for(const line of split(content, 1024)) {
+  for (const line of split(content, 1024)) {
     embed.addField(`**After edit**`, line);
   }
 
-  embed.addField('**---**',
+  embed.addField(
+    '**---**',
     `**Message author:** <@${newMsg.author?.id}>\n**Channel:** <#${newMsg.channel?.id}>\n[Jump to message](${newMsg.url})`
   );
-  
+
   channel.send(embed);
-}
+};
 
 function split(input: string, len: number): string[] {
-  return input.match(new RegExp('.{1,' + len + '}(?=(.{' + len + '})+(?!.))|.{1,' + len + '}$', 'g')) || [input]
+  return (
+    input.match(
+      new RegExp(
+        '.{1,' + len + '}(?=(.{' + len + '})+(?!.))|.{1,' + len + '}$',
+        'g'
+      )
+    ) || [input]
+  );
 }

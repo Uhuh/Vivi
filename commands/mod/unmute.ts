@@ -1,19 +1,29 @@
-import { Message, MessageEmbed } from 'discord.js';
+import { Message } from 'discord.js';
 import ViviBot from '../../src/bot';
-import { REMOVE_MUTE } from '../../src/setup_tables';
+import { GET_GUILD_CONFIG, UNMUTE_USER } from '../../src/database/database';
 
 const unmute = {
   desc: 'Unmute a user',
   name: 'unmute',
   args: '<user id or mention> <reason>',
   type: 'admin',
-  run: (message: Message, args: string[], client: ViviBot) => {
+  run: async (message: Message, args: string[], client: ViviBot) => {
     if (!message.member?.hasPermission('BAN_MEMBERS')) {
       return message.react('👎');
     }
     if (!args.length) {
       return message.reply(
         `you forgot some arguements. \`${client.config.PREFIX}unmute <user id> <reason>\``
+      );
+    }
+    const { guild } = message;
+    if (!guild) return;
+    const config = await GET_GUILD_CONFIG(guild.id);
+    if (!config) return;
+
+    if (!config.muteRole) {
+      return message.reply(
+        `there is no mute role configured for this server. Try \`${config.prefix}setMute <mute roleId/mention>\``
       );
     }
 
@@ -40,27 +50,25 @@ const unmute = {
 
     const reason = args.join(' ').trim() === '' ? '' : args.join(' ').trim();
 
-    const embed = new MessageEmbed();
-    const mute = client.mutes.get(userId);
+    client.logIssue(guild.id, 'unmute', reason, message.author, user.user);
 
-    if (!mute) {
-      return message.reply(
-        `couldn't find a mute case for that user... are they muted? Check the ID.`
-      );
-    }
+    UNMUTE_USER(guild.id, userId)
+      .then(() => {
+        user.roles
+          .remove(config.muteRole!)
+          .catch(() =>
+            message.reply(
+              `unable to remove mute role from user. Maybe they left?`
+            )
+          );
+      })
+      .catch(() => {
+        message.reply(
+          `unable to unmute, I don't think they were muted to begin with.`
+        );
+      });
 
-    client.mutes.delete(userId);
-    clearTimeout(mute);
-    client.logIssue('Unmuted', reason, message.author, user.user);
-    embed.setTitle(`**Unmuted** ${user.user.tag} (<@${user.id}>)`);
-    REMOVE_MUTE(user.id);
-    user.roles
-      .remove(client.muteRole)
-      .catch(() =>
-        console.error(`Unable to remove mute role from user. Maybe they left?`)
-      );
-
-    message.channel.send(embed);
+    message.channel.send(`**Unmuted** ${user.user.tag} (<@${user.id}>)`);
     return;
   },
 };

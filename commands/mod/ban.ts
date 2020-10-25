@@ -1,5 +1,6 @@
-import { Message, MessageEmbed } from 'discord.js';
+import { Message } from 'discord.js';
 import ViviBot from '../../src/bot';
+import { GET_GUILD_CONFIG } from '../../src/database/database';
 
 const ban = {
   desc: 'Ban a user',
@@ -7,12 +8,18 @@ const ban = {
   args: '<user id> <reason>',
   type: 'admin',
   run: async (message: Message, args: string[], client: ViviBot) => {
-    if (!message.member?.hasPermission('BAN_MEMBERS')) {
+    if (!message.member?.hasPermission('BAN_MEMBERS') || !message.guild) {
       return message.react('👎');
     }
     if (!args.length) {
       return message.reply(`you forgot some arguements.`);
     }
+
+    const { guild } = message;
+    if (!guild) return;
+    const config = await GET_GUILD_CONFIG(guild.id);
+    if (!config) return;
+
     /**
      * If they mention the user then use that otherwise they should've sent the user id
      * args.shift() returns the first element and pops it out of the array.
@@ -33,17 +40,11 @@ const ban = {
         ? 'No reason provided.'
         : args.join(' ').trim();
 
-    const embed = new MessageEmbed();
     if (user) {
+      const banMessage =
+        config.banMessage || `You've been banned from ${guild.name}.`;
       await user
-        .send(
-          `
-Your account has been terminated from our server with reason: "${reason}".
-If you would like to appeal your account's termination, you may do so at \`https://forms.gle/vUNc5jDAGRopchFf6\`.
-
-Thank you for your understanding.
-`
-        )
+        .send(banMessage)
         .catch(() =>
           console.error('Issue sending ban appeal message to user. Oh well?')
         );
@@ -52,24 +53,29 @@ Thank you for your understanding.
         .ban({ reason })
         .then(() => {
           client.logIssue(
-            'Ban',
+            message.guild?.id!,
+            'ban',
             reason,
             message.author,
             user?.user || userId || 'User'
           );
-          embed.setTitle(
+          message.channel.send(
             `**Banned** ${user?.user.tag || 'User'} (<@${userId}>)`
           );
-          message.channel.send(embed);
         })
         .catch(() => message.reply(`I had issues trying to ban that user!`));
     } else {
       message.guild?.members
         .ban(userId || '')
         .then(() => {
-          client.logIssue('Ban', reason, message.author, userId || 'User');
-          embed.setTitle(`**Banned** User (<@${userId}>)`);
-          message.channel.send(embed);
+          client.logIssue(
+            guild.id,
+            'ban',
+            reason,
+            message.author,
+            userId || 'User'
+          );
+          message.channel.send(`**Banned** User (<@${userId}>)`);
         })
         .catch(() => message.reply(`I had issues trying to ban that user!`));
     }

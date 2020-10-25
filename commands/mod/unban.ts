@@ -30,7 +30,13 @@ const unban = {
       .unban(userId || '')
       .then(() => {
         const embed = new MessageEmbed();
-        client.logIssue('Unban', reason, message.author, userId || 'User');
+        client.logIssue(
+          message.guild?.id!,
+          'unban',
+          reason,
+          message.author,
+          userId || 'User'
+        );
         embed.setTitle(`**Unbanned** User (<@${userId}>)`);
         message.channel.send(embed);
       })
