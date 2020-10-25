@@ -1,17 +1,22 @@
-import { Message } from "discord.js";
-import ViviBot from "../../src/bot";
-import { GET_USER_WARN, SET_WARN } from "../../src/setup_tables";
+import { Message } from 'discord.js';
+import ViviBot from '../../src/bot';
+import { GET_USER_WARN } from '../../src/setup_tables';
 import * as moment from 'moment';
+import { CREATE_WARN } from '../../src/database/database';
 
 const warn = {
-	desc: 'warn a user',
-	name: 'warn',
-	args: '<user id> <reason>',
-	type: 'admin',
-	run: async (message: Message, args: string[], client: ViviBot) => {
-    if (!message.member?.hasPermission("MANAGE_MESSAGES")) { return message.react('❌') }
+  desc: 'warn a user',
+  name: 'warn',
+  args: '<user id> <reason>',
+  type: 'admin',
+  run: async (message: Message, args: string[], client: ViviBot) => {
+    if (!message.member?.hasPermission('MANAGE_MESSAGES')) {
+      return message.react('❌');
+    }
     if (!args.length) {
-      return message.reply(`you forgot some arguements. \`${client.config.PREFIX}warn <user id> <reason>\``)
+      return message.reply(
+        `you forgot some arguements. \`${client.config.PREFIX}warn <user id> <reason>\``
+      );
     }
 
     /**
@@ -20,18 +25,20 @@ const warn = {
      */
     const userId = message.mentions.members?.first()?.id || args.shift();
 
-    if(message.mentions.members?.first()) args.shift();
+    if (message.mentions.members?.first()) args.shift();
 
     // Ensure the user is in the guild
     const user = message.guild?.members.cache.get(userId || '');
 
     if (!user) {
-      return message.reply(`Issue finding that user with that user id. Make sure you copied the ID correctly.`);
+      return message.reply(
+        `Issue finding that user with that user id. Make sure you copied the ID correctly.`
+      );
     }
 
     let userWarnings = GET_USER_WARN(userId || '');
 
-    if(!userWarnings) userWarnings = [];
+    if (!userWarnings) userWarnings = [];
 
     const WEEK_OLD = moment().subtract(8, 'days').startOf('day');
     let activeWarns = 0;
@@ -43,35 +50,67 @@ const warn = {
 
     ++activeWarns;
 
-    const reason = args.join(' ').trim() === '' ? 'No reason provided.' : args.join(' ').trim();
+    const reason =
+      args.join(' ').trim() === ''
+        ? 'No reason provided.'
+        : args.join(' ').trim();
 
     if (activeWarns > 3) {
-      message.channel.send(`Banned ${user.displayName} for getting more than 3 strikes.`);
-      await user.send(
-`
+      message.channel.send(
+        `Banned ${user.displayName} for getting more than 3 strikes.`
+      );
+      await user
+        .send(
+          `
 Your account has been terminated from our server with reason: "${reason}".
 If you would like to appeal your account's termination, you may do so at \`https://forms.gle/vUNc5jDAGRopchFf6\`.
 
 = = = Warn list = = =
-${userWarnings.map(w => `  - ID: ${w.id} | Reason: ${w.reason}\n`).join('')}
+${userWarnings.map((w) => `  - ID: ${w.id} | Reason: ${w.reason}\n`).join('')}
 
 Thank you for your understanding.
 `
-        ).catch(() => console.error('Issue sending ban appeal message to user. Oh well?'));
+        )
+        .catch(() =>
+          console.error('Issue sending ban appeal message to user. Oh well?')
+        );
       user.ban().catch(() => message.channel.send(`Issues banning user.`));
-      SET_WARN(user.id, reason, message.author.id);
-      client.logIssue('AutoMod: Ban', `Strike! You're out! **Reason:** ${reason}`, message.author, user.user)
+
+      CREATE_WARN(message.guild!.id, user.id, message.author.id, reason);
+
+      client.logIssue(
+        'AutoMod: Ban',
+        `Strike! You're out! **Reason:** ${reason}`,
+        message.author,
+        user.user
+      );
     } else {
-      message.channel.send(`<@${user.id}> You've been warned for \`${reason}\`. You have ${activeWarns} strike${activeWarns > 1 ? 's' : ''} now.`);
-      SET_WARN(user.id, reason, message.author.id);
-      client.logIssue('Warn', reason === 'No reason provided.' ? '' : reason, message.author, user.user);
-      user.send(`You have been warned!\n**Reason:** ${reason}`)
+      message.channel.send(
+        `<@${
+          user.id
+        }> You've been warned for \`${reason}\`. You have ${activeWarns} strike${
+          activeWarns > 1 ? 's' : ''
+        } now.`
+      );
+
+      CREATE_WARN(message.guild!.id, user.id, message.author.id, reason);
+
+      client.logIssue(
+        'Warn',
+        reason === 'No reason provided.' ? '' : reason,
+        message.author,
+        user.user
+      );
+      user
+        .send(`You have been warned!\n**Reason:** ${reason}`)
         .catch(() => console.error(`Can't DM user, probably has friends on.`));
-      message.delete().catch(() => console.error(`Issues deleting the message!`));
+      message
+        .delete()
+        .catch(() => console.error(`Issues deleting the message!`));
     }
 
     return;
-	}
-}
+  },
+};
 
 export default warn;

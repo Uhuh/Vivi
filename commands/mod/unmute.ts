@@ -1,16 +1,20 @@
-import { Message, MessageEmbed } from "discord.js";
-import ViviBot from "../../src/bot";
-import { REMOVE_MUTE } from "../../src/setup_tables";
+import { Message, MessageEmbed } from 'discord.js';
+import ViviBot from '../../src/bot';
+import { REMOVE_MUTE } from '../../src/setup_tables';
 
 const unmute = {
-	desc: 'Unmute a user',
-	name: 'unmute',
-	args: '<user id or mention> <reason>',
-	type: 'admin',
-	run: (message: Message, args: string[], client: ViviBot) => {
-    if (!message.member?.hasPermission('BAN_MEMBERS')) { return message.react('👎') }
+  desc: 'Unmute a user',
+  name: 'unmute',
+  args: '<user id or mention> <reason>',
+  type: 'admin',
+  run: (message: Message, args: string[], client: ViviBot) => {
+    if (!message.member?.hasPermission('BAN_MEMBERS')) {
+      return message.react('👎');
+    }
     if (!args.length) {
-      return message.reply(`you forgot some arguements. \`${client.config.PREFIX}unmute <user id> <reason>\``)
+      return message.reply(
+        `you forgot some arguements. \`${client.config.PREFIX}unmute <user id> <reason>\``
+      );
     }
 
     /**
@@ -19,17 +23,19 @@ const unmute = {
      */
     const userId = message.mentions.members?.first()?.id || args.shift();
 
-    if(!userId) {
+    if (!userId) {
       return message.reply(`missing the user id argument!`);
     }
 
-    if(message.mentions.members?.first()) args.shift();
+    if (message.mentions.members?.first()) args.shift();
 
     // Ensure the user is in the guild
     const user = message.guild?.members.cache.get(userId || '');
 
     if (!user) {
-      return message.reply(`couldn't find that user, check that the ID is correct.`);
+      return message.reply(
+        `couldn't find that user, check that the ID is correct.`
+      );
     }
 
     const reason = args.join(' ').trim() === '' ? '' : args.join(' ').trim();
@@ -38,7 +44,9 @@ const unmute = {
     const mute = client.mutes.get(userId);
 
     if (!mute) {
-      return message.reply(`couldn't find a mute case for that user... are they muted? Check the ID.`);
+      return message.reply(
+        `couldn't find a mute case for that user... are they muted? Check the ID.`
+      );
     }
 
     client.mutes.delete(userId);
@@ -46,13 +54,15 @@ const unmute = {
     client.logIssue('Unmuted', reason, message.author, user.user);
     embed.setTitle(`**Unmuted** ${user.user.tag} (<@${user.id}>)`);
     REMOVE_MUTE(user.id);
-    user.roles.remove(client.muteRole)
-      .catch(() => console.error(`Unable to remove mute role from user. Maybe they left?`));
+    user.roles
+      .remove(client.muteRole)
+      .catch(() =>
+        console.error(`Unable to remove mute role from user. Maybe they left?`)
+      );
 
-  
     message.channel.send(embed);
     return;
-	}
-}
+  },
+};
 
 export default unmute;

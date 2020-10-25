@@ -1,7 +1,7 @@
-import { Message, MessageEmbed } from "discord.js";
-import ViviBot from "../../src/bot";
+import { Message, MessageEmbed } from 'discord.js';
+import ViviBot from '../../src/bot';
 import * as moment from 'moment';
-import { GET_USER_WARN } from "../../src/setup_tables";
+import { GET_USER_WARNS } from '../../src/database/database';
 
 export default {
   desc: 'Information about user.',
@@ -17,9 +17,12 @@ export default {
      * If they mention the user then use that otherwise they should've sent the user id
      * args.shift() returns the first element and pops it out of the array.
      */
-    const userId = message.mentions.members?.first()?.id || args.shift() || message.author.id;
+    const userId =
+      message.mentions.members?.first()?.id ||
+      args.shift() ||
+      message.author.id;
 
-    if(message.mentions.members?.first()) args.shift();
+    if (message.mentions.members?.first()) args.shift();
 
     // Ensure the user is in the guild
     const member = message.guild?.members.cache.get(userId || '');
@@ -28,12 +31,14 @@ export default {
 
     const embed = new MessageEmbed();
     const WEEK_OLD = moment().subtract(7, 'days').startOf('day');
-    const warnings = GET_USER_WARN(userId);
-    const activeWarns = warnings.filter(w => !moment.unix(w.date).isBefore(WEEK_OLD)) || [];
-    
-    embed.setTitle(`**User Info**`)
+    const warnings = await GET_USER_WARNS(message.guild!.id, userId);
+    const activeWarns =
+      warnings.filter((w) => !moment.unix(w.date).isBefore(WEEK_OLD)) || [];
+
+    embed
+      .setTitle(`**User Info**`)
       .setColor(7419530)
-      .setThumbnail(member.user.avatarURL({dynamic: true}) || "")
+      .setThumbnail(member.user.avatarURL({ dynamic: true }) || '')
       .setFooter(`Replying to: ${message.author.tag}`)
       .setTimestamp(new Date());
 
@@ -42,15 +47,23 @@ export default {
       .addField('**Joined**', member.joinedAt?.toDateString(), true)
       .addField('**Username**', member.user.tag, true)
       .addField('**ID**', member.user.id)
-      .addField('Warnings', warnings.length ? 
-        `Total: ${warnings.length} | Active: ${activeWarns.length}\n\nIDs: ${warnings.map(w => w.id)}` :
-        'No warnings for this user'
+      .addField(
+        'Warnings',
+        warnings.length
+          ? `Total: ${warnings.length} | Active: ${
+              activeWarns.length
+            }\n\nIDs: ${warnings.map((w) => w.id)}`
+          : 'No warnings for this user'
       )
-      .addField('Active Warnings', activeWarns.length ? 
-        activeWarns.map(w => `ID: ${w.id} | Reason: ${w.reason}\n`).join('') :
-        'No active warnings for this user'
+      .addField(
+        'Active Warnings',
+        activeWarns.length
+          ? activeWarns
+              .map((w) => `ID: ${w.id} | Reason: ${w.reason}\n`)
+              .join('')
+          : 'No active warnings for this user'
       );
 
-    message.channel.send({ embed })
-  }
-}
+    message.channel.send({ embed });
+  },
+};

@@ -1,15 +1,20 @@
-import ViviBot from "../src/bot";
+import ViviBot from '../src/bot';
 import * as fs from 'fs';
 
 const commandHandler = (client: ViviBot) => {
   const helpCommands: string[] = [];
   const modCommands: string[] = [];
-  fs.readdirSync("commands/general/").forEach(file =>
+  const configCommands: string[] = [];
+  fs.readdirSync('commands/general/').forEach((file) =>
     helpCommands.push(file.slice(0, -3))
   );
 
-  fs.readdirSync("commands/mod/").forEach(file =>
+  fs.readdirSync('commands/mod/').forEach((file) =>
     modCommands.push(file.slice(0, -3))
+  );
+
+  fs.readdirSync('commands/config/').forEach((file) =>
+    configCommands.push(file.slice(0, -3))
   );
 
   for (const file of helpCommands) {
@@ -21,6 +26,11 @@ const commandHandler = (client: ViviBot) => {
     const command = require(`./mod/${file}`);
     client.commands.set(command.default.name.toLowerCase(), command.default);
   }
-}
+
+  for (const file of configCommands) {
+    const command = require(`./config/${file}`);
+    client.commands.set(command.default.name.toLowerCase(), command.default);
+  }
+};
 
 export default commandHandler;

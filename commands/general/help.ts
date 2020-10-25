@@ -1,5 +1,5 @@
-import { Message, MessageEmbed } from "discord.js";
-import ViviBot from "../../src/bot";
+import { Message, MessageEmbed } from 'discord.js';
+import ViviBot from '../../src/bot';
 
 const help = {
   desc: 'Sends a list of all available commands.',
@@ -16,16 +16,27 @@ const help = {
     embed
       .setTitle('**Commands**')
       .setColor(16711684)
-      .setAuthor(user.username, user.avatarURL() || "")
-      .setThumbnail(user.avatarURL() || "")
+      .setAuthor(user.username, user.avatarURL() || '')
+      .setThumbnail(user.avatarURL() || '')
       .setFooter(`Replying to: ${message.author.tag}`)
       .setTimestamp(new Date());
 
     if (!args.length) {
-      embed.setTitle('**Command Categories**')
-      embed.addField(`**General**`, `Try out \`${client.config.PREFIX}help general\``)
-      if (message.member?.hasPermission("MANAGE_MESSAGES"))
-        embed.addField(`**Admin**`, `Try out \`${client.config.PREFIX}help admin\``);
+      embed.setTitle('**Command Categories**');
+      embed.addField(
+        `**General**`,
+        `Try out \`${client.config.PREFIX}help general\``
+      );
+      if (message.member?.hasPermission('MANAGE_MESSAGES')) {
+        embed.addField(
+          `**Config**`,
+          `Try out \`${client.config.PREFIX}help config\``
+        );
+        embed.addField(
+          `**Admin**`,
+          `Try out \`${client.config.PREFIX}help admin\``
+        );
+      }
     } else if (args.length === 1) {
       args[0] = args[0].toLowerCase();
       if (args[0] !== 'general' && args[0] !== 'admin') {
@@ -35,7 +46,11 @@ const help = {
       let commands = `***<> = required arguments, [] = optional.***\n\n`;
       for (const func of client.commands.values()) {
         if (func.type === args[0]) {
-          if (func.type === 'admin' && !message.member?.hasPermission("MANAGE_MESSAGES")) continue;
+          if (
+            func.type === 'admin' &&
+            !message.member?.hasPermission('MANAGE_MESSAGES')
+          )
+            continue;
           commands += `**${client.config.PREFIX}${func.name} ${func.args}** - ${func.desc}\n`;
         }
       }
@@ -43,7 +58,7 @@ const help = {
     }
 
     message.channel.send({ embed });
-  }
-}
+  },
+};
 
 export default help;
