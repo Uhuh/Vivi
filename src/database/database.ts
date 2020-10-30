@@ -240,8 +240,8 @@ export const GET_BANNED_WORDS = async (guildId: string) => {
  * @param guildId Guild ID to add new banned word to
  * @param words The word(s) to be added to banned list
  */
-export const NEW_BANNED_WORD = (guildId: string, words: string[]) => {
-  ConfigModel.findOneAndUpdate(
+export const NEW_BANNED_WORD = async (guildId: string, words: string[]) => {
+  return ConfigModel.findOneAndUpdate(
     { guildId },
     {
       $push: {
@@ -262,8 +262,8 @@ export const NEW_BANNED_WORD = (guildId: string, words: string[]) => {
  * @param guildId The guild to remove a banned word from.
  * @param worda The word(s) to remove.
  */
-export const REMOVE_BANNED_WORD = (guildId: string, words: string[]) => {
-  ConfigModel.findOneAndUpdate(
+export const REMOVE_BANNED_WORD = async (guildId: string, words: string[]) => {
+  return ConfigModel.findOneAndUpdate(
     { guildId },
     {
       $pull: {
