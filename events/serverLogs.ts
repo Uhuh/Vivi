@@ -26,10 +26,20 @@ export const MessageDelete = async (message: DMsg) => {
   if (!message.guild) return;
   const embed = new Discord.MessageEmbed();
   const config = await GET_GUILD_CONFIG(message.guild.id);
-  if (!config?.serverLog) return;
+  /**
+   * If there is no server log configured ignore.
+   * If the guild whitelisted the channel ignore it.
+   */
+  if (
+    !config?.serverLog ||
+    config.serverLogWhitelist?.includes(message.channel!.id)
+  )
+    return;
+
   const channel = message.guild.channels.cache.get(
     config?.serverLog
   ) as Discord.TextChannel;
+
   if (message.attachments?.size) {
     for (const [, att] of message.attachments) {
       channel.send(att.proxyURL);
@@ -53,10 +63,20 @@ export const MessageEdit = async (oldMsg: DMsg, newMsg: DMsg) => {
   if (!oldMsg.guild) return;
   const embed = new Discord.MessageEmbed();
   const config = await GET_GUILD_CONFIG(oldMsg.guild.id);
-  if (!config?.serverLog) return;
+  /**
+   * If there is no server log configured ignore.
+   * If the guild whitelisted the channel ignore it.
+   */
+  if (
+    !config?.serverLog ||
+    config.serverLogWhitelist?.includes(oldMsg.channel!.id)
+  )
+    return;
+
   const channel = oldMsg.guild.channels.cache.get(
     config?.serverLog
   ) as Discord.TextChannel;
+
   embed
     .setTitle('**Message Edited**')
     .setAuthor(newMsg.author?.tag, newMsg.author?.avatarURL() || '')

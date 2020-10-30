@@ -8,10 +8,12 @@ import { MessageDelete, MessageEdit, UserJoin } from '../events/serverLogs';
 import * as moment from 'moment';
 import * as mongoose from 'mongoose';
 import {
+  ALL_GUILD_PREFIXES,
   CREATE_WARN,
+  GENERATE_GUILD_CONFIG,
   GET_BANNED_WORDS,
   GET_GUILD_CONFIG,
-  GET_GUILD_MUTES,
+  GET_UNMUTED_USERS,
   GET_USER_WARNS,
   NEW_CASE,
   UNMUTE_USER,
@@ -21,14 +23,14 @@ interface Command {
   desc: string;
   name: string;
   args: string;
-  type: string;
+  type: 'general' | 'admin' | 'config';
   run: Function;
 }
 
 // Discord embed sidebar colors.
 enum COLOR {
   DEFAULT = 15158332,
-  RED = 15158332,
+  RED = 16711684,
   YELLOW = 15844367,
   GREEN = 3066993,
 }
@@ -37,16 +39,19 @@ export default class ViviBot extends Discord.Client {
   config: any;
   commands: Discord.Collection<string, Command>;
   bannedWords: Discord.Collection<string, string[]>;
+  guildPrefix: Discord.Collection<string, string>;
   constructor(intents: Discord.WebSocketOptions) {
     super({ ws: intents });
     this.config = config;
     this.commands = new Discord.Collection();
     this.bannedWords = new Discord.Collection();
+    this.guildPrefix = new Discord.Collection();
     commandHandler(this);
     this.once('ready', () => {
       console.info(`[Started]: ${new Date()}\n`);
       console.info('Vivi reporting for duty!');
       setInterval(() => this.randomPres(), 10000);
+      setInterval(() => this.checkMutes(), 600000); // 600000 = 10minutes
     });
 
     //CMD Handling
@@ -87,6 +92,7 @@ export default class ViviBot extends Discord.Client {
       }
     });
     this.on('guildMemberAdd', (member) => UserJoin(member));
+    this.on('guildCreate', ({ id }) => GENERATE_GUILD_CONFIG(id));
   }
 
   randomPres = () => {
@@ -195,7 +201,8 @@ export default class ViviBot extends Discord.Client {
             'warn',
             `Warned for saying a banned word. ||${id}||`,
             this.user!,
-            message.author
+            message.author,
+            config.nextWarnId
           );
           message.author
             .send(
@@ -214,7 +221,7 @@ export default class ViviBot extends Discord.Client {
 
   logIssue = async (
     guildId: string,
-    type: 'mute' | 'warn' | 'ban' | 'kick' | 'unban' | 'unmute',
+    type: 'mute' | 'warn' | 'ban' | 'kick' | 'unban' | 'unmute' | 'unwarn',
     reason: string,
     mod: Discord.User,
     user: Discord.User | string,
@@ -245,6 +252,7 @@ export default class ViviBot extends Discord.Client {
         break;
       case 'unmute':
       case 'unban':
+      case 'unwarn':
         color = COLOR.GREEN;
         break;
     }
@@ -292,6 +300,13 @@ export default class ViviBot extends Discord.Client {
     }
   };
 
+  loadGuildPrefixes = async () => {
+    const guilds = await ALL_GUILD_PREFIXES();
+    for (const g of guilds) {
+      this.guildPrefix.set(g.guildId, g.prefix || 'v.');
+    }
+  };
+
   /**
    * Check every guild muted members and remove mute roles from them.
    * Probably only check this every 10 minutes.
@@ -302,26 +317,29 @@ export default class ViviBot extends Discord.Client {
       // If the server mute role is not configured, ignore.
       // Not sure how they muted without it.
       if (!config?.muteRole) continue;
-      const mutes = await GET_GUILD_MUTES(id);
+      const mutes = await GET_UNMUTED_USERS(id);
       for (const m of mutes) {
-        if (moment(m.unMuteDate).isBefore(moment())) {
-          const member = guild.members.cache.get(m.userId);
-          if (member) {
-            member.roles.remove(config.muteRole);
-          }
-          UNMUTE_USER(id, m.userId);
+        await guild.members.fetch(m.userId);
+        const member = guild.members.cache.get(m.userId);
+
+        if (member) {
+          member.roles.remove(config.muteRole).catch();
+          this.logIssue(id, 'unmute', 'Times up.', this.user!, member.user);
         }
+        UNMUTE_USER(id, m.userId);
       }
     }
   };
 
-  async start() {
+  start = async () => {
     await mongoose.connect('mongodb://localhost/database', {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       useCreateIndex: true,
     });
+    mongoose.set('useFindAndModify', false);
     await this.login(this.config.TOKEN);
+    await this.loadGuildPrefixes();
     await this.loadBannedWords();
-  }
+  };
 }

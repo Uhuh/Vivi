@@ -12,8 +12,9 @@ const unmute = {
       return message.react('👎');
     }
     if (!args.length) {
+      const prefix = client.guildPrefix.get(message.guild?.id || '') || 'v.';
       return message.reply(
-        `you forgot some arguements. \`${client.config.PREFIX}unmute <user id> <reason>\``
+        `you forgot some arguements. \`${prefix}unmute <user id> <reason>\``
       );
     }
     const { guild } = message;

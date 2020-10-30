@@ -17,8 +17,9 @@ const warn = {
       return message.react('❌');
     }
     if (!args.length) {
+      const prefix = client.guildPrefix.get(message.guild?.id || '') || 'v.';
       return message.reply(
-        `you forgot some arguements. \`${client.config.PREFIX}warn <user id> <reason>\``
+        `you forgot some arguements. \`${prefix}warn <user id> <reason>\``
       );
     }
 

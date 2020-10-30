@@ -10,7 +10,7 @@ const listWords = {
     if (!message.guild || !message.member?.hasPermission(['MANAGE_CHANNELS']))
       return;
 
-    message.channel.send(await GET_BANNED_WORDS(message.guild.id));
+    message.channel.send((await GET_BANNED_WORDS(message.guild.id)).join(', '));
   },
 };
 

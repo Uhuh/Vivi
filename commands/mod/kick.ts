@@ -11,8 +11,9 @@ const kick = {
       return message.react('❌');
     }
     if (!args.length) {
+      const prefix = client.guildPrefix.get(message.guild?.id || '') || 'v.';
       return message.reply(
-        `you forgot some arguements. \`${client.config.PREFIX}kick <user id> <reason>\``
+        `you forgot some arguements. \`${prefix}kick <user id> <reason>\``
       );
     }
     /**

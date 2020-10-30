@@ -13,6 +13,8 @@ const help = {
 
     if (!user) return;
 
+    const prefix = client.guildPrefix.get(message.guild?.id || '') || 'v.';
+
     embed
       .setTitle('**Commands**')
       .setColor(16711684)
@@ -23,23 +25,18 @@ const help = {
 
     if (!args.length) {
       embed.setTitle('**Command Categories**');
-      embed.addField(
-        `**General**`,
-        `Try out \`${client.config.PREFIX}help general\``
-      );
+      embed.addField(`**General**`, `Try out \`${prefix}help general\``);
       if (message.member?.hasPermission('MANAGE_MESSAGES')) {
-        embed.addField(
-          `**Config**`,
-          `Try out \`${client.config.PREFIX}help config\``
-        );
-        embed.addField(
-          `**Admin**`,
-          `Try out \`${client.config.PREFIX}help admin\``
-        );
+        embed.addField(`**Config**`, `Try out \`${prefix}help config\``);
+        embed.addField(`**Admin**`, `Try out \`${prefix}help admin\``);
       }
     } else if (args.length === 1) {
       args[0] = args[0].toLowerCase();
-      if (args[0] !== 'general' && args[0] !== 'admin') {
+      if (
+        args[0] !== 'general' &&
+        args[0] !== 'admin' &&
+        args[0] !== 'config'
+      ) {
         return;
       }
       embed.setTitle(`**${args[0].toUpperCase()} commands**`);
@@ -51,7 +48,7 @@ const help = {
             !message.member?.hasPermission('MANAGE_MESSAGES')
           )
             continue;
-          commands += `**${client.config.PREFIX}${func.name} ${func.args}** - ${func.desc}\n`;
+          embed.addField(`**${prefix}${func.name} ${func.args}**`, func.desc);
         }
       }
       embed.setDescription(commands);

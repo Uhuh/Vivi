@@ -2,11 +2,29 @@ import ConfigModel from './guildConfig';
 import CaseModel from './cases';
 import MuteModel from './mutes';
 import WarnModel from './warnings';
+import * as moment from 'moment';
 
-export type CaseType = 'unmute' | 'mute' | 'warn' | 'ban' | 'unban' | 'kick';
+export type CaseType =
+  | 'unmute'
+  | 'mute'
+  | 'warn'
+  | 'ban'
+  | 'unban'
+  | 'kick'
+  | 'unwarn';
+
+export const GENERATE_GUILD_CONFIG = async (guildId: string) => {
+  return await ConfigModel.create({ guildId }).catch(() => {
+    console.error(`Failed to generate a config for guild[${guildId}]`);
+  });
+};
 
 export const GET_GUILD_CONFIG = async (guildId: string) => {
   return await ConfigModel.findOne({ guildId });
+};
+
+export const ALL_GUILD_PREFIXES = async () => {
+  return await ConfigModel.find({}, 'guildId prefix');
 };
 
 /**
@@ -38,12 +56,11 @@ export const NEW_CASE = async (
     type,
     warnId,
   })
-    .then((modCase) => {
+    .then(() => {
       config.save();
       console.log(
         `Successfully created case for user[${userId}] by mod[${modId}]`
       );
-      console.log(modCase);
     })
     .catch((err) => {
       console.error(
@@ -86,16 +103,14 @@ export const CREATE_WARN = async (
     reason,
     date,
   })
-    .then((warn) => {
+    .then(() => {
       config.save();
       console.log(
         `Successfully created warn for user[${userId}] by mod[${modId}]`
       );
-      console.log(warn);
     })
-    .catch((err) => {
+    .catch(() => {
       console.error(`Error creating warn for user[${userId}] by mod[${modId}]`);
-      console.error(err);
     });
 };
 
@@ -118,9 +133,8 @@ export const UPDATE_WARN_REASON = (
   reason: string
 ) => {
   WarnModel.findOneAndUpdate({ guildId, warnId }, { reason })
-    .then((warn) => {
+    .then(() => {
       console.log('Updated warn with new reason');
-      console.log(warn);
     })
     .catch(() =>
       console.error(
@@ -141,8 +155,16 @@ export const GET_USER_WARNS = async (guildId: string, userId: string) => {
  * Grab a single warn for a user.
  * @param userId User ID to get warn
  */
-export const GET_WARN = async (guildId: string, userId: string) => {
+export const GET_USER_WARN = async (guildId: string, userId: string) => {
   return await WarnModel.findOne({ guildId, userId });
+};
+
+export const GET_WARN = async (guildId: string, warnId: number) => {
+  return await WarnModel.findOne({ guildId, warnId });
+};
+
+export const SET_MAX_WARNS = async (guildId: string, maxWarns: number) => {
+  return ConfigModel.findOneAndUpdate({ guildId }, { maxWarns });
 };
 
 /**
@@ -151,10 +173,8 @@ export const GET_WARN = async (guildId: string, userId: string) => {
  * @param modLog The mod channel id.
  */
 export const SET_MOD_CHANNEL = (guildId: string, modLog: string) => {
-  ConfigModel.findOneAndUpdate({ guildId }, { modLog }, (err, doc) => {
+  ConfigModel.findOneAndUpdate({ guildId }, { modLog }, (err) => {
     if (err) console.error(`Error on setting mod log channel.`);
-
-    console.log(doc);
   });
 };
 
@@ -164,11 +184,41 @@ export const SET_MOD_CHANNEL = (guildId: string, modLog: string) => {
  * @param serverLog The server channel id.
  */
 export const SET_SERVER_CHANNEL = (guildId: string, serverLog: string) => {
-  ConfigModel.findOneAndUpdate({ guildId }, { serverLog }, (err, doc) => {
+  ConfigModel.findOneAndUpdate({ guildId }, { serverLog }, (err) => {
     if (err) console.error(`Error on setting server log channel.`);
-
-    console.log(doc);
   });
+};
+
+export const ADD_CHANNEL_WHITELIST = async (
+  guildId: string,
+  channelId: string
+) => {
+  return ConfigModel.findOneAndUpdate(
+    { guildId },
+    {
+      $push: {
+        serverLogWhitelist: {
+          $each: [channelId],
+        },
+      },
+    }
+  );
+};
+
+export const REMOVE_CHANNEL_WHITELIST = async (
+  guildId: string,
+  channelId: string
+) => {
+  return ConfigModel.findOneAndUpdate(
+    { guildId },
+    {
+      $pull: {
+        serverLogWhitelist: {
+          $in: [channelId],
+        },
+      },
+    }
+  );
 };
 
 /**
@@ -188,41 +238,48 @@ export const GET_BANNED_WORDS = async (guildId: string) => {
 /**
  * Add new word to a guilds banned list.
  * @param guildId Guild ID to add new banned word to
- * @param word The word to be added to banned list
+ * @param words The word(s) to be added to banned list
  */
-export const NEW_BANNED_WORD = (guildId: string, word: string) => {
-  ConfigModel.findOne({ guildId })
-    .then((config) => {
-      config?.bannedWords?.push(word);
-      config?.save();
-    })
-    .catch(() =>
-      console.error(
-        `Error on adding ban word, could not find guild[${guildId}]`
-      )
-    );
+export const NEW_BANNED_WORD = (guildId: string, words: string[]) => {
+  ConfigModel.findOneAndUpdate(
+    { guildId },
+    {
+      $push: {
+        bannedWords: {
+          $each: words,
+        },
+      },
+    }
+  ).catch(() =>
+    console.error(
+      `Error on adding banned words, could not find guild[${guildId}]`
+    )
+  );
 };
 
 /**
  * Remove a word from a guilds banned word list.
  * @param guildId The guild to remove a banned word from.
- * @param word The word to remove
+ * @param worda The word(s) to remove.
  */
-export const REMOVE_BANNED_WORD = (guildId: string, word: string) => {
-  ConfigModel.findOne({ guildId }, (err, config) => {
-    if (err) {
-      return console.error(
-        `Error on removing banned word for guild[${guildId}]`,
-        err
-      );
+export const REMOVE_BANNED_WORD = (guildId: string, words: string[]) => {
+  ConfigModel.findOneAndUpdate(
+    { guildId },
+    {
+      $pull: {
+        bannedWords: {
+          $in: words,
+        },
+      },
+    },
+    (err) => {
+      if (err) {
+        return console.error(
+          `Error on removing words[${words}] for guild[${guildId}]`
+        );
+      }
     }
-
-    const index = config?.bannedWords?.indexOf(word);
-
-    if (index && index !== -1) {
-      config?.bannedWords?.splice(index, 0);
-    }
-  });
+  );
 };
 
 /**
@@ -230,20 +287,21 @@ export const REMOVE_BANNED_WORD = (guildId: string, word: string) => {
  * @param guildId Guild to set banned message for.
  * @param message Banned message, max length is 1020 chars.
  */
-export const SET_BANNED_MSG = (guildId: string, message: string) => {
-  ConfigModel.findOneAndUpdate({ guildId }, { banMessage: message }).catch(() =>
-    console.error(`Error on saving ban message for guild[${guildId}]`)
-  );
+export const SET_BANNED_MSG = async (guildId: string, banMessage: string) => {
+  return ConfigModel.findOneAndUpdate({ guildId }, { banMessage });
 };
 
-export const SET_GUILD_PREFIX = (guildId: string, prefix: string) => {
-  ConfigModel.findOneAndUpdate({ guildId }, { prefix }).catch(() =>
-    console.error(`Error on setting guild[${guildId}] prefix[${prefix}]`)
-  );
+export const SET_GUILD_PREFIX = async (guildId: string, prefix: string) => {
+  return ConfigModel.findOneAndUpdate({ guildId }, { prefix });
 };
 
 export const SET_MUTE_ROLE = (guildId: string, muteRole: string) => {
-  ConfigModel.findOneAndUpdate({ guildId }, { muteRole });
+  ConfigModel.findOneAndUpdate({ guildId }, { muteRole }, (err) => {
+    if (err)
+      return console.error(
+        `Error on setting guilds[${guildId}] mute role[${muteRole}]`
+      );
+  });
 };
 
 export const SET_WARN_LIMIT = (guildId: string, maxWarns: number) => {
@@ -252,16 +310,12 @@ export const SET_WARN_LIMIT = (guildId: string, maxWarns: number) => {
   );
 };
 
-export const SET_WARN_EXPIRE = (guildId: string, warnLifeSpan: number) => {
-  ConfigModel.findOneAndUpdate({ guildId }, { warnLifeSpan }).catch(() =>
-    console.error(`Error on updating warn lifespan for guild[${guildId}]`)
-  );
+export const SET_WARN_EXPIRE = async (
+  guildId: string,
+  warnLifeSpan: number
+) => {
+  return ConfigModel.findOneAndUpdate({ guildId }, { warnLifeSpan });
 };
-
-/**
- * !!TODO Setup MuteModel and create functions for it.
- * !!TODO Redo mute system so that 23days isn't the limit.
- */
 
 export const GET_GUILD_MUTES = async (guildId: string) => {
   return await MuteModel.find({ guildId });
@@ -294,4 +348,14 @@ export const UNMUTE_USER = async (guildId: string, userId: string) => {
 
 export const GET_USER_MUTE = async (guildId: string, userId: string) => {
   return await MuteModel.findOne({ guildId, userId });
+};
+
+export const GET_UNMUTED_USERS = async (guildId: string) => {
+  const now = moment().unix();
+  return MuteModel.find({
+    guildId,
+    unMuteDate: {
+      $lt: now,
+    },
+  }).sort({ unMuteDate: 'asc' });
 };

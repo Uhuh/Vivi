@@ -8,6 +8,7 @@ const GuildConfig = new Schema({
   prefix: { type: String, default: 'v.' },
   modLog: { type: String, default: null },
   serverLog: { type: String, default: null },
+  serverLogWhitelist: { type: [String], default: [] },
   banMessage: { type: String, default: null, maxlength: 1020 },
   bannedWords: { type: [String], default: ['bad'], maxlength: 120 },
   muteRole: { type: String, default: null },
@@ -22,6 +23,7 @@ export interface IGuildConfig {
   prefix?: string;
   modLog?: string;
   serverLog?: string;
+  serverLogWhitelist?: string[];
   banMessage?: string;
   bannedWords?: string[];
   muteRole?: string;

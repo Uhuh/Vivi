@@ -1,8 +1,8 @@
 import { Message, MessageEmbed, TextChannel, User } from 'discord.js';
-import ViviBot from '../../src/bot';
 import * as moment from 'moment';
 import {
   GET_CASE,
+  GET_GUILD_CONFIG,
   GET_USER_MUTE,
   UPDATE_USER_MUTE,
   UPDATE_WARN_REASON,
@@ -13,9 +13,19 @@ const reason = {
   name: 'reason',
   args: '<case #> <reason>',
   type: 'admin',
-  run: async (message: Message, args: string[], client: ViviBot) => {
+  run: async (message: Message, args: string[]) => {
     if (!message.guild || !message.member?.hasPermission(['MANAGE_MESSAGES']))
       return;
+
+    const config = await GET_GUILD_CONFIG(message.guild.id);
+
+    if (!config) {
+      return message.reply(`I somehow cannot find the guilds config file.`);
+    } else if (!config.modLog) {
+      return message.reply(
+        `I could not find a mod log channel setup for this server. Set up the mod/server log channel with the logs command.`
+      );
+    }
 
     message.delete().catch(console.error);
 
@@ -40,7 +50,7 @@ const reason = {
     }
 
     const channel = message.guild.channels.cache.get(
-      client.config.MOD_LOGS
+      config?.modLog
     ) as TextChannel;
 
     let caseMessage = channel.messages.cache.get(modCase.messageId);

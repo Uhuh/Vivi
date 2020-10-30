@@ -17,8 +17,9 @@ const mute = {
       return message.react('👎');
     }
     if (!args.length) {
+      const prefix = client.guildPrefix.get(message.guild?.id || '') || 'v.';
       return message.reply(
-        `you forgot some arguements. Example usage: \`${client.config.PREFIX}mute <user id> Annoying! | 5m\``
+        `you forgot some arguements. Example usage: \`${prefix}mute <user id> Annoying! | 5m\``
       );
     }
 
@@ -66,6 +67,7 @@ const mute = {
         : args.join(' ').trim();
 
     let [reason, time] = words.split('|').map((t) => t.trim());
+    if (reason === '') reason = 'No reason provided.';
 
     // Default is infinite
     const now = moment().unix();
