@@ -8,7 +8,7 @@ const config = {
   type: 'config',
   run: async (message: Message) => {
     const { guild } = message;
-    if (!guild || !message.member?.hasPermission(['MANAGE_CHANNELS'])) return;
+    if (!guild || !message.member?.hasPermission(['MANAGE_GUILD'])) return;
 
     const guildConfig = await GET_GUILD_CONFIG(guild.id);
 
@@ -52,6 +52,12 @@ const config = {
         'Amount of warns handed out:',
         guildConfig.nextWarnId! - 1,
         true
+      )
+      .addField(
+        'Whitelisted channels:',
+        guildConfig.serverLogWhitelist?.length
+          ? guildConfig.serverLogWhitelist?.map((c) => `<#${c}>`)
+          : 'None!'
       )
       .addField(
         'Ban message:',

@@ -11,7 +11,7 @@ const warn = {
   desc: 'warn a user',
   name: 'warn',
   args: '<user id> <reason>',
-  type: 'admin',
+  type: 'mod',
   run: async (message: Message, args: string[], client: ViviBot) => {
     if (!message.member?.hasPermission('MANAGE_MESSAGES')) {
       return message.react('❌');

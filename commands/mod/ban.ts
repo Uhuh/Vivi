@@ -6,7 +6,7 @@ const ban = {
   desc: 'Ban a user',
   name: 'ban',
   args: '<user id> <reason>',
-  type: 'admin',
+  type: 'mod',
   run: async (message: Message, args: string[], client: ViviBot) => {
     if (!message.member?.hasPermission('BAN_MEMBERS') || !message.guild) {
       return message.react('👎');

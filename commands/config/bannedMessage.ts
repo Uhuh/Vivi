@@ -7,7 +7,7 @@ const banMsg = {
   args: '<words n stuff>',
   type: 'config',
   run: (message: Message, args: string[]) => {
-    if (!message.guild || !message.member?.hasPermission(['MANAGE_CHANNELS']))
+    if (!message.guild || !message.member?.hasPermission(['MANAGE_GUILD']))
       return;
 
     SET_BANNED_MSG(message.guild.id, args.join(' '))

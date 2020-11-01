@@ -304,6 +304,10 @@ export const SET_MUTE_ROLE = (guildId: string, muteRole: string) => {
   });
 };
 
+export const REMOVE_MUTE_ROLE = (guildId: string) => {
+  ConfigModel.findOneAndUpdate({ guildId }, { muteRole: undefined });
+};
+
 export const SET_WARN_LIMIT = (guildId: string, maxWarns: number) => {
   ConfigModel.findOneAndUpdate({ guildId }, { maxWarns }).catch(() =>
     console.error(`Error on setting max warns for guild[${guildId}]`)

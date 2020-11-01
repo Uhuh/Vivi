@@ -2,13 +2,13 @@ import { Message, MessageEmbed } from 'discord.js';
 import { GENERATE_GUILD_CONFIG } from '../../src/database/database';
 
 const setup = {
-  desc: 'Generate guild config.',
+  desc: 'If Vivi failed to setup the server config, run this to fix it.',
   name: 'setup',
   args: '',
   type: 'setup',
   run: async (message: Message) => {
     const { guild } = message;
-    if (!guild || !message.member?.hasPermission(['MANAGE_CHANNELS'])) return;
+    if (!guild || !message.member?.hasPermission(['MANAGE_GUILD'])) return;
 
     const guildConfig = await GENERATE_GUILD_CONFIG(guild.id);
 

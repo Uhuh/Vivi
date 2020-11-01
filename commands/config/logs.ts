@@ -10,7 +10,7 @@ const logs = {
   args: '<mod | server> <#channel | id>',
   type: 'config',
   run: async (message: Message, args: string[]) => {
-    if (!message.guild || !message.member?.hasPermission(['MANAGE_CHANNELS']))
+    if (!message.guild || !message.member?.hasPermission(['MANAGE_GUILD']))
       return;
     let [type, id] = args;
 
@@ -29,10 +29,12 @@ const logs = {
     switch (type.toLowerCase()) {
       case 'mod':
         SET_MOD_CHANNEL(message.guild.id, id);
+        message.react('✅');
         channel.send(`I'm configured to send any mod actions here now! :tada:`);
         break;
       case 'server':
         SET_SERVER_CHANNEL(message.guild.id, id);
+        message.react('✅');
         channel.send(`I'm configured to send server updates here now! :tada:`);
         break;
       default:

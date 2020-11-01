@@ -6,9 +6,9 @@ const unmute = {
   desc: 'Unmute a user',
   name: 'unmute',
   args: '<user id or mention> <reason>',
-  type: 'admin',
+  type: 'mod',
   run: async (message: Message, args: string[], client: ViviBot) => {
-    if (!message.member?.hasPermission('BAN_MEMBERS')) {
+    if (!message.member?.hasPermission('MANAGE_MESSAGES')) {
       return message.react('👎');
     }
     if (!args.length) {

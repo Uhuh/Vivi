@@ -28,7 +28,7 @@ const help = {
       embed.addField(`**General**`, `Try out \`${prefix}help general\``);
       if (message.member?.hasPermission('MANAGE_MESSAGES')) {
         embed.addField(`**Config**`, `Try out \`${prefix}help config\``);
-        embed.addField(`**Admin**`, `Try out \`${prefix}help admin\``);
+        embed.addField(`**Mod**`, `Try out \`${prefix}help mod\``);
       }
     } else if (args.length === 1) {
       args[0] = args[0].toLowerCase();

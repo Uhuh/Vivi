@@ -7,7 +7,7 @@ const setMute = {
   args: '<@role | id>',
   type: 'config',
   run: (message: Message, args: string[]) => {
-    if (!message.guild || !message.member?.hasPermission(['MANAGE_CHANNELS']))
+    if (!message.guild || !message.member?.hasPermission(['MANAGE_GUILD']))
       return;
     const roleId = message.mentions.roles.first()?.id || args.shift();
 

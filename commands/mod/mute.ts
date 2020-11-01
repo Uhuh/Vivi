@@ -11,7 +11,7 @@ const mute = {
   desc: 'Mute a user',
   name: 'mute',
   args: '<user id or mention> <reason> | [number {m,h,d,w,y}]',
-  type: 'admin',
+  type: 'mod',
   run: async (message: Message, args: string[], client: ViviBot) => {
     if (!message.member?.hasPermission('MANAGE_MESSAGES')) {
       return message.react('👎');
@@ -30,7 +30,7 @@ const mute = {
 
     if (!config.muteRole) {
       return message.reply(
-        `there is no mute role configured for this server. Try \`${config.prefix}setMute <mute roleId/mention>\``
+        `there is no mute role configured for this server. Try \`${config.prefix}muterole <mute roleId/mention>\``
       );
     }
 

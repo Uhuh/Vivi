@@ -10,7 +10,7 @@ const whitelist = {
   args: '<add|remove> <#channel/channel ID>',
   type: 'config',
   run: (message: Message, args: string[]) => {
-    if (!message.guild || !message.member?.hasPermission(['MANAGE_CHANNELS']))
+    if (!message.guild || !message.member?.hasPermission(['MANAGE_GUILD']))
       return;
 
     if (!args.length) {

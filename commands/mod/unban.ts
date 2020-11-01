@@ -5,7 +5,7 @@ const unban = {
   desc: 'Unban a user',
   name: 'unban',
   args: '<user id> <reason>',
-  type: 'admin',
+  type: 'mod',
   run: (message: Message, args: string[], client: ViviBot) => {
     if (!message.member?.hasPermission('BAN_MEMBERS')) {
       return message.react('👎');

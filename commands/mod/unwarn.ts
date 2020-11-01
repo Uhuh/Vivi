@@ -6,7 +6,7 @@ const unwarn = {
   desc: 'Remove a warning from a user',
   name: 'unwarn',
   args: '<warn id> <reason>',
-  type: 'admin',
+  type: 'mod',
   run: async (message: Message, args: string[], client: ViviBot) => {
     const { guild } = message;
     if (!guild || !message.member?.hasPermission('MANAGE_MESSAGES')) {

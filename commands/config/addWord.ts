@@ -9,7 +9,7 @@ const addword = {
   args: '<list of words seperated by comma>',
   type: 'config',
   run: async (message: Message, args: string[], client: ViviBot) => {
-    if (!message.guild || !message.member?.hasPermission(['MANAGE_CHANNELS']))
+    if (!message.guild || !message.member?.hasPermission(['MANAGE_GUILD']))
       return;
 
     NEW_BANNED_WORD(message.guild.id!, args.join('').split(',')).then(

@@ -3,11 +3,11 @@ import { SET_WARN_EXPIRE } from '../../src/database/database';
 
 const warnLifeSpan = {
   desc: 'Set how long it takes for a warn to expire.',
-  name: 'warnExpire',
+  name: 'warnexpire',
   args: '<number in days>',
   type: 'config',
   run: (message: Message, args: string[]) => {
-    if (!message.guild || !message.member?.hasPermission(['MANAGE_CHANNELS']))
+    if (!message.guild || !message.member?.hasPermission(['MANAGE_GUILD']))
       return;
 
     const numDays = Number(args[0]);

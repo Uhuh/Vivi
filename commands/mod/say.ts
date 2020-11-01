@@ -1,10 +1,11 @@
 import { Message } from 'discord.js';
 
 const say = {
-  desc: '>:)',
+  desc:
+    'Say something in chat. If you mention a channel the bot will speak there instead.',
   name: 'say',
   args: '',
-  type: 'owner',
+  type: 'mod',
   run: (message: Message, args: string[]) => {
     if (!message.member?.hasPermission(['MANAGE_MESSAGES'])) return;
     const channel = message.mentions.channels.first();

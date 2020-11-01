@@ -5,9 +5,9 @@ const listWords = {
   desc: 'List of currently banned words. (Trigger warning)',
   name: 'listwords',
   args: '',
-  type: 'admin',
+  type: 'mod',
   run: async (message: Message) => {
-    if (!message.guild || !message.member?.hasPermission(['MANAGE_CHANNELS']))
+    if (!message.guild || !message.member?.hasPermission(['MANAGE_GUILD']))
       return;
 
     const words = await GET_BANNED_WORDS(message.guild.id);

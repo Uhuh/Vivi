@@ -7,7 +7,7 @@ const checkwarns = {
     'List a users warnings, get their active warnings by using the active tag after the id',
   name: 'checkwarns',
   args: '<user id> [active]',
-  type: 'admin',
+  type: 'mod',
   run: async (message: Message, args: string[]) => {
     if (!message.member?.hasPermission('MANAGE_MESSAGES')) {
       return message.react('❌');

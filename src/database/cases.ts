@@ -1,7 +1,7 @@
 import { Schema, Document, Model, model } from 'mongoose';
 
 const Cases = new Schema({
-  guildId: { type: Number, required: true },
+  guildId: { type: String, required: true },
   caseId: { type: Number, required: true },
   messageId: { type: String, required: true, default: null },
   userId: { type: String, required: true, default: null },

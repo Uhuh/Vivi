@@ -5,7 +5,7 @@ const kick = {
   desc: 'Kick a user',
   name: 'kick',
   args: '<user id> <reason>',
-  type: 'admin',
+  type: 'mod',
   run: (message: Message, args: string[], client: ViviBot) => {
     if (!message.member?.hasPermission('KICK_MEMBERS')) {
       return message.react('❌');
