@@ -5,6 +5,7 @@ const listWords = {
   desc: 'List of currently banned words. (Trigger warning)',
   name: 'listwords',
   args: '',
+  alias: ['lw'],
   type: 'mod',
   run: async (message: Message) => {
     if (!message.guild || !message.member?.hasPermission(['MANAGE_GUILD']))

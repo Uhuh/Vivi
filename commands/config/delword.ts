@@ -9,6 +9,7 @@ const deleteword = {
   desc: 'Delete banned word(s) from banned list.',
   name: 'delword',
   args: '<words separated by ,>',
+  alias: ['dw'],
   type: 'config',
   run: (message: Message, args: string[], client: ViviBot) => {
     if (!message.guild || !message.member?.hasPermission(['MANAGE_GUILD']))

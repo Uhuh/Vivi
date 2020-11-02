@@ -5,6 +5,7 @@ const setup = {
   desc: 'If Vivi failed to setup the server config, run this to fix it.',
   name: 'setup',
   args: '',
+  alias: [],
   type: 'setup',
   run: async (message: Message) => {
     const { guild } = message;

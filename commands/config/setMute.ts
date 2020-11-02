@@ -5,6 +5,7 @@ const setMute = {
   desc: 'Set the mute role for the server',
   name: 'muteRole',
   args: '<@role | id>',
+  alias: ['m'],
   type: 'config',
   run: (message: Message, args: string[]) => {
     if (!message.guild || !message.member?.hasPermission(['MANAGE_GUILD']))

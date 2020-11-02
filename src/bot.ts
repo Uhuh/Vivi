@@ -23,7 +23,8 @@ interface Command {
   desc: string;
   name: string;
   args: string;
-  type: 'general' | 'admin' | 'config';
+  alias: string[];
+  type: 'general' | 'mod' | 'config';
   run: Function;
 }
 
@@ -99,13 +100,11 @@ export default class ViviBot extends Discord.Client {
     const user = this.user;
     if (!user) return console.log('Client dead?');
 
-    const presArr = [`with dolphins`, `with food`];
-
     user
       .setPresence({
         activity: {
-          name: presArr[Math.floor(Math.random() * presArr.length)],
-          type: 'PLAYING',
+          name: '@Vivi help',
+          type: 'WATCHING',
         },
         status: 'online',
       })
@@ -119,11 +118,12 @@ export default class ViviBot extends Discord.Client {
     /**
      * Loop through all the users words, check if they're in the banned list
      */
-    const content = message.content.toLowerCase();
+    const content = message.content;
     const words = this.bannedWords.get(guild.id);
+
     if (!words) return;
     for (const word of words) {
-      const reg = new RegExp(word, 'g');
+      const reg = new RegExp(`${word}`, 'g');
       const match = reg.exec(content);
       /**
        * Only get users warnings IF they match a banned word so that the bot doesn't query for each users warns
@@ -270,7 +270,7 @@ export default class ViviBot extends Discord.Client {
       .addField(
         `**Reason**`,
         reason === ''
-          ? `Mod please do \`bbreason ${config.nextCaseId} <reason>\``
+          ? `Mod please do \`${config.prefix}reason ${config.nextCaseId} <reason>\``
           : reason
       )
       .setColor(color)

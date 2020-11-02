@@ -12,6 +12,7 @@ const reason = {
   desc: 'Change the reason for a mod case in #mod-logs',
   name: 'reason',
   args: '<case #> <reason>',
+  alias: ['r'],
   type: 'mod',
   run: async (message: Message, args: string[]) => {
     if (!message.guild || !message.member?.hasPermission(['MANAGE_MESSAGES']))

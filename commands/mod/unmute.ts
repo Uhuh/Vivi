@@ -6,6 +6,7 @@ const unmute = {
   desc: 'Unmute a user',
   name: 'unmute',
   args: '<user id or mention> <reason>',
+  alias: ['um'],
   type: 'mod',
   run: async (message: Message, args: string[], client: ViviBot) => {
     if (!message.member?.hasPermission('MANAGE_MESSAGES')) {
@@ -41,7 +42,13 @@ const unmute = {
     if (message.mentions.members?.first()) args.shift();
 
     // Ensure the user is in the guild
-    const user = message.guild?.members.cache.get(userId || '');
+    let user = message.guild?.members.cache.get(userId || '');
+
+    // Try a fetch incase the user isn't cached.
+    if (!user) {
+      await message.guild?.members.fetch(userId || '');
+      user = message.guild?.members.cache.get(userId || '');
+    }
 
     if (!user) {
       return message.reply(
@@ -55,7 +62,7 @@ const unmute = {
 
     UNMUTE_USER(guild.id, userId)
       .then(() => {
-        user.roles
+        user!.roles
           .remove(config.muteRole!)
           .catch(() =>
             message.reply(

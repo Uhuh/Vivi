@@ -5,6 +5,7 @@ export default {
   desc: '',
   name: 'eval',
   args: '',
+  alias: ['e'],
   type: 'owner',
   //@ts-ignore
   run: async (message: Discord.Message, args: string[], client: ViviBot) => {

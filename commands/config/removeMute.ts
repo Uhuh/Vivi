@@ -8,6 +8,7 @@ const removeMute = {
   desc: 'Remove the current setup mute role.',
   name: 'unbind',
   args: '',
+  alias: [],
   type: 'config',
   run: async (message: Message) => {
     if (!message.guild || !message.member?.hasPermission(['MANAGE_GUILD']))

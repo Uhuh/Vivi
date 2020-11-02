@@ -7,6 +7,7 @@ const addword = {
     "Add a word or list of words to banned list. Make sure you understand what you're adding.",
   name: 'addword',
   args: '<list of words seperated by comma>',
+  alias: ['aw'],
   type: 'config',
   run: async (message: Message, args: string[], client: ViviBot) => {
     if (!message.guild || !message.member?.hasPermission(['MANAGE_GUILD']))

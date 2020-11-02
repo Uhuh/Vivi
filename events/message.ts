@@ -21,7 +21,13 @@ const msg = (client: ViviBot, message: Message) => {
 
     if (!command) return;
     //If the command isn't in the big ol' list.
-    const clientCommand = client.commands.get(command.toLowerCase());
+    let clientCommand = client.commands.get(command.toLowerCase());
+    // Possible alias was used instead
+    if (!clientCommand) {
+      clientCommand = client.commands.find((f) =>
+        f.alias.includes(command.toLowerCase())
+      );
+    }
     if (!clientCommand) return;
 
     try {

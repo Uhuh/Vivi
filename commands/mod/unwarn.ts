@@ -6,6 +6,7 @@ const unwarn = {
   desc: 'Remove a warning from a user',
   name: 'unwarn',
   args: '<warn id> <reason>',
+  alias: ['uw'],
   type: 'mod',
   run: async (message: Message, args: string[], client: ViviBot) => {
     const { guild } = message;

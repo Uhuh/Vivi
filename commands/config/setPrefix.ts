@@ -6,6 +6,7 @@ const prefix = {
   desc: 'Set the guilds prefix.',
   name: 'prefix',
   args: '<any prefix you want>',
+  alias: ['p'],
   type: 'config',
   run: (message: Message, args: string[], client: ViviBot) => {
     if (

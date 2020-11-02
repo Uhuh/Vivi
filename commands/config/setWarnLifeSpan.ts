@@ -5,6 +5,7 @@ const warnLifeSpan = {
   desc: 'Set how long it takes for a warn to expire.',
   name: 'warnexpire',
   args: '<number in days>',
+  alias: ['we'],
   type: 'config',
   run: (message: Message, args: string[]) => {
     if (!message.guild || !message.member?.hasPermission(['MANAGE_GUILD']))

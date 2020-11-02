@@ -5,6 +5,7 @@ const banMsg = {
   desc: `Set ban message. This will get DMd to a user right before they're banned.`,
   name: 'banmsg',
   args: '<words n stuff>',
+  alias: ['bm'],
   type: 'config',
   run: (message: Message, args: string[]) => {
     if (!message.guild || !message.member?.hasPermission(['MANAGE_GUILD']))

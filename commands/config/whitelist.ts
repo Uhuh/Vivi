@@ -8,6 +8,7 @@ const whitelist = {
   desc: 'Whitelist a channel to ignore server logs for.',
   name: 'whitelist',
   args: '<add|remove> <#channel/channel ID>',
+  alias: ['wl'],
   type: 'config',
   run: (message: Message, args: string[]) => {
     if (!message.guild || !message.member?.hasPermission(['MANAGE_GUILD']))
@@ -36,7 +37,7 @@ const whitelist = {
     switch (type.toLowerCase()) {
       case 'add':
         ADD_CHANNEL_WHITELIST(message.guild.id, channel.id)
-          .then(() => message.reply(`Successfully whitelisted channel.`))
+          .then(() => message.reply(`successfully whitelisted channel.`))
           .catch(() =>
             message.reply(`I had issues whitelisting that channel.`)
           );
@@ -44,7 +45,7 @@ const whitelist = {
       case 'remove':
         REMOVE_CHANNEL_WHITELIST(message.guild.id, channel.id)
           .then(() =>
-            message.reply(`Successfully removed the channel from whitelist.`)
+            message.reply(`successfully removed the channel from whitelist.`)
           )
           .catch(() =>
             message.reply(`I had issues removing that channel from whitelist.`)

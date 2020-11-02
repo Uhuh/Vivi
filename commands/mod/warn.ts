@@ -11,6 +11,7 @@ const warn = {
   desc: 'warn a user',
   name: 'warn',
   args: '<user id> <reason>',
+  alias: ['w'],
   type: 'mod',
   run: async (message: Message, args: string[], client: ViviBot) => {
     if (!message.member?.hasPermission('MANAGE_MESSAGES')) {
@@ -37,12 +38,20 @@ const warn = {
     if (message.mentions.members?.first()) args.shift();
 
     // Ensure the user is in the guild
-    const user = message.guild?.members.cache.get(userId || '');
+    await message.guild?.members.fetch(userId || '');
+    let user = message.guild?.members.cache.get(userId || '');
+    // Try a fetch incase the user isn't cached.
+    if (!user) {
+      await message.guild?.members.fetch(userId || '');
+      user = message.guild?.members.cache.get(userId || '');
+    }
 
     if (!user) {
       return message.reply(
         `Issue finding that user with that user id. Make sure you copied the ID correctly.`
       );
+    } else if (user.user.bot) {
+      return message.reply(`what use do you have warning a bot...?`);
     }
 
     let userWarnings = await GET_USER_WARNS(guild.id, user.id);
@@ -82,7 +91,7 @@ const warn = {
       client.logIssue(
         guild.id,
         'ban',
-        `Strike! You're out! **Reason:** ${reason}`,
+        reason === 'No reason provided.' ? '' : reason,
         message.author,
         user.user,
         config.nextWarnId!

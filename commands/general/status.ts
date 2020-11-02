@@ -4,6 +4,7 @@ export default {
   desc: 'Gets the server info',
   name: 'status',
   args: '',
+  alias: ['s'],
   type: 'general',
   run: async function (message: Message) {
     const embed = new MessageEmbed();

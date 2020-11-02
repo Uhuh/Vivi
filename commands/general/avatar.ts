@@ -4,6 +4,7 @@ export default {
   desc: 'Grabs users avatar link.',
   name: 'avatar',
   args: '[user: mention/id]',
+  alias: ['ava', 'a'],
   type: 'general',
   run: (message: Message, args: string[]) => {
     /**

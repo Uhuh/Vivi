@@ -5,11 +5,15 @@ const help = {
   desc: 'Sends a list of all available commands.',
   name: 'help',
   args: '',
+  alias: ['cmds', 'h', 'commands'],
   type: '',
   run: async function (message: Message, args: string[], client: ViviBot) {
     const embed = new MessageEmbed();
 
     const { user } = client;
+
+    if (args[0] !== 'general' && args[0] !== 'mod' && args[0] !== 'config')
+      return;
 
     if (!user) return;
 
@@ -32,19 +36,12 @@ const help = {
       }
     } else if (args.length === 1) {
       args[0] = args[0].toLowerCase();
-      if (
-        args[0] !== 'general' &&
-        args[0] !== 'admin' &&
-        args[0] !== 'config'
-      ) {
-        return;
-      }
       embed.setTitle(`**${args[0].toUpperCase()} commands**`);
       let commands = `***<> = required arguments, [] = optional.***\n\n`;
       for (const func of client.commands.values()) {
-        if (func.type === args[0]) {
+        if (args[0] === func.type) {
           if (
-            func.type === 'admin' &&
+            func.type === 'mod' &&
             !message.member?.hasPermission('MANAGE_MESSAGES')
           )
             continue;

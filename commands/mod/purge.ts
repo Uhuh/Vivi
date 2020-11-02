@@ -4,6 +4,7 @@ export default {
   desc: 'Clear messages in a channel.',
   name: 'purge',
   args: '<amount>',
+  alias: ['p'],
   type: 'mod',
   run: (message: Message, args: string[]) => {
     let amount = Number(args[0]);

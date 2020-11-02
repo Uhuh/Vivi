@@ -3,8 +3,9 @@ import { SET_MAX_WARNS } from '../../src/database/database';
 
 const warnsMax = {
   desc: 'Set the max warns a user can get before getting banned.',
-  name: 'maxWarns',
+  name: 'maxwarns',
   args: '<a number in the range [1, 10]>',
+  alias: ['mw'],
   type: 'config',
   run: (message: Message, args: string[]) => {
     if (!message.guild || !message.member?.hasPermission(['MANAGE_GUILD']))

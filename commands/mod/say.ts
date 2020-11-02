@@ -5,6 +5,7 @@ const say = {
     'Say something in chat. If you mention a channel the bot will speak there instead.',
   name: 'say',
   args: '',
+  alias: [],
   type: 'mod',
   run: (message: Message, args: string[]) => {
     if (!message.member?.hasPermission(['MANAGE_MESSAGES'])) return;

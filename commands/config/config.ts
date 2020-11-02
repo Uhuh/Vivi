@@ -5,6 +5,7 @@ const config = {
   desc: 'Show the servers current config',
   name: 'config',
   args: '',
+  alias: [],
   type: 'config',
   run: async (message: Message) => {
     const { guild } = message;

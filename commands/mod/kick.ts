@@ -5,8 +5,9 @@ const kick = {
   desc: 'Kick a user',
   name: 'kick',
   args: '<user id> <reason>',
+  alias: ['k'],
   type: 'mod',
-  run: (message: Message, args: string[], client: ViviBot) => {
+  run: async (message: Message, args: string[], client: ViviBot) => {
     if (!message.member?.hasPermission('KICK_MEMBERS')) {
       return message.react('❌');
     }
@@ -25,7 +26,12 @@ const kick = {
     if (message.mentions.members?.first()) args.shift();
 
     // Ensure the user is in the guild
-    const user = message.guild?.members.cache.get(userId || '');
+    let user = message.guild?.members.cache.get(userId || '');
+    // Try a fetch incase the user isn't cached.
+    if (!user) {
+      await message.guild?.members.fetch(userId || '');
+      user = message.guild?.members.cache.get(userId || '');
+    }
 
     if (!user) {
       return console.error(`Issue getting user on guild. User ID: ${userId}`);
@@ -45,9 +51,9 @@ const kick = {
           'kick',
           reason,
           message.author,
-          user.user
+          user!.user
         );
-        embed.setTitle(`**Kicked** ${user.user.tag} (<@${user.id}>)`);
+        embed.setTitle(`**Kicked** ${user!.user.tag} (<@${user!.id}>)`);
         message.channel.send(embed);
       })
       .catch(() => message.reply(`I had issue trying to kick that user!`));

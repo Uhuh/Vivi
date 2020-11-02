@@ -11,6 +11,7 @@ const mute = {
   desc: 'Mute a user',
   name: 'mute',
   args: '<user id or mention> <reason> | [number {m,h,d,w,y}]',
+  alias: ['m'],
   type: 'mod',
   run: async (message: Message, args: string[], client: ViviBot) => {
     if (!message.member?.hasPermission('MANAGE_MESSAGES')) {
@@ -53,7 +54,12 @@ const mute = {
     if (message.mentions.members?.first()) args.shift();
 
     // Ensure the user is in the guild
-    const user = message.guild?.members.cache.get(userId || '');
+    let user = message.guild?.members.cache.get(userId || '');
+    // Try a fetch incase the user isn't cached.
+    if (!user) {
+      await message.guild?.members.fetch(userId || '');
+      user = message.guild?.members.cache.get(userId || '');
+    }
 
     if (!user) {
       return message.reply(
@@ -111,7 +117,7 @@ const mute = {
     user.roles
       .add(config.muteRole)
       .then(async () => {
-        await user
+        await user!
           .send(`You've been muted for \`${reason}\`. Duration is ${time}.`)
           .catch((e) =>
             console.error(

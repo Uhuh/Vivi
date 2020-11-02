@@ -7,6 +7,7 @@ export default {
   desc: 'Information about user.',
   name: 'userinfo',
   args: '',
+  alias: ['ui'],
   type: 'general',
   run: async function (message: Message, args: string[], client: ViviBot) {
     const { user } = client;

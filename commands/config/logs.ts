@@ -8,6 +8,7 @@ const logs = {
   desc: 'Set Mod or Server logging channels',
   name: 'logs',
   args: '<mod | server> <#channel | id>',
+  alias: ['l'],
   type: 'config',
   run: async (message: Message, args: string[]) => {
     if (!message.guild || !message.member?.hasPermission(['MANAGE_GUILD']))
