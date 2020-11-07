@@ -12,7 +12,12 @@ const help = {
 
     const { user } = client;
 
-    if (args[0] !== 'general' && args[0] !== 'mod' && args[0] !== 'config')
+    if (
+      args.length &&
+      args[0] !== 'general' &&
+      args[0] !== 'mod' &&
+      args[0] !== 'config'
+    )
       return;
 
     if (!user) return;
@@ -31,7 +36,10 @@ const help = {
       embed.setTitle('**Command Categories**');
       embed.addField(`**General**`, `Try out \`${prefix}help general\``);
       if (message.member?.hasPermission('MANAGE_MESSAGES')) {
-        embed.addField(`**Config**`, `Try out \`${prefix}help config\``);
+        embed.addField(
+          `**Config**`,
+          `Try out \`${prefix}config help\`\nAll config commands require MANAGE_GUILD permissions.`
+        );
         embed.addField(`**Mod**`, `Try out \`${prefix}help mod\``);
       }
     } else if (args.length === 1) {

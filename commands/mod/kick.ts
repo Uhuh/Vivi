@@ -1,4 +1,4 @@
-import { Message, MessageEmbed } from 'discord.js';
+import { Message } from 'discord.js';
 import ViviBot from '../../src/bot';
 
 const kick = {
@@ -45,7 +45,6 @@ const kick = {
     user
       .kick()
       .then(() => {
-        const embed = new MessageEmbed();
         client.logIssue(
           message.guild!.id,
           'kick',
@@ -53,8 +52,7 @@ const kick = {
           message.author,
           user!.user
         );
-        embed.setTitle(`**Kicked** ${user!.user.tag} (<@${user!.id}>)`);
-        message.channel.send(embed);
+        message.channel.send(`**Kicked** ${user!.user.tag} (<@${user!.id}>)`);
       })
       .catch(() => message.reply(`I had issue trying to kick that user!`));
   },

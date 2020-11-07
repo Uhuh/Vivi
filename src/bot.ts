@@ -1,12 +1,11 @@
 import * as Discord from 'discord.js';
+import * as DBL from 'dblapi.js';
 import * as dotenv from 'dotenv';
-dotenv.config();
-import msg from '../events/message';
-import * as config from './vars';
-import commandHandler from '../commands/commandHandler';
-import { MessageDelete, MessageEdit, UserJoin } from '../events/serverLogs';
 import * as moment from 'moment';
 import * as mongoose from 'mongoose';
+import commandHandler from '../commands/commandHandler';
+import msg from '../events/message';
+import { MessageDelete, MessageEdit, UserJoin } from '../events/serverLogs';
 import {
   ALL_GUILD_PREFIXES,
   CREATE_WARN,
@@ -18,6 +17,8 @@ import {
   NEW_CASE,
   UNMUTE_USER,
 } from './database/database';
+dotenv.config();
+import * as config from './vars';
 
 interface Command {
   desc: string;
@@ -49,10 +50,12 @@ export default class ViviBot extends Discord.Client {
     this.guildPrefix = new Discord.Collection();
     commandHandler(this);
     this.once('ready', () => {
+      const dblapi = new DBL(this.config.DBLTOKEN, this);
       console.info(`[Started]: ${new Date()}\n`);
       console.info('Vivi reporting for duty!');
+      setInterval(() => dblapi.postStats(this.guilds.cache.size), 1800000);
       setInterval(() => this.randomPres(), 10000);
-      setInterval(() => this.checkMutes(), 600000); // 600000 = 10minutes
+      setInterval(() => this.checkMutes(), 60000); // 1 minute // 600000 = 10minutes
     });
 
     //CMD Handling
@@ -123,7 +126,7 @@ export default class ViviBot extends Discord.Client {
 
     if (!words) return;
     for (const word of words) {
-      const reg = new RegExp(`${word}`, 'g');
+      const reg = new RegExp('\\b' + word + '\\b', 'g');
       const match = reg.exec(content);
       /**
        * Only get users warnings IF they match a banned word so that the bot doesn't query for each users warns
@@ -332,7 +335,7 @@ export default class ViviBot extends Discord.Client {
   };
 
   start = async () => {
-    await mongoose.connect('mongodb://localhost/database', {
+    await mongoose.connect(`mongodb://localhost/${config.DATABASE_TYPE}`, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       useCreateIndex: true,

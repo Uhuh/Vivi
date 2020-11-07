@@ -18,22 +18,22 @@ export default {
     if (Number.isNaN(amount)) {
       return message.reply(`Pass the amount of messages you want to purge.`);
     }
-
     // Delete the message sent
-    message.delete();
-    channel
-      .bulkDelete(amount)
+    message
+      .delete()
       .then(() => {
-        console.log(`Bulk deleted ${amount}`);
+        channel
+          .bulkDelete(amount)
+          // So Discord;s bulkdelete wont delete anything older than 14 days. So we gotta manually delete it.
+          .catch(() => {
+            for (; amount > 0; amount--) {
+              const m = channel.lastMessage;
+              if (!m) continue;
+              m.delete();
+            }
+          });
       })
-      // So Discord;s bulkdelete wont delete anything older than 14 days. So we gotta manually delete it.
-      .catch(() => {
-        for (; amount > 0; amount--) {
-          const m = channel.lastMessage;
-          if (!m) continue;
-          m.delete();
-        }
-      });
+      .catch(() => message.reply(`I don't have manage message perms.`));
 
     return;
   },

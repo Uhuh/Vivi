@@ -98,11 +98,7 @@ const warn = {
       );
     } else {
       message.channel.send(
-        `<@${
-          user.id
-        }> You've been warned for \`${reason}\`. You have ${activeWarns} strike${
-          activeWarns > 1 ? 's' : ''
-        } now.`
+        `<@${user.id}> You've been warned for \`${reason}\`. You have ${activeWarns} out of ${config.maxWarns} warns now.`
       );
 
       CREATE_WARN(message.guild!.id, user.id, message.author.id, reason);
@@ -116,7 +112,9 @@ const warn = {
         config.nextWarnId!
       );
       user
-        .send(`You have been warned!\n**Reason:** ${reason}`)
+        .send(
+          `You have been warned in **${message.guild?.name}**\n**Reason:** ${reason}`
+        )
         .catch(() => console.error(`Can't DM user, probably has friends on.`));
       message
         .delete()

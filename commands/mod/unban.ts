@@ -1,4 +1,4 @@
-import { Message, MessageEmbed } from 'discord.js';
+import { Message } from 'discord.js';
 import ViviBot from '../../src/bot';
 
 const unban = {
@@ -30,7 +30,6 @@ const unban = {
     message.guild?.members
       .unban(userId || '')
       .then(() => {
-        const embed = new MessageEmbed();
         client.logIssue(
           message.guild?.id!,
           'unban',
@@ -38,8 +37,7 @@ const unban = {
           message.author,
           userId || 'User'
         );
-        embed.setTitle(`**Unbanned** User (<@${userId}>)`);
-        message.channel.send(embed);
+        message.channel.send(`**Unbanned** User (<@${userId}>)`);
       })
       .catch(() => message.reply(`I had issues trying to unban them.`));
     return;

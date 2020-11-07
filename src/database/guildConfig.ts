@@ -1,4 +1,7 @@
 import { Schema, Document, Model, model } from 'mongoose';
+import * as dotenv from 'dotenv';
+dotenv.config();
+import * as config from '../vars';
 
 const GuildConfig = new Schema({
   guildId: { type: String, required: true, unique: true, index: true },
@@ -10,7 +13,11 @@ const GuildConfig = new Schema({
   serverLog: { type: String, default: null },
   serverLogWhitelist: { type: [String], default: [] },
   banMessage: { type: String, default: null, maxlength: 1020 },
-  bannedWords: { type: [String], default: ['bad'], maxlength: 120 },
+  bannedWords: {
+    type: [String],
+    default: [...config.DEFAULT_BANNED.split(' ')],
+    maxlength: 120,
+  },
   muteRole: { type: String, default: null },
   nextCaseId: { type: Number, default: 1 },
   nextWarnId: { type: Number, default: 1 },

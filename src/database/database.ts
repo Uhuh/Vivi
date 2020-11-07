@@ -14,9 +14,9 @@ export type CaseType =
   | 'unwarn';
 
 export const GENERATE_GUILD_CONFIG = async (guildId: string) => {
-  return await ConfigModel.create({ guildId }).catch(() => {
-    console.error(`Failed to generate a config for guild[${guildId}]`);
-  });
+  return await ConfigModel.create({ guildId }).catch(() =>
+    console.error(`Failed to generate a config for guild[${guildId}]`)
+  );
 };
 
 export const GET_GUILD_CONFIG = async (guildId: string) => {
@@ -305,7 +305,10 @@ export const SET_MUTE_ROLE = (guildId: string, muteRole: string) => {
 };
 
 export const REMOVE_MUTE_ROLE = (guildId: string) => {
-  ConfigModel.findOneAndUpdate({ guildId }, { muteRole: undefined });
+  ConfigModel.findOneAndUpdate(
+    { guildId },
+    { $unset: { muteRole: 1 } }
+  ).catch(() => console.error(`Error on removing mute role`));
 };
 
 export const SET_WARN_LIMIT = (guildId: string, maxWarns: number) => {

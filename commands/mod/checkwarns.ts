@@ -4,7 +4,8 @@ import { GET_GUILD_CONFIG, GET_USER_WARNS } from '../../src/database/database';
 
 const checkwarns = {
   desc:
-    'List a users warnings, get their active warnings by using the active tag after the id',
+    'List a users warnings, get their active warnings by using the active tag after the id\n' +
+    'Active warns are warns that have not expired yet.',
   name: 'checkwarns',
   args: '<user id> [active]',
   alias: ['cw'],
