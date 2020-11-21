@@ -134,12 +134,8 @@ These changes include:
     </div>
   </div>
   <div style="display:flex;width:90%;padding-top:20px;">
-    <img style="border-radius:10px;width:333px" src="https://media.discordapp.net/attachments/739975295641321581/773696231562149888/mute1.png">
+    <img style="border-radius:10px;width:333px;height:100%" src="https://media.discordapp.net/attachments/739975295641321581/773696231562149888/mute1.png">
     <div style="padding-left:20px">
-    <hr style="border: 1px solid grey;background-color:grey;border-radius:5px;">
-      <strong>Souped-Up Server Mutes</strong>
-      <hr style="border: 1px solid grey;background-color:grey;border-radius:5px;">
-      <br>
       <strong>If someone is continuing to be a nuisance on your server even after you warn them, slap a mute down and shut them up real quick! My mute system applies a server role to users that - after setting up your mute permissions - will not only keep people from messaging in channels, but also removes their access to the channels entirely! 
       </strong>
     </div>

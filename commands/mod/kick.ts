@@ -29,7 +29,13 @@ const kick = {
     let user = message.guild?.members.cache.get(userId || '');
     // Try a fetch incase the user isn't cached.
     if (!user) {
-      await message.guild?.members.fetch(userId || '');
+      await message.guild?.members
+        .fetch(userId || '')
+        .catch(() =>
+          console.error(
+            `Failed to get user to kick. ID is probably a message ID. [${userId}]`
+          )
+        );
       user = message.guild?.members.cache.get(userId || '');
     }
 

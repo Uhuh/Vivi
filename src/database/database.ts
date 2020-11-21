@@ -244,7 +244,7 @@ export const NEW_BANNED_WORD = async (guildId: string, words: string[]) => {
   return ConfigModel.findOneAndUpdate(
     { guildId },
     {
-      $push: {
+      $addToSet: {
         bannedWords: {
           $each: words,
         },

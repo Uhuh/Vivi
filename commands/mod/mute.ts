@@ -31,7 +31,7 @@ const mute = {
 
     if (!config.muteRole) {
       return message.reply(
-        `there is no mute role configured for this server. Try \`${config.prefix}muterole <mute roleId/mention>\``
+        `there is no mute role configured for this server. Try \`${config.prefix}config mute <@role/ID>\``
       );
     }
 
@@ -57,7 +57,13 @@ const mute = {
     let user = message.guild?.members.cache.get(userId || '');
     // Try a fetch incase the user isn't cached.
     if (!user) {
-      await message.guild?.members.fetch(userId || '');
+      await message.guild?.members
+        .fetch(userId || '')
+        .catch(() =>
+          console.error(
+            `Failed to get user to mute. Potentially not a user ID. [${userId}]`
+          )
+        );
       user = message.guild?.members.cache.get(userId || '');
     }
 

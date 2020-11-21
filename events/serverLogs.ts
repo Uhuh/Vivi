@@ -60,7 +60,7 @@ export const MessageDelete = async (message: DMsg) => {
 };
 
 export const MessageEdit = async (oldMsg: DMsg, newMsg: DMsg) => {
-  if (!oldMsg.guild) return;
+  if (!oldMsg.guild || oldMsg.content === newMsg.content) return;
   const embed = new Discord.MessageEmbed();
   const config = await GET_GUILD_CONFIG(oldMsg.guild.id);
   /**

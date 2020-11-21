@@ -53,14 +53,14 @@ export default {
         warnings.length
           ? `Total: ${warnings.length} | Active: ${
               activeWarns.length
-            }\n\nIDs: ${warnings.map((w) => w.id)}`
+            }\n\nIDs: ${warnings.map((w) => w.warnId)}`
           : 'No warnings for this user'
       )
       .addField(
         'Active Warnings',
         activeWarns.length
           ? activeWarns
-              .map((w) => `ID: ${w.id} | Reason: ${w.reason}\n`)
+              .map((w) => `ID: ${w.warnId} | Reason: ${w.reason}\n`)
               .join('')
           : 'No active warnings for this user'
       );

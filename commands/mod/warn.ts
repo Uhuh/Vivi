@@ -38,13 +38,14 @@ const warn = {
     if (message.mentions.members?.first()) args.shift();
 
     // Ensure the user is in the guild
-    await message.guild?.members.fetch(userId || '');
-    let user = message.guild?.members.cache.get(userId || '');
-    // Try a fetch incase the user isn't cached.
-    if (!user) {
-      await message.guild?.members.fetch(userId || '');
-      user = message.guild?.members.cache.get(userId || '');
-    }
+    await message.guild?.members
+      .fetch(userId || '')
+      .catch(() =>
+        console.error(
+          `Failed to get user to warn. Probably message ID. [${userId}]`
+        )
+      );
+    const user = message.guild?.members.cache.get(userId || '');
 
     if (!user) {
       return message.reply(
