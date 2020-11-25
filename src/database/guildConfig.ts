@@ -18,6 +18,11 @@ const GuildConfig = new Schema({
     default: [...config.DEFAULT_BANNED.split(' ')],
     maxlength: 120,
   },
+  joinRoles: {
+    type: [String],
+    default: [],
+    maxlength: 5,
+  },
   muteRole: { type: String, default: null },
   nextCaseId: { type: Number, default: 1 },
   nextWarnId: { type: Number, default: 1 },
@@ -33,6 +38,7 @@ export interface IGuildConfig {
   serverLogWhitelist?: string[];
   banMessage?: string;
   bannedWords?: string[];
+  joinRoles?: string[];
   muteRole?: string;
   nextCaseId?: number;
   nextWarnId?: number;

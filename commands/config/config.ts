@@ -2,12 +2,15 @@ import { Message, MessageEmbed, TextChannel } from 'discord.js';
 import ViviBot from '../../src/bot';
 import {
   ADD_CHANNEL_WHITELIST,
+  ADD_JOIN_ROLE,
   GENERATE_GUILD_CONFIG,
   GET_BANNED_WORDS,
   GET_GUILD_CONFIG,
+  GUILD_JOIN_ROLES,
   NEW_BANNED_WORD,
   REMOVE_BANNED_WORD,
   REMOVE_CHANNEL_WHITELIST,
+  REMOVE_JOIN_ROLE,
   REMOVE_MUTE_ROLE,
   SET_BANNED_MSG,
   SET_GUILD_PREFIX,
@@ -146,10 +149,105 @@ const config = {
       case 'listwords':
         listWords.run(message);
         break;
+      case 'join':
+        joinRole.run(message, args, client);
+        break;
       default:
         message.reply(
           `invalid config type! Run the config help command to see the list.`
         );
+    }
+
+    return;
+  },
+};
+
+const joinRole = {
+  desc: 'Add, remove or list the guilds join roles.',
+  name: 'join',
+  args: '<add | remove | list> <Role name | Role ID>',
+  alias: ['j'],
+  type: 'config',
+  run: async (message: Message, args: string[], client: ViviBot) => {
+    if (
+      !message.guild ||
+      !message.member?.hasPermission(['MANAGE_GUILD']) ||
+      args.length === 0
+    )
+      return;
+
+    const command = args.shift()?.toLowerCase();
+    const roleId = args.join(' ');
+    switch (command) {
+      case 'add':
+      case 'remove':
+        if (!roleId) {
+          return message.reply(`you need to include the role name or ID.`);
+        }
+
+        const role = message.guild.roles.cache.find(
+          (r) => r.id === roleId || r.name.toLowerCase() === roleId
+        );
+
+        if (!role) {
+          return message.reply(`couldn't find a role with that name or ID`);
+        }
+
+        const clientMember = message.guild.members.cache.find(
+          (m) => m.id === client.user?.id
+        );
+
+        if (!clientMember) {
+          return console.error(
+            `Join command - I don't know why the client member was unfindable.`
+          );
+        }
+
+        if (
+          role.position >
+          Math.max(...clientMember.roles.cache.map((r) => r.position))
+        ) {
+          return message.reply(
+            `the role you're trying to add is higher in the role hierarchy so I can't give it out. Put it below my role or give me a role that's above it.`
+          );
+        }
+        if (command === 'add') {
+          ADD_JOIN_ROLE(message.guild.id, role.id)
+            .then(() =>
+              message.reply(`successfully added the role to the join list.`)
+            )
+            .catch(() => {
+              message.reply(`issue adding role. :(`);
+            });
+        } else {
+          REMOVE_JOIN_ROLE(message.guild.id, role.id)
+            .then(() =>
+              message.reply(`successfully removed the role from the join list.`)
+            )
+            .catch(() => {
+              message.reply(`issue removing role. :(`);
+            });
+        }
+        break;
+      case 'list':
+        const roles = await GUILD_JOIN_ROLES(message.guild.id);
+        if (!roles) {
+          return message.reply(`no join roles!`);
+        }
+        const embed = new MessageEmbed();
+        embed
+          .setTitle(`Roles users get when joining`)
+          .setColor(16580705)
+          .setDescription(
+            `${
+              !roles.joinRoles?.length
+                ? 'No join roles!'
+                : roles.joinRoles.map((r) => `<@&${r}>`).join('\n')
+            }`
+          );
+
+        message.channel.send(embed);
+        break;
     }
 
     return;
@@ -532,6 +630,7 @@ const configFuncs = [
   prefix,
   word,
   banMsg,
+  joinRole,
   logs,
   mute,
   warnExpire,

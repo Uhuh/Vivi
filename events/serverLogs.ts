@@ -1,5 +1,9 @@
 import * as Discord from 'discord.js';
-import { GET_GUILD_CONFIG, GET_USER_MUTE } from '../src/database/database';
+import {
+  GET_GUILD_CONFIG,
+  GET_USER_MUTE,
+  GUILD_JOIN_ROLES,
+} from '../src/database/database';
 
 // Discord Message
 type DMsg = Discord.Message | Discord.PartialMessage;
@@ -9,16 +13,18 @@ export const UserJoin = async (
 ) => {
   if (!member.guild) return;
   const config = await GET_GUILD_CONFIG(member.guild.id);
-  if (!config?.muteRole) return;
+  const joinRoles = await GUILD_JOIN_ROLES(member.guild.id);
+
   const user = await GET_USER_MUTE(member.guild.id, member.id);
-  if (user) {
+  if (user && config?.muteRole) {
     member.roles
       ?.add(config?.muteRole)
       .catch(() => console.error(`Couldn't mute the user on join.`));
-  } else if (member instanceof Discord.GuildMember) {
-    /* member.send(
-      `Welcome to the Love Letter community!\nPlease wait 10 minutes until I can help you get verified. In the meantime make sure to read the <#732961554005229639> and look at the <#729135006018175077>.`
-    ).catch(() => console.error(`Couldn't DM user welcome message.`)); */
+  }
+  for (const role of joinRoles?.joinRoles || []) {
+    member.roles
+      ?.add(role)
+      .catch(() => console.error(`Couldn't give join role to user.`));
   }
 };
 

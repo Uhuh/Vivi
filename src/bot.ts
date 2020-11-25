@@ -15,6 +15,7 @@ import {
   GET_UNMUTED_USERS,
   GET_USER_WARNS,
   NEW_CASE,
+  REMOVE_JOIN_ROLE,
   UNMUTE_USER,
 } from './database/database';
 dotenv.config();
@@ -97,6 +98,7 @@ export default class ViviBot extends Discord.Client {
     });
     this.on('guildMemberAdd', (member) => UserJoin(member));
     this.on('guildCreate', ({ id }) => GENERATE_GUILD_CONFIG(id));
+    this.on('roleDelete', (role) => REMOVE_JOIN_ROLE(role.guild.id, role.id));
   }
 
   randomPres = () => {

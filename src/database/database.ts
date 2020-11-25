@@ -27,6 +27,36 @@ export const ALL_GUILD_PREFIXES = async () => {
   return await ConfigModel.find({}, 'guildId prefix');
 };
 
+export const GUILD_JOIN_ROLES = async (guildId: string) => {
+  return await ConfigModel.findOne({ guildId }, 'joinRoles');
+};
+
+export const ADD_JOIN_ROLE = async (guildId: string, roleId: string) => {
+  return await ConfigModel.findOneAndUpdate(
+    { guildId },
+    {
+      $push: {
+        joinRoles: {
+          $each: [roleId],
+        },
+      },
+    }
+  );
+};
+
+export const REMOVE_JOIN_ROLE = async (guildId: string, roleId: string) => {
+  return await ConfigModel.findOneAndUpdate(
+    { guildId },
+    {
+      $pull: {
+        joinRoles: {
+          $in: [roleId],
+        },
+      },
+    }
+  );
+};
+
 /**
  * Create new mod case and link to message and warn, if given.
  * @param guildId Guild ID is to calculate the next case ID
