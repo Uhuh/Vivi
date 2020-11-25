@@ -216,6 +216,15 @@ tr td:last-child {
     <td>Change the servers prefix.</td>
   </tr>
   <tr>
+    <td>v.config join &lt;add | remove | list&gt; &lt;name | id&gt;</td>
+    <td>v.config join add 781062380934266901<br>
+      v.config join add Member<br>
+      v.config join remove 781062380934266901<br>
+      v.config join list
+    </td>
+    <td>Add or remove a role that will be given to any user that joins the server. You can view the roles being given out with the list option.</td>
+  </tr>
+  <tr>
     <td>v.config word &lt;add | delete&gt; &lt;word&gt;</td>
     <td>v.config word delete uwu<br>v.config word delete owo, 0w0, o3o<br>v.config word add uwu<br>v.config word add owo, 0w0, o3o</td>
     <td>Add or delete a word or list of words for the banned words filter list.</td>
