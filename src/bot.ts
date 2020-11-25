@@ -324,14 +324,20 @@ export default class ViviBot extends Discord.Client {
       if (!config?.muteRole) continue;
       const mutes = await GET_UNMUTED_USERS(id);
       for (const m of mutes) {
-        await guild.members.fetch(m.userId);
-        const member = guild.members.cache.get(m.userId);
-
-        if (member) {
-          member.roles.remove(config.muteRole).catch();
-          this.logIssue(id, 'unmute', 'Times up.', this.user!, member.user);
+        try {
+          await guild.members.fetch(m.userId);
+          const member = guild.members.cache.get(m.userId);
+          if (member) {
+            member.roles.remove(config.muteRole).catch();
+            this.logIssue(id, 'unmute', 'Times up.', this.user!, member.user);
+          }
+        } catch {
+          /**
+           * If the member left the server execute this instead.
+           */
+          this.logIssue(id, 'unmute', 'Times up.', this.user!, m.userId);
+          UNMUTE_USER(id, m.userId);
         }
-        UNMUTE_USER(id, m.userId);
       }
     }
   };
