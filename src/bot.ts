@@ -331,6 +331,7 @@ export default class ViviBot extends Discord.Client {
             member.roles.remove(config.muteRole).catch();
             this.logIssue(id, 'unmute', 'Times up.', this.user!, member.user);
           }
+          UNMUTE_USER(id, m.userId);
         } catch {
           /**
            * If the member left the server execute this instead.
