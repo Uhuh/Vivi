@@ -14,11 +14,11 @@ import {
   REMOVE_MUTE_ROLE,
   SET_BANNED_MSG,
   SET_GUILD_PREFIX,
-  SET_MAX_WARNS,
   SET_MOD_CHANNEL,
   SET_MUTE_ROLE,
   SET_SERVER_CHANNEL,
   SET_WARN_EXPIRE,
+  SET_WARN_LIMIT,
 } from '../../src/database/database';
 
 const config = {
@@ -484,7 +484,7 @@ const warnsMax = {
       return message.reply(`That's not within the range [1, 10]`);
     }
 
-    return SET_MAX_WARNS(message.guild.id!, maxWarns)
+    return SET_WARN_LIMIT(message.guild.id!, maxWarns)
       .then(() => message.reply(`successfully set the max warns.`))
       .catch(() =>
         message.reply(`I failed to set the max warns for this guild.`)

@@ -416,7 +416,7 @@ export const REMOVE_MUTE_ROLE = (guildId: string) => {
  * @param maxWarns Max allowed warnings for this guild config.
  */
 export const SET_WARN_LIMIT = (guildId: string, maxWarns: number) => {
-  ConfigModel.findOneAndUpdate({ guildId }, { maxWarns }).catch(() =>
+  return ConfigModel.findOneAndUpdate({ guildId }, { maxWarns }).catch(() =>
     console.error(`Error on setting max warns for guild[${guildId}]`)
   );
 };
