@@ -203,9 +203,14 @@ export const SET_MAX_WARNS = async (guildId: string, maxWarns: number) => {
  * @param modLog The mod channel id.
  */
 export const SET_MOD_CHANNEL = (guildId: string, modLog: string) => {
-  ConfigModel.findOneAndUpdate({ guildId }, { modLog }, (err) => {
-    if (err) console.error(`Error on setting mod log channel.`);
-  });
+  ConfigModel.findOneAndUpdate(
+    { guildId },
+    { modLog },
+    { new: true },
+    (err) => {
+      if (err) console.error(`Error on setting mod log channel.`);
+    }
+  );
 };
 
 /**
@@ -214,9 +219,14 @@ export const SET_MOD_CHANNEL = (guildId: string, modLog: string) => {
  * @param serverLog The server channel id.
  */
 export const SET_SERVER_CHANNEL = (guildId: string, serverLog: string) => {
-  ConfigModel.findOneAndUpdate({ guildId }, { serverLog }, (err) => {
-    if (err) console.error(`Error on setting server log channel.`);
-  });
+  ConfigModel.findOneAndUpdate(
+    { guildId },
+    { serverLog },
+    { new: true },
+    (err) => {
+      if (err) console.error(`Error on setting server log channel.`);
+    }
+  );
 };
 
 export const ADD_CHANNEL_WHITELIST = async (
@@ -302,6 +312,7 @@ export const REMOVE_BANNED_WORD = async (guildId: string, words: string[]) => {
         },
       },
     },
+    { new: true },
     (err) => {
       if (err) {
         return console.error(
@@ -326,12 +337,17 @@ export const SET_GUILD_PREFIX = async (guildId: string, prefix: string) => {
 };
 
 export const SET_MUTE_ROLE = (guildId: string, muteRole: string) => {
-  ConfigModel.findOneAndUpdate({ guildId }, { muteRole }, (err) => {
-    if (err)
-      return console.error(
-        `Error on setting guilds[${guildId}] mute role[${muteRole}]`
-      );
-  });
+  ConfigModel.findOneAndUpdate(
+    { guildId },
+    { muteRole },
+    { new: true },
+    (err: any) => {
+      if (err)
+        return console.error(
+          `Error on setting guilds[${guildId}] mute role[${muteRole}]`
+        );
+    }
+  );
 };
 
 export const REMOVE_MUTE_ROLE = (guildId: string) => {

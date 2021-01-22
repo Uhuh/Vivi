@@ -8,7 +8,7 @@ import {
 // Discord Message
 type DMsg = Discord.Message | Discord.PartialMessage;
 
-export const UserJoin = async (
+export const UserJoinRoles = async (
   member: Discord.GuildMember | Discord.PartialGuildMember
 ) => {
   if (!member.guild) return;
@@ -26,6 +26,46 @@ export const UserJoin = async (
       ?.add(role)
       .catch(() => console.error(`Couldn't give join role to user.`));
   }
+};
+
+/**
+ *
+ * @param member The user that joined or left the guild.
+ * @param type join | leave - If a user join or left a guild.
+ */
+export const MemberUpdated = async (
+  member: Discord.GuildMember | Discord.PartialGuildMember,
+  type: 'join' | 'left'
+) => {
+  if (!member.guild) return;
+  const config = await GET_GUILD_CONFIG(member.guild.id);
+
+  /**
+   * If there is no server log configured ignore.
+   */
+  if (!config?.serverLog) return;
+
+  const channel = member.guild.channels.cache.get(
+    config?.serverLog
+  ) as Discord.TextChannel;
+
+  const embed = new Discord.MessageEmbed();
+
+  embed
+    .setTitle(`**User ${type} (${member.id})**`)
+    .setThumbnail(member.user?.avatarURL() || '')
+    .addField('Member', member, true)
+    .setFooter(`ID: ${member.id}`)
+    .setTimestamp(new Date());
+
+  if (type === 'join') {
+    embed
+      .addField('**Created**', member.user?.createdAt.toDateString(), true)
+      .addField('**Username**', member.user?.tag, true)
+      .addField('**ID**', member.user?.id);
+  }
+
+  channel.send(embed);
 };
 
 export const MessageDelete = async (message: DMsg) => {

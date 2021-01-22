@@ -1,4 +1,4 @@
-import { Message } from 'discord.js';
+import { Message, TextChannel } from 'discord.js';
 
 export default {
   desc: 'Clear messages in a channel.',
@@ -10,7 +10,7 @@ export default {
     let amount = Number(args[0]);
     const { member } = message;
 
-    const channel = message.channel;
+    const channel = message.channel as TextChannel;
 
     if (!member?.hasPermission('MANAGE_MESSAGES')) {
       return message.react('👎');

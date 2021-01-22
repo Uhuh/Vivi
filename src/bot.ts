@@ -5,7 +5,12 @@ import * as moment from 'moment';
 import * as mongoose from 'mongoose';
 import commandHandler from '../commands/commandHandler';
 import msg from '../events/message';
-import { MessageDelete, MessageEdit, UserJoin } from '../events/serverLogs';
+import {
+  MemberUpdated,
+  MessageDelete,
+  MessageEdit,
+  UserJoinRoles,
+} from '../events/serverLogs';
 import {
   ALL_GUILD_PREFIXES,
   CREATE_WARN,
@@ -96,7 +101,11 @@ export default class ViviBot extends Discord.Client {
         console.error(`Error on message update!`);
       }
     });
-    this.on('guildMemberAdd', (member) => UserJoin(member));
+    this.on('guildMemberAdd', (member) => {
+      UserJoinRoles(member);
+      MemberUpdated(member, 'join');
+    });
+    this.on('guildMemberRemove', (member) => MemberUpdated(member, 'left'));
     this.on('guildCreate', ({ id }) => GENERATE_GUILD_CONFIG(id));
     this.on('roleDelete', (role) => REMOVE_JOIN_ROLE(role.guild.id, role.id));
   }
