@@ -4,6 +4,9 @@ import MuteModel from './mutes';
 import WarnModel from './warnings';
 import * as moment from 'moment';
 
+/**
+ * All types of cases that can be logged in the mod log channel.
+ */
 export type CaseType =
   | 'unmute'
   | 'mute'
@@ -13,24 +16,44 @@ export type CaseType =
   | 'kick'
   | 'unwarn';
 
+/**
+ * Create a new config model for guild.
+ * @param guildId Newly joined guild or setup command guild id.
+ */
 export const GENERATE_GUILD_CONFIG = async (guildId: string) => {
   return await ConfigModel.create({ guildId }).catch(() =>
     console.error(`Failed to generate a config for guild[${guildId}]`)
   );
 };
 
+/**
+ * Get a specific guild config.
+ * @param guildId Guild Id to retrieve specific guild config.
+ */
 export const GET_GUILD_CONFIG = async (guildId: string) => {
   return await ConfigModel.findOne({ guildId });
 };
 
+/**
+ * Get all guild prefixes.
+ */
 export const ALL_GUILD_PREFIXES = async () => {
   return await ConfigModel.find({}, 'guildId prefix');
 };
 
+/**
+ * Get joinRoles for a single guild.
+ * @param guildId Guild ID
+ */
 export const GUILD_JOIN_ROLES = async (guildId: string) => {
   return await ConfigModel.findOne({ guildId }, 'joinRoles');
 };
 
+/**
+ * Add a role ID to a specific guilds joinRoles array.
+ * @param guildId Guild ID
+ * @param roleId Role ID to be added to joinRoles
+ */
 export const ADD_JOIN_ROLE = async (guildId: string, roleId: string) => {
   return await ConfigModel.findOneAndUpdate(
     { guildId },
@@ -44,6 +67,11 @@ export const ADD_JOIN_ROLE = async (guildId: string, roleId: string) => {
   );
 };
 
+/**
+ * Remove a role ID from a specific guilds joinRoles array.
+ * @param guildId Guild ID
+ * @param roleId Role ID to be removed from joinRoles
+ */
 export const REMOVE_JOIN_ROLE = async (guildId: string, roleId: string) => {
   return await ConfigModel.findOneAndUpdate(
     { guildId },
@@ -92,7 +120,7 @@ export const NEW_CASE = async (
         `Successfully created case for user[${userId}] by mod[${modId}]`
       );
     })
-    .catch((err) => {
+    .catch((err: any) => {
       console.error(
         `Error creating case for user[${userId}] by mod[${modId}] : Type[${type}]`
       );
@@ -189,12 +217,13 @@ export const GET_USER_WARN = async (guildId: string, userId: string) => {
   return await WarnModel.findOne({ guildId, userId });
 };
 
+/**
+ * Get a single warning for a specific guild.
+ * @param guildId Guild ID
+ * @param warnId Warn ID to find specific warn.
+ */
 export const GET_WARN = async (guildId: string, warnId: number) => {
   return await WarnModel.findOne({ guildId, warnId });
-};
-
-export const SET_MAX_WARNS = async (guildId: string, maxWarns: number) => {
-  return ConfigModel.findOneAndUpdate({ guildId }, { maxWarns });
 };
 
 /**
@@ -207,7 +236,7 @@ export const SET_MOD_CHANNEL = (guildId: string, modLog: string) => {
     { guildId },
     { modLog },
     { new: true },
-    (err) => {
+    (err: any) => {
       if (err) console.error(`Error on setting mod log channel.`);
     }
   );
@@ -223,12 +252,17 @@ export const SET_SERVER_CHANNEL = (guildId: string, serverLog: string) => {
     { guildId },
     { serverLog },
     { new: true },
-    (err) => {
+    (err: any) => {
       if (err) console.error(`Error on setting server log channel.`);
     }
   );
 };
 
+/**
+ * Add a channel ID to list of ignored channels for server logging.
+ * @param guildId Guild ID for ConfigModel
+ * @param channelId Channel ID for serverlogging to ignore.
+ */
 export const ADD_CHANNEL_WHITELIST = async (
   guildId: string,
   channelId: string
@@ -245,6 +279,11 @@ export const ADD_CHANNEL_WHITELIST = async (
   );
 };
 
+/**
+ * Remove a channel Id from server logging whitelist.
+ * @param guildId Guild ID for ConfigModel
+ * @param channelId Channel ID to remove from whitelist.
+ */
 export const REMOVE_CHANNEL_WHITELIST = async (
   guildId: string,
   channelId: string
@@ -313,7 +352,7 @@ export const REMOVE_BANNED_WORD = async (guildId: string, words: string[]) => {
       },
     },
     { new: true },
-    (err) => {
+    (err: any) => {
       if (err) {
         return console.error(
           `Error on removing words[${words}] for guild[${guildId}]`
@@ -332,10 +371,20 @@ export const SET_BANNED_MSG = async (guildId: string, banMessage: string) => {
   return ConfigModel.findOneAndUpdate({ guildId }, { banMessage });
 };
 
+/**
+ * Change the guilds prefix.
+ * @param guildId Guild Id to get ConfigModel.
+ * @param prefix Prefix to set for guild.
+ */
 export const SET_GUILD_PREFIX = async (guildId: string, prefix: string) => {
   return ConfigModel.findOneAndUpdate({ guildId }, { prefix });
 };
 
+/**
+ * Set a role as a guilds mute role.
+ * @param guildId Guild ID to get ConfigModel
+ * @param muteRole Role ID to set as the mute role.
+ */
 export const SET_MUTE_ROLE = (guildId: string, muteRole: string) => {
   ConfigModel.findOneAndUpdate(
     { guildId },
@@ -350,6 +399,10 @@ export const SET_MUTE_ROLE = (guildId: string, muteRole: string) => {
   );
 };
 
+/**
+ * Remove the mute role from guild config.
+ * @param guildId Guild ID to get ConfigModel.
+ */
 export const REMOVE_MUTE_ROLE = (guildId: string) => {
   ConfigModel.findOneAndUpdate(
     { guildId },
@@ -357,12 +410,22 @@ export const REMOVE_MUTE_ROLE = (guildId: string) => {
   ).catch(() => console.error(`Error on removing mute role`));
 };
 
+/**
+ * Set a maximum amount of warns a user can get for the guild.
+ * @param guildId Guild ID to set Config/
+ * @param maxWarns Max allowed warnings for this guild config.
+ */
 export const SET_WARN_LIMIT = (guildId: string, maxWarns: number) => {
   ConfigModel.findOneAndUpdate({ guildId }, { maxWarns }).catch(() =>
     console.error(`Error on setting max warns for guild[${guildId}]`)
   );
 };
 
+/**
+ * Set how many days until a warn expires in the guild.
+ * @param guildId Guild ID to get ConfigModel
+ * @param warnLifeSpan Number of days til warn expires.
+ */
 export const SET_WARN_EXPIRE = async (
   guildId: string,
   warnLifeSpan: number
@@ -370,10 +433,21 @@ export const SET_WARN_EXPIRE = async (
   return ConfigModel.findOneAndUpdate({ guildId }, { warnLifeSpan });
 };
 
+/**
+ * Get all mutes in this guild.
+ * @param guildId Guild ID for MuteModel
+ */
 export const GET_GUILD_MUTES = async (guildId: string) => {
   return await MuteModel.find({ guildId });
 };
 
+/**
+ * Mute a user for a set amount of time.
+ * @param guildId GuildID for MuteModel
+ * @param userId User to mute
+ * @param dateMuted Date muted
+ * @param unMuteDate When they will be unmuted.
+ */
 export const MUTE_USER = (
   guildId: string,
   userId: string,
@@ -385,6 +459,12 @@ export const MUTE_USER = (
   );
 };
 
+/**
+ * Extend or shorten a users mute date.
+ * @param guildId Guild ID for MuteModel
+ * @param userId User to update mute for.
+ * @param unMuteDate New unmute date.
+ */
 export const UPDATE_USER_MUTE = (
   guildId: string,
   userId: string,
@@ -395,14 +475,28 @@ export const UPDATE_USER_MUTE = (
   );
 };
 
+/**
+ * Remove user from mute list.
+ * @param guildId Guild ID for MuteModel
+ * @param userId User to unmute.
+ */
 export const UNMUTE_USER = async (guildId: string, userId: string) => {
   return MuteModel.findOneAndDelete({ guildId, userId });
 };
 
+/**
+ * Get a users mute details.
+ * @param guildId Guild ID for MuteModel.
+ * @param userId User mute to retrieve.
+ */
 export const GET_USER_MUTE = async (guildId: string, userId: string) => {
   return await MuteModel.findOne({ guildId, userId });
 };
 
+/**
+ * Get all users for whom unmute dates are passed.
+ * @param guildId Guild ID to check for unmuted users.
+ */
 export const GET_UNMUTED_USERS = async (guildId: string) => {
   const now = moment().unix();
   return MuteModel.find({
