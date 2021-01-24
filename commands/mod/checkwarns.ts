@@ -11,8 +11,17 @@ const checkwarns = {
   alias: ['cw'],
   type: 'mod',
   run: async (message: Message, args: string[]) => {
-    if (!message.member?.hasPermission('MANAGE_MESSAGES')) {
-      return message.react('❌');
+    if (!message.guild) return;
+    const { guild } = message;
+    const config = await GET_GUILD_CONFIG(guild.id);
+
+    if (!config) return;
+
+    if (
+      !message.member?.hasPermission('MANAGE_MESSAGES') &&
+      !(config.modRole && message.member?.roles.cache.has(config.modRole))
+    ) {
+      return message.react('👎');
     }
     if (!args.length) {
       return message.reply(`please supply a user id.`);
@@ -33,7 +42,6 @@ const checkwarns = {
     }
 
     const warns = await GET_USER_WARNS(message.guild?.id!, userId);
-    const config = await GET_GUILD_CONFIG(message.guild?.id!);
 
     const embed = new MessageEmbed();
     const active = args.shift() || 'not';

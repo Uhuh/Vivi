@@ -1,5 +1,6 @@
 import { Message } from 'discord.js';
 import ViviBot from '../../src/bot';
+import { GET_GUILD_CONFIG } from '../../src/database/database';
 
 const kick = {
   desc: 'Kick a user',
@@ -8,8 +9,17 @@ const kick = {
   alias: ['k'],
   type: 'mod',
   run: async (message: Message, args: string[], client: ViviBot) => {
-    if (!message.member?.hasPermission('KICK_MEMBERS')) {
-      return message.react('❌');
+    if (!message.guild) return;
+    const { guild } = message;
+    const config = await GET_GUILD_CONFIG(guild.id);
+
+    if (!config) return;
+
+    if (
+      !message.member?.hasPermission('KICK_MEMBERS') &&
+      !(config.modRole && message.member?.roles.cache.has(config.modRole))
+    ) {
+      return message.react('👎');
     }
     if (!args.length) {
       const prefix = client.guildPrefix.get(message.guild?.id || '') || 'v.';

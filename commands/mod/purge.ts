@@ -1,4 +1,5 @@
 import { Message, TextChannel } from 'discord.js';
+import { GET_GUILD_CONFIG } from '../../src/database/database';
 
 export default {
   desc: 'Clear messages in a channel.',
@@ -6,13 +7,21 @@ export default {
   args: '<amount>',
   alias: ['p'],
   type: 'mod',
-  run: (message: Message, args: string[]) => {
+  run: async (message: Message, args: string[]) => {
     let amount = Number(args[0]);
-    const { member } = message;
 
     const channel = message.channel as TextChannel;
 
-    if (!member?.hasPermission('MANAGE_MESSAGES')) {
+    if (!message.guild) return;
+    const { guild } = message;
+    const config = await GET_GUILD_CONFIG(guild.id);
+
+    if (!config) return;
+
+    if (
+      !message.member?.hasPermission('MANAGE_MESSAGES') &&
+      !(config.modRole && message.member?.roles.cache.has(config.modRole))
+    ) {
       return message.react('👎');
     }
     if (Number.isNaN(amount)) {

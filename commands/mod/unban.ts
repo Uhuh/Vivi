@@ -1,5 +1,6 @@
 import { Message } from 'discord.js';
 import ViviBot from '../../src/bot';
+import { GET_GUILD_CONFIG } from '../../src/database/database';
 
 const unban = {
   desc: 'Unban a user',
@@ -7,8 +8,17 @@ const unban = {
   args: '<user id> <reason>',
   alias: ['ub'],
   type: 'mod',
-  run: (message: Message, args: string[], client: ViviBot) => {
-    if (!message.member?.hasPermission('BAN_MEMBERS')) {
+  run: async (message: Message, args: string[], client: ViviBot) => {
+    if (!message.guild) return;
+    const { guild } = message;
+    const config = await GET_GUILD_CONFIG(guild.id);
+
+    if (!config) return;
+
+    if (
+      !message.member?.hasPermission('BAN_MEMBERS') &&
+      !(config.modRole && message.member?.roles.cache.has(config.modRole))
+    ) {
       return message.react('👎');
     }
     if (!args.length) {

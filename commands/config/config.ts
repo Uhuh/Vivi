@@ -75,6 +75,13 @@ const config = {
           true
         )
         .addField(
+          'Mod role:',
+          guildConfig.modRole
+            ? guild.roles.cache.get(guildConfig.modRole)
+            : 'Not set!',
+          true
+        )
+        .addField(
           'Current amount of mod cases:',
           guildConfig.nextCaseId! - 1,
           true

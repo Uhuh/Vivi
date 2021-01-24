@@ -1,6 +1,10 @@
 import { Message } from 'discord.js';
 import ViviBot from '../../src/bot';
-import { DELETE_WARN, GET_WARN } from '../../src/database/database';
+import {
+  DELETE_WARN,
+  GET_GUILD_CONFIG,
+  GET_WARN,
+} from '../../src/database/database';
 
 const unwarn = {
   desc: 'Remove a warning from a user',
@@ -9,9 +13,17 @@ const unwarn = {
   alias: ['uw'],
   type: 'mod',
   run: async (message: Message, args: string[], client: ViviBot) => {
+    if (!message.guild) return;
     const { guild } = message;
-    if (!guild || !message.member?.hasPermission('MANAGE_MESSAGES')) {
-      return message.react('❌');
+    const config = await GET_GUILD_CONFIG(guild.id);
+
+    if (!config) return;
+
+    if (
+      !message.member?.hasPermission('MANAGE_MESSAGES') &&
+      !(config.modRole && message.member?.roles.cache.has(config.modRole))
+    ) {
+      return message.react('👎');
     }
     if (!args.length) {
       return message.reply(

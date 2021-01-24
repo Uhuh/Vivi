@@ -1,4 +1,5 @@
 import { Message } from 'discord.js';
+import { GET_GUILD_CONFIG } from '../../src/database/database';
 
 const say = {
   desc:
@@ -7,8 +8,19 @@ const say = {
   args: '',
   alias: [],
   type: 'mod',
-  run: (message: Message, args: string[]) => {
-    if (!message.member?.hasPermission(['MANAGE_MESSAGES'])) return;
+  run: async (message: Message, args: string[]) => {
+    if (!message.guild) return;
+    const { guild } = message;
+    const config = await GET_GUILD_CONFIG(guild.id);
+
+    if (!config) return;
+
+    if (
+      !message.member?.hasPermission('MANAGE_MESSAGES') &&
+      !(config.modRole && message.member?.roles.cache.has(config.modRole))
+    ) {
+      return message.react('👎');
+    }
     const channel = message.mentions.channels.first();
     if (channel) args.shift();
 

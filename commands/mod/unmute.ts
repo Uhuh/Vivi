@@ -9,7 +9,16 @@ const unmute = {
   alias: ['um'],
   type: 'mod',
   run: async (message: Message, args: string[], client: ViviBot) => {
-    if (!message.member?.hasPermission('MANAGE_MESSAGES')) {
+    if (!message.guild) return;
+    const { guild } = message;
+    const config = await GET_GUILD_CONFIG(guild.id);
+
+    if (!config) return;
+
+    if (
+      !message.member?.hasPermission('MANAGE_MESSAGES') &&
+      !(config.modRole && message.member?.roles.cache.has(config.modRole))
+    ) {
       return message.react('👎');
     }
     if (!args.length) {
@@ -18,10 +27,6 @@ const unmute = {
         `you forgot some arguements. \`${prefix}unmute <user id> <reason>\``
       );
     }
-    const { guild } = message;
-    if (!guild) return;
-    const config = await GET_GUILD_CONFIG(guild.id);
-    if (!config) return;
 
     if (!config.muteRole) {
       return message.reply(

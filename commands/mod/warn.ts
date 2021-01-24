@@ -14,8 +14,17 @@ const warn = {
   alias: ['w'],
   type: 'mod',
   run: async (message: Message, args: string[], client: ViviBot) => {
-    if (!message.member?.hasPermission('MANAGE_MESSAGES')) {
-      return message.react('❌');
+    if (!message.guild) return;
+    const { guild } = message;
+    const config = await GET_GUILD_CONFIG(guild.id);
+
+    if (!config) return;
+
+    if (
+      !message.member?.hasPermission('MANAGE_MESSAGES') &&
+      !(config.modRole && message.member?.roles.cache.has(config.modRole))
+    ) {
+      return message.react('👎');
     }
     if (!args.length) {
       const prefix = client.guildPrefix.get(message.guild?.id || '') || 'v.';
@@ -23,11 +32,6 @@ const warn = {
         `you forgot some arguements. \`${prefix}warn <user id> <reason>\``
       );
     }
-
-    const { guild } = message;
-    if (!guild) return;
-    const config = await GET_GUILD_CONFIG(guild.id);
-    if (!config) return;
 
     /**
      * If they mention the user then use that otherwise they should've sent the user id

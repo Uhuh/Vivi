@@ -15,10 +15,18 @@ const reason = {
   alias: ['r'],
   type: 'mod',
   run: async (message: Message, args: string[]) => {
-    if (!message.guild || !message.member?.hasPermission(['MANAGE_MESSAGES']))
-      return;
+    if (!message.guild) return;
+    const { guild } = message;
+    const config = await GET_GUILD_CONFIG(guild.id);
 
-    const config = await GET_GUILD_CONFIG(message.guild.id);
+    if (!config) return;
+
+    if (
+      !message.member?.hasPermission('MANAGE_MESSAGES') &&
+      !(config.modRole && message.member?.roles.cache.has(config.modRole))
+    ) {
+      return message.react('👎');
+    }
 
     if (!config) {
       return message.reply(`I somehow cannot find the guilds config file.`);
