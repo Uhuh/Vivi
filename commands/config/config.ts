@@ -582,7 +582,7 @@ const modRole = {
   desc:
     'Set the mod role, anyone with this role will be presumed as a mod and can use the mod commands.',
   name: 'mod',
-  args: '',
+  args: '<@role | id | none>',
   alias: [''],
   type: 'config',
   run: async (message: Message, args: string[]) => {
