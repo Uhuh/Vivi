@@ -29,7 +29,7 @@ export const UserJoinRoles = async (
 };
 
 /**
- *
+ * Whenever a user joins or leaves a guild log it to the guilds server logs.
  * @param member The user that joined or left the guild.
  * @param type join | leave - If a user join or left a guild.
  */
@@ -39,6 +39,7 @@ export const MemberUpdated = async (
 ) => {
   if (!member.guild) return;
   const config = await GET_GUILD_CONFIG(member.guild.id);
+  const color = type === 'join' ? '#008E44' : '#A62019';
 
   /**
    * If there is no server log configured ignore.
@@ -53,6 +54,7 @@ export const MemberUpdated = async (
 
   embed
     .setTitle(`**User ${type} (${member.id})**`)
+    .setColor(color)
     .setThumbnail(member.user?.avatarURL() || '')
     .addField('Member', member, true)
     .setFooter(`ID: ${member.id}`)
@@ -68,10 +70,15 @@ export const MemberUpdated = async (
   channel.send(embed);
 };
 
+/**
+ * Whenever a message is deleted in a guild log to server logs.
+ * @param message Deleted message
+ */
 export const MessageDelete = async (message: DMsg) => {
   if (!message.guild) return;
   const embed = new Discord.MessageEmbed();
   const config = await GET_GUILD_CONFIG(message.guild.id);
+  const color = '#F8C300';
   /**
    * If there is no server log configured ignore.
    * If the guild whitelisted the channel ignore it.
@@ -93,6 +100,7 @@ export const MessageDelete = async (message: DMsg) => {
   }
   embed
     .setTitle('**Message Deleted**')
+    .setColor(color)
     .setAuthor(message.author?.tag, message.author?.avatarURL() || '')
     .setDescription(message.content === '' ? 'Vivi: Empty' : message.content)
     .addField(
@@ -105,10 +113,16 @@ export const MessageDelete = async (message: DMsg) => {
   channel.send(embed);
 };
 
+/**
+ * Whenever a message is edited log to server logs.
+ * @param oldMsg Old message content.
+ * @param newMsg New edited message.
+ */
 export const MessageEdit = async (oldMsg: DMsg, newMsg: DMsg) => {
   if (!oldMsg.guild || oldMsg.content === newMsg.content) return;
   const embed = new Discord.MessageEmbed();
   const config = await GET_GUILD_CONFIG(oldMsg.guild.id);
+  const color = '#CC7900';
   /**
    * If there is no server log configured ignore.
    * If the guild whitelisted the channel ignore it.
@@ -125,6 +139,7 @@ export const MessageEdit = async (oldMsg: DMsg, newMsg: DMsg) => {
 
   embed
     .setTitle('**Message Edited**')
+    .setColor(color)
     .setAuthor(newMsg.author?.tag, newMsg.author?.avatarURL() || '')
     .setDescription(
       (oldMsg?.content === '' ? 'Vivi: Empty!' : oldMsg.content) ||
@@ -134,9 +149,10 @@ export const MessageEdit = async (oldMsg: DMsg, newMsg: DMsg) => {
     .setTimestamp(new Date());
 
   const content = newMsg.content || 'Vivi: Empty!';
-
-  for (const line of split(content, 1024)) {
-    embed.addField(`**After edit**`, line);
+  const splitContent = split(content);
+  embed.addField(`**After edit**`, splitContent[0]);
+  for (let i = 1; i < splitContent.length; i++) {
+    embed.addField('-', splitContent[i]);
   }
 
   embed.addField(
@@ -147,13 +163,6 @@ export const MessageEdit = async (oldMsg: DMsg, newMsg: DMsg) => {
   channel.send(embed);
 };
 
-function split(input: string, len: number): string[] {
-  return (
-    input.match(
-      new RegExp(
-        '.{1,' + len + '}(?=(.{' + len + '})+(?!.))|.{1,' + len + '}$',
-        'g'
-      )
-    ) || [input]
-  );
+function split(input: string): string[] {
+  return input.match(/.{1,1024}/g) || [input];
 }
