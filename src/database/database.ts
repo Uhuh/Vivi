@@ -506,3 +506,33 @@ export const GET_UNMUTED_USERS = async (guildId: string) => {
     },
   }).sort({ unMuteDate: 'asc' });
 };
+
+/**
+ * Set a role ID to allow anyone with this role to gain access to mod commands.
+ * @param guildId Guild ID to get ConfigModel.
+ * @param modRole Role ID to set as the mod role.
+ */
+export const SET_MOD_ROLE = async (guildId: string, modRole: string) => {
+  ConfigModel.findOneAndUpdate(
+    { guildId },
+    { modRole },
+    { new: true },
+    (err: any) => {
+      if (err)
+        return console.error(
+          `Error on setting guilds[${guildId}] mute role[${modRole}]`
+        );
+    }
+  );
+};
+
+/**
+ * Remove the mod role ID.
+ * @param guildId Guild ID to get ConfigModel
+ */
+export const REMOVE_MOD_ROLE = async (guildId: string) => {
+  ConfigModel.findOneAndUpdate(
+    { guildId },
+    { $unset: { modRole: 1 } }
+  ).catch(() => console.error(`Error on removing mute role`));
+};

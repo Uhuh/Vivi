@@ -11,10 +11,12 @@ import {
   REMOVE_BANNED_WORD,
   REMOVE_CHANNEL_WHITELIST,
   REMOVE_JOIN_ROLE,
+  REMOVE_MOD_ROLE,
   REMOVE_MUTE_ROLE,
   SET_BANNED_MSG,
   SET_GUILD_PREFIX,
   SET_MOD_CHANNEL,
+  SET_MOD_ROLE,
   SET_MUTE_ROLE,
   SET_SERVER_CHANNEL,
   SET_WARN_EXPIRE,
@@ -136,6 +138,9 @@ const config = {
         break;
       case 'mute':
         mute.run(message, args);
+        break;
+      case 'mod':
+        modRole.run(message, args);
         break;
       case 'warnexpire':
         warnExpire.run(message, args);
@@ -566,6 +571,48 @@ const listWords = {
   },
 };
 
+const modRole = {
+  desc:
+    'Set the mod role, anyone with this role will be presumed as a mod and can use the mod commands.',
+  name: 'mod',
+  args: '',
+  alias: [''],
+  type: 'config',
+  run: async (message: Message, args: string[]) => {
+    if (!message.guild || !message.member?.hasPermission(['MANAGE_GUILD']))
+      return;
+
+    if (!args.length) {
+      return message.reply(
+        `you need to send either a role mention, id of 'none'.`
+      );
+    }
+
+    if (args.length && args[0] === 'none') {
+      const config = await GET_GUILD_CONFIG(message.guild.id);
+      if (!config?.modRole) {
+        return message.reply(
+          `the server doesn't have a mod role setup already!`
+        );
+      }
+
+      REMOVE_MOD_ROLE(message.guild.id);
+
+      return message.reply(`successfully remove mod role.`);
+    }
+
+    const roleId = message.mentions.roles.first()?.id || args.shift();
+
+    if (!roleId) {
+      return message.reply(`did you not pass a role id or not mention a role?`);
+    }
+
+    SET_MOD_ROLE(message.guild.id, roleId);
+
+    return message.reply(`successfully set mod role.`);
+  },
+};
+
 const setup = {
   desc: 'If Vivi failed to setup the server config, run this to fix it.',
   name: 'setup',
@@ -633,6 +680,7 @@ const configFuncs = [
   joinRole,
   logs,
   mute,
+  modRole,
   warnExpire,
   warnsMax,
   whitelist,

@@ -24,6 +24,7 @@ const GuildConfig = new Schema({
     maxlength: 5,
   },
   muteRole: { type: String, default: null },
+  modRole: { type: String, default: null },
   nextCaseId: { type: Number, default: 1 },
   nextWarnId: { type: Number, default: 1 },
 });
@@ -40,6 +41,7 @@ export interface IGuildConfig {
   bannedWords?: string[];
   joinRoles?: string[];
   muteRole?: string;
+  modRole?: string;
   nextCaseId?: number;
   nextWarnId?: number;
 }

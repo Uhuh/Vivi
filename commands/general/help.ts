@@ -27,6 +27,9 @@ const help = {
     embed
       .setTitle('**Commands**')
       .setColor(16711684)
+      .setURL(
+        'https://discord.com/oauth2/authorize?client_id=773437651780894722&scope=bot&permissions=67497190'
+      )
       .setAuthor(user.username, user.avatarURL() || '')
       .setThumbnail(user.avatarURL() || '')
       .setFooter(`Replying to: ${message.author.tag}`)
