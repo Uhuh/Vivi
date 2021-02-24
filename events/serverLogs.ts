@@ -8,6 +8,13 @@ import {
 // Discord Message
 type DMsg = Discord.Message | Discord.PartialMessage;
 
+export enum Color {
+  Green = '#008E44',
+  Red = '#008E44',
+  MustardYellow = '#F8C300',
+  DarkOrange = '#CC7900',
+}
+
 export const UserJoinRoles = async (
   member: Discord.GuildMember | Discord.PartialGuildMember
 ) => {
@@ -39,7 +46,7 @@ export const MemberUpdated = async (
 ) => {
   if (!member.guild) return;
   const config = await GET_GUILD_CONFIG(member.guild.id);
-  const color = type === 'join' ? '#008E44' : '#A62019';
+  const color = type === 'join' ? Color.Green : Color.Red;
 
   /**
    * If there is no server log configured ignore.
@@ -78,7 +85,6 @@ export const MessageDelete = async (message: DMsg) => {
   if (!message.guild) return;
   const embed = new Discord.MessageEmbed();
   const config = await GET_GUILD_CONFIG(message.guild.id);
-  const color = '#F8C300';
   /**
    * If there is no server log configured ignore.
    * If the guild whitelisted the channel ignore it.
@@ -95,12 +101,12 @@ export const MessageDelete = async (message: DMsg) => {
 
   if (message.attachments?.size) {
     for (const [, att] of message.attachments) {
-      channel.send(att.proxyURL);
+      embed.attachFiles([att.proxyURL]);
     }
   }
   embed
     .setTitle('**Message Deleted**')
-    .setColor(color)
+    .setColor(Color.MustardYellow)
     .setAuthor(message.author?.tag, message.author?.avatarURL() || '')
     .setDescription(message.content === '' ? 'Vivi: Empty' : message.content)
     .addField(
@@ -122,7 +128,6 @@ export const MessageEdit = async (oldMsg: DMsg, newMsg: DMsg) => {
   if (!oldMsg.guild || oldMsg.content === newMsg.content) return;
   const embed = new Discord.MessageEmbed();
   const config = await GET_GUILD_CONFIG(oldMsg.guild.id);
-  const color = '#CC7900';
   /**
    * If there is no server log configured ignore.
    * If the guild whitelisted the channel ignore it.
@@ -139,7 +144,7 @@ export const MessageEdit = async (oldMsg: DMsg, newMsg: DMsg) => {
 
   embed
     .setTitle('**Message Edited**')
-    .setColor(color)
+    .setColor(Color.DarkOrange)
     .setAuthor(newMsg.author?.tag, newMsg.author?.avatarURL() || '')
     .setDescription(
       (oldMsg?.content === '' ? 'Vivi: Empty!' : oldMsg.content) ||

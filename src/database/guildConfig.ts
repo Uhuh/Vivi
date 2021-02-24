@@ -29,6 +29,8 @@ const GuildConfig = new Schema({
   nextWarnId: { type: Number, default: 1 },
 });
 
+// type LoggingType = 'deleted_msg' | 'edit_msg' | 'user_join' | 'user_leave' | 'invite_created' | 'invite_used' |
+
 export interface IGuildConfig {
   guildId: string;
   maxWarns?: number;
