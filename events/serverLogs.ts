@@ -10,7 +10,7 @@ type DMsg = Discord.Message | Discord.PartialMessage;
 
 export enum Color {
   Green = '#008E44',
-  Red = '#008E44',
+  Red = '#A62019',
   MustardYellow = '#F8C300',
   DarkOrange = '#CC7900',
 }
