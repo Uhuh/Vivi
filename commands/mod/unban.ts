@@ -28,7 +28,9 @@ const unban = {
      * If they mention the user then use that otherwise they should've sent the user id
      * args.shift() returns the first element and pops it out of the array.
      */
-    const userId = message.mentions.members?.first()?.id || args.shift();
+    const userId =
+      message.mentions.members?.filter((u) => u.id !== client.user?.id).first()
+        ?.id || args.shift();
 
     if (message.mentions.members?.first()) args.shift();
 

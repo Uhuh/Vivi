@@ -1,5 +1,6 @@
 import { Message, MessageEmbed } from 'discord.js';
 import * as moment from 'moment';
+import ViviBot from '../../src/bot';
 import { GET_GUILD_CONFIG, GET_USER_WARNS } from '../../src/database/database';
 
 const checkwarns = {
@@ -10,7 +11,7 @@ const checkwarns = {
   args: '<user id> [active]',
   alias: ['cw'],
   type: 'mod',
-  run: async (message: Message, args: string[]) => {
+  run: async (message: Message, args: string[], client: ViviBot) => {
     if (!message.guild) return;
     const { guild } = message;
     const config = await GET_GUILD_CONFIG(guild.id);
@@ -31,7 +32,9 @@ const checkwarns = {
      * If they mention the user then use that otherwise they should've sent the user id
      * args.shift() returns the first element and pops it out of the array.
      */
-    const userId = message.mentions.members?.first()?.id || args.shift();
+    const userId =
+      message.mentions.members?.filter((u) => u.id !== client.user?.id).first()
+        ?.id || args.shift();
 
     if (message.mentions.members?.first()) args.shift();
 
