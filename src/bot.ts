@@ -13,7 +13,6 @@ import {
 } from '../events/serverLogs';
 import {
   ALL_GUILD_PREFIXES,
-  CREATE_WARN,
   GENERATE_GUILD_CONFIG,
   GET_BANNED_WORDS,
   GET_GUILD_CONFIG,
@@ -25,6 +24,7 @@ import {
 } from './database/database';
 dotenv.config();
 import * as config from './vars';
+import { CaseType } from './database/cases';
 
 interface Command {
   desc: string;
@@ -192,7 +192,7 @@ export default class ViviBot extends Discord.Client {
             .catch(() => message.channel.send(`Issues banning user.`));
           this.logIssue(
             guild.id,
-            'ban',
+            CaseType.Ban,
             `Strike! You're out! (Banned word: ||${id}||)`,
             this.user!,
             message.author
@@ -212,11 +212,10 @@ export default class ViviBot extends Discord.Client {
 
           this.logIssue(
             guild.id,
-            'warn',
+            CaseType.Warn,
             `Warned for saying a banned word. ||${id}||`,
             this.user!,
-            message.author,
-            config.nextWarnId
+            message.author
           );
           message.author
             .send(
@@ -235,11 +234,10 @@ export default class ViviBot extends Discord.Client {
 
   logIssue = async (
     guildId: string,
-    type: 'mute' | 'warn' | 'ban' | 'kick' | 'unban' | 'unmute' | 'unwarn',
+    type: CaseType,
     reason: string,
     mod: Discord.User,
-    user: Discord.User | string,
-    warnId?: number
+    user: Discord.User | string
   ) => {
     const config = await GET_GUILD_CONFIG(guildId);
 
@@ -257,22 +255,23 @@ export default class ViviBot extends Discord.Client {
       ?.channels.cache.get(config.modLog);
 
     let color = COLOR.DEFAULT;
-    switch (type.toLowerCase()) {
-      case 'ban':
+    switch (type) {
+      case CaseType.Ban:
         color = COLOR.RED;
         break;
-      case 'mute':
+      case CaseType.Mute:
         color = COLOR.YELLOW;
         break;
-      case 'unmute':
-      case 'unban':
-      case 'unwarn':
+      case CaseType.Kick:
+        break;
+      default:
+        // The rest are undo's.
         color = COLOR.GREEN;
         break;
     }
 
     embed
-      .setTitle(`${type} | Case #${config.nextCaseId}`)
+      .setTitle(`${CaseType[type]} | Case #${config.nextCaseId}`)
       .addField(
         `**User**`,
         `${typeof user === 'string' ? user : user?.tag} (<@${
@@ -298,8 +297,7 @@ export default class ViviBot extends Discord.Client {
             mod.id,
             typeof user === 'string' ? user : user.id,
             m.id,
-            type,
-            warnId
+            type
           );
         });
       }
@@ -338,14 +336,20 @@ export default class ViviBot extends Discord.Client {
           const member = guild.members.cache.get(m.userId);
           if (member) {
             member.roles.remove(config.muteRole).catch();
-            this.logIssue(id, 'unmute', 'Times up.', this.user!, member.user);
+            this.logIssue(
+              id,
+              CaseType.UnMute,
+              'Times up.',
+              this.user!,
+              member.user
+            );
           }
           UNMUTE_USER(id, m.userId);
         } catch {
           /**
            * If the member left the server execute this instead.
            */
-          this.logIssue(id, 'unmute', 'Times up.', this.user!, m.userId);
+          this.logIssue(id, CaseType.UnMute, 'Times up.', this.user!, m.userId);
           UNMUTE_USER(id, m.userId);
         }
       }
