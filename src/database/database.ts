@@ -1,20 +1,5 @@
-import ConfigModel from './guildConfig';
-import CaseModel from './cases';
-import MuteModel from './mutes';
-import WarnModel from './warnings';
-import * as moment from 'moment';
-
-/**
- * All types of cases that can be logged in the mod log channel.
- */
-export type CaseType =
-  | 'unmute'
-  | 'mute'
-  | 'warn'
-  | 'ban'
-  | 'unban'
-  | 'kick'
-  | 'unwarn';
+import ConfigModel from './guild';
+import CaseModel, { CaseType } from './cases';
 
 /**
  * Create a new config model for guild.
@@ -92,7 +77,7 @@ export const REMOVE_JOIN_ROLE = async (guildId: string, roleId: string) => {
  * @param userId ID of user being acted upon
  * @param messageId ID of message embed in mod log channel
  * @param type Type of mod event
- * @param warnId If the case involves a user being warned pass the ID.
+ * @param punishmentLength Date when users punishment will end.
  */
 export const NEW_CASE = async (
   guildId: string,
@@ -100,7 +85,7 @@ export const NEW_CASE = async (
   userId: string,
   messageId: string,
   type: CaseType,
-  warnId?: number
+  punishmentLength?: Date
 ) => {
   const config = await ConfigModel.findOne({ guildId });
   if (!config) return console.error(`Could not find guild config`);
@@ -112,7 +97,7 @@ export const NEW_CASE = async (
     userId,
     messageId,
     type,
-    warnId,
+    punishmentLength,
   })
     .then(() => {
       config.save();
@@ -122,7 +107,7 @@ export const NEW_CASE = async (
     })
     .catch((err: any) => {
       console.error(
-        `Error creating case for user[${userId}] by mod[${modId}] : Type[${type}]`
+        `Error creating case for user[${userId}] by mod[${modId}] : Type[${CaseType[type]}]`
       );
       console.error(err);
     });
@@ -137,47 +122,16 @@ export const GET_CASE = async (guildId: string, caseId: number) => {
 };
 
 /**
- * Warn a user
- * @param userId User being warned
- * @param modId Mod that issued the warn
- * @param reason Reason why user was warned
- * @param date The time of the warn
+ *
+ * I think maybe that instead of deleting it just sets the reason to `Warning removed by X (mod)`
+ * and then expires the punishment date.
  */
-export const CREATE_WARN = async (
-  guildId: string,
-  userId: string,
-  modId: string,
-  reason: string,
-  date = String(Math.trunc(new Date().getTime() / 1000))
-) => {
-  const config = await ConfigModel.findOne({ guildId });
-  if (!config) return console.error(`Could not find guild config`);
-
-  WarnModel.create({
-    guildId,
-    warnId: config.nextWarnId!++,
-    userId,
-    modId,
-    reason,
-    date,
-  })
-    .then(() => {
-      config.save();
-      console.log(
-        `Successfully created warn for user[${userId}] by mod[${modId}]`
-      );
-    })
-    .catch(() => {
-      console.error(`Error creating warn for user[${userId}] by mod[${modId}]`);
-    });
-};
-
 /**
- * Delete a users warning.
- * @param id ID from mongoose.
+ * Delete case. Only needed for warnings.
+ * @param caseId ID from mongoose. Displayed on each modlog case message.
  */
-export const DELETE_WARN = async (guildId: string, warnId: number) => {
-  return WarnModel.findOneAndDelete({ guildId, warnId });
+export const DELETE_CASE = async (guildId: string, caseId: number) => {
+  return CaseModel.findOneAndDelete({ guildId, caseId });
 };
 
 /**
@@ -185,18 +139,18 @@ export const DELETE_WARN = async (guildId: string, warnId: number) => {
  * @param id ID from mongoose.
  * @param reason Updated warn reason.
  */
-export const UPDATE_WARN_REASON = (
+export const UPDATE_CASE_REASON = (
   guildId: string,
-  warnId: number,
+  caseId: number,
   reason: string
 ) => {
-  WarnModel.findOneAndUpdate({ guildId, warnId }, { reason })
+  CaseModel.findOneAndUpdate({ guildId, caseId }, { reason })
     .then(() => {
       console.log('Updated warn with new reason');
     })
     .catch(() =>
       console.error(
-        `Error on updating warn[${warnId}] with reason["${reason}"]`
+        `Error on updating warn[${caseId}] with reason["${reason}"]`
       )
     );
 };
@@ -206,24 +160,16 @@ export const UPDATE_WARN_REASON = (
  * @param userId User ID to get warns of.
  */
 export const GET_USER_WARNS = async (guildId: string, userId: string) => {
-  return await WarnModel.find({ guildId, userId });
-};
-
-/**
- * Grab a single warn for a user.
- * @param userId User ID to get warn
- */
-export const GET_USER_WARN = async (guildId: string, userId: string) => {
-  return await WarnModel.findOne({ guildId, userId });
+  return await CaseModel.find({ guildId, userId, type: CaseType.Warn });
 };
 
 /**
  * Get a single warning for a specific guild.
  * @param guildId Guild ID
- * @param warnId Warn ID to find specific warn.
+ * @param caseId Warn ID to find specific warn.
  */
-export const GET_WARN = async (guildId: string, warnId: number) => {
-  return await WarnModel.findOne({ guildId, warnId });
+export const GET_WARN = async (guildId: string, caseId: number) => {
+  return await CaseModel.findOne({ guildId, caseId, type: CaseType.Warn });
 };
 
 /**
@@ -435,43 +381,31 @@ export const SET_WARN_EXPIRE = async (
 
 /**
  * Get all mutes in this guild.
- * @param guildId Guild ID for MuteModel
+ * @param guildId Guild ID for CaseModel
  */
 export const GET_GUILD_MUTES = async (guildId: string) => {
-  return await MuteModel.find({ guildId });
-};
-
-/**
- * Mute a user for a set amount of time.
- * @param guildId GuildID for MuteModel
- * @param userId User to mute
- * @param dateMuted Date muted
- * @param unMuteDate When they will be unmuted.
- */
-export const MUTE_USER = (
-  guildId: string,
-  userId: string,
-  dateMuted: number,
-  unMuteDate: number
-) => {
-  MuteModel.create({ guildId, userId, dateMuted, unMuteDate }).catch(() =>
-    console.error(`Error on muting user[${userId}] for guild[${guildId}]`)
-  );
+  return await CaseModel.find({ guildId, type: CaseType.Mute });
 };
 
 /**
  * Extend or shorten a users mute date.
- * @param guildId Guild ID for MuteModel
+ * @param guildId Guild ID for CaseModel
  * @param userId User to update mute for.
- * @param unMuteDate New unmute date.
+ * @param punishmentLength New unmute date.
  */
 export const UPDATE_USER_MUTE = (
   guildId: string,
   userId: string,
-  unMuteDate: number
+  caseId: number,
+  punishmentLength: Date
 ) => {
-  MuteModel.findOneAndUpdate({ guildId, userId }, { unMuteDate }).catch(() =>
-    console.error(`Error on updating user[${userId}] mute time[${unMuteDate}]`)
+  CaseModel.findOneAndUpdate(
+    { guildId, userId, caseId },
+    { punishmentLength }
+  ).catch(() =>
+    console.error(
+      `Error on updating user[${userId}] mute time[${punishmentLength}]`
+    )
   );
 };
 
@@ -481,7 +415,7 @@ export const UPDATE_USER_MUTE = (
  * @param userId User to unmute.
  */
 export const UNMUTE_USER = async (guildId: string, userId: string) => {
-  return MuteModel.findOneAndDelete({ guildId, userId });
+  return CaseModel.findOneAndDelete({ guildId, userId, type: CaseType.Mute });
 };
 
 /**
@@ -490,7 +424,7 @@ export const UNMUTE_USER = async (guildId: string, userId: string) => {
  * @param userId User mute to retrieve.
  */
 export const GET_USER_MUTE = async (guildId: string, userId: string) => {
-  return await MuteModel.findOne({ guildId, userId });
+  return await CaseModel.findOne({ guildId, userId, type: CaseType.Mute });
 };
 
 /**
@@ -498,13 +432,13 @@ export const GET_USER_MUTE = async (guildId: string, userId: string) => {
  * @param guildId Guild ID to check for unmuted users.
  */
 export const GET_UNMUTED_USERS = async (guildId: string) => {
-  const now = moment().unix();
-  return MuteModel.find({
+  return CaseModel.find({
     guildId,
-    unMuteDate: {
-      $lt: now,
+    type: CaseType.Mute,
+    punishmentLength: {
+      $lt: new Date(),
     },
-  }).sort({ unMuteDate: 'asc' });
+  });
 };
 
 /**
