@@ -51,19 +51,21 @@ These changes include:
   <hr style="border: 1px solid grey;background-color:grey;width:100%">
 
   <div style="display:flex;padding-top:30px;">
-	  <div>
+	  <div style="widtH:70%">
       <div style="width: 95%">
         <strong>
           Vivi comes with default settings (seen to the right) which can be changed by any user that has <span style="color:red">MANAGE_GUILD</span> permissions, to ensure that only trusted individuals are allowed access into Vivi's high level permissions. Vivi is easily configured with command lines to change her log channels, maximum warns allowed before automatic banning, ban message, and guild prefix.
         </strong>
       </div>
-      <div style="display:flex;padding-top:40px;width:95%">
+      <div style="display:flex;padding-top:120px;width:95%">
         <img style="border-radius:10px;height:150px;" src="https://media.discordapp.net/attachments/773580650255089675/774421495702356038/unknown.png"/>
-      	<strong style="padding-left:15px">Config settings are easily setup through command lines and can be changed at any time.
-</strong>
       </div>
     </div>
-    <img style="border-radius:10px;height:300px" src="https://media.discordapp.net/attachments/773580650255089675/774420822643179520/unknown.png"/>
+    <div>
+      <img style="border-radius:10px;height:300px" src="https://media.discordapp.net/attachments/773580650255089675/774420822643179520/unknown.png"/>
+  <strong style="padding-left:15px">Config settings are easily setup through command lines and can be changed at any time.
+</strong>
+  	</div>
   </div>
   <div style="width:100%;text-align:center;padding-top:20px">
     <h1>The basics</h1>
@@ -127,12 +129,12 @@ These changes include:
   <div class="warn-reason" style="display:flex;width:90%;padding-top:20px;">
     <img style="border-radius:10px;height:200px;width:350px;" src="https://media.discordapp.net/attachments/739975295641321581/773691547489140796/proof.png"><div style="width:50px"></div>
     <img style="border-radius:10px;height:200px;width:350px;" src="https://media.discordapp.net/attachments/739975295641321581/773691575976722452/proof2.png">
-    <div style="padding-left:20px;">
+  </div>
+  <div style="padding-left:20px;">
       <hr style="border: 1px solid grey;background-color:grey;border-radius:5px;">
       <strong><span style="color:red">Inside your mod logs channel</span> you can easily edit any reason for an existing action through its Case ID (the number indicated by the # sign in the moderator logs). It's recommended to use to free image hosting site to easily show evidence to both other moderators and affected users.</strong>
       <hr style="border: 1px solid grey;background-color:grey;border-radius:5px;">
     </div>
-  </div>
   <div style="display:flex;width:90%;padding-top:20px;">
     <img style="border-radius:10px;width:333px;height:100%" src="https://media.discordapp.net/attachments/739975295641321581/773696231562149888/mute1.png">
     <div style="padding-left:20px">
