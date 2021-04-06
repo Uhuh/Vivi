@@ -1,4 +1,4 @@
-import { Message, MessageEmbed, TextChannel } from 'discord.js';
+import { GuildChannel, Message, MessageEmbed, TextChannel } from 'discord.js';
 import ViviBot from '../../src/bot';
 import {
   ADD_CHANNEL_WHITELIST,
@@ -13,7 +13,9 @@ import {
   REMOVE_JOIN_ROLE,
   REMOVE_MOD_ROLE,
   REMOVE_MUTE_ROLE,
+  REMOVE_WELCOME,
   SET_BANNED_MSG,
+  SET_BANNER,
   SET_GUILD_PREFIX,
   SET_MOD_CHANNEL,
   SET_MOD_ROLE,
@@ -21,6 +23,7 @@ import {
   SET_SERVER_CHANNEL,
   SET_WARN_EXPIRE,
   SET_WARN_LIMIT,
+  SET_WELCOME,
 } from '../../src/database/database';
 
 const config = {
@@ -129,7 +132,6 @@ const config = {
         }
 
         message.channel.send(embed);
-
         break;
       case 'prefix':
         prefix.run(message, args, client);
@@ -164,6 +166,12 @@ const config = {
       case 'join':
         joinRole.run(message, args, client);
         break;
+      case 'banner':
+        banner.run(message, args);
+        break;
+      case 'welcome':
+        welcome.run(message, args);
+        break;
       default:
         message.reply(
           `invalid config type! Run the config help command to see the list.`
@@ -171,6 +179,77 @@ const config = {
     }
 
     return;
+  },
+};
+
+const welcome = {
+  desc: 'Set your servers welcome channel.',
+  name: 'welcome',
+  args: '<add | remove> <#channel | channel-id>',
+  alias: [],
+  type: 'config',
+  run: async (message: Message, args: string[]) => {
+    if (!message.guild || !message.member?.hasPermission(['MANAGE_GUILD']))
+      return;
+
+    if (!args.length || (args[0] !== 'add' && args[0] !== 'remove')) {
+      return message.reply(
+        'you need to use `add` or `remove` for channels. Example `v.config welcome add #welcome`'
+      );
+    }
+
+    if (args[0] === 'remove') {
+      return REMOVE_WELCOME(message.guild.id)
+        .then(() => message.reply(`successfully removed the welcome channel.`))
+        .catch(() => message.reply(`I had an issue removing the channel.`));
+    }
+
+    const channelId = message.mentions.channels.first()?.id || args[0];
+    let channel:
+      | GuildChannel
+      | null
+      | undefined = message.guild.channels.cache.get(channelId);
+
+    if (!channel) {
+      channel = message.guild.channels.resolve(channelId);
+    }
+    if (!channel) {
+      return message.reply(
+        `I'm having issues finding that channel. Did you pass the right ID? If you mentioned make sure you mentioned the correct one.`
+      );
+    }
+
+    return SET_WELCOME(message.guild.id, channelId)
+      .then(() => message.reply(`successfully set the welcome channel.`))
+      .catch(() =>
+        message.reply(`I had an issue trying to set the welcome channel.`)
+      );
+  },
+};
+
+const banner = {
+  desc: 'Set your servers welcome banner type.',
+  name: 'banner',
+  args: '<left | center>',
+  alias: [],
+  type: 'config',
+  run: async (message: Message, args: string[]) => {
+    if (!message.guild || !message.member?.hasPermission(['MANAGE_GUILD']))
+      return;
+
+    if (!args.length || (args[0] !== 'left' && args[0] !== 'center')) {
+      return message.reply(
+        'there are currently only two banner types. `left` and `center` so please try them out!'
+      );
+    }
+
+    return SET_BANNER(message.guild.id, args[0])
+      .then(() =>
+        message.reply(`successfully changed the banner type to \`${args[0]}\``)
+      )
+      .catch(() =>
+        message.reply(`I encounted and issue setting the banner type.`)
+      );
   },
 };
 
@@ -693,6 +772,8 @@ const configFuncs = [
   whitelist,
   listWords,
   setup,
+  banner,
+  welcome,
 ];
 
 export default config;
