@@ -27,6 +27,8 @@ const GuildConfig = new Schema({
   modRole: { type: String, default: null },
   nextCaseId: { type: Number, default: 1 },
   nextWarnId: { type: Number, default: 1 },
+  bannerType: { type: String, default: 'left' },
+  welcomeChannel: { type: String, default: null },
 });
 
 // type LoggingType = 'deleted_msg' | 'edit_msg' | 'user_join' | 'user_leave' | 'invite_created' | 'invite_used' |
@@ -46,6 +48,8 @@ export interface IGuildConfig {
   modRole?: string;
   nextCaseId?: number;
   nextWarnId?: number;
+  bannerType?: 'left' | 'center';
+  welcomeChannel?: string;
 }
 
 export interface IGuildConfigDoc extends IGuildConfig, Document {}

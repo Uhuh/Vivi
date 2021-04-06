@@ -536,3 +536,31 @@ export const REMOVE_MOD_ROLE = async (guildId: string) => {
     { $unset: { modRole: 1 } }
   ).catch(() => console.error(`Error on removing mute role`));
 };
+
+export const SET_BANNER = async (
+  guildId: string,
+  banner: 'left' | 'center'
+) => {
+  ConfigModel.findOneAndUpdate({ guildId }, { bannerType: banner }).catch(() =>
+    console.error(
+      `Error on setting banner[${banner}] type for guild[${guildId}]`
+    )
+  );
+};
+
+export const SET_WELCOME = async (guildId: string, welcomeChannel: string) => {
+  ConfigModel.findOneAndUpdate({ guildId }, { welcomeChannel }).catch(() =>
+    console.error(
+      `Error on setting welcome-channel[${welcomeChannel}] for guild[${guildId}]`
+    )
+  );
+};
+
+export const REMOVE_WELCOME = async (guildId: string) => {
+  ConfigModel.findOneAndUpdate(
+    { guildId },
+    { $unset: { welcomeChannel: 1 } }
+  ).catch(() =>
+    console.error(`Error on removing welcome-channel for guild[${guildId}]`)
+  );
+};
