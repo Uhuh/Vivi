@@ -137,8 +137,7 @@ export default class ViviBot extends Discord.Client {
 
     if (!words) return;
     for (const word of words) {
-      const reg = new RegExp('\\b' + word + '\\b', 'g');
-      const match = reg.exec(content);
+      const match = content.toLowerCase().includes(word);
       /**
        * Only get users warnings IF they match a banned word so that the bot doesn't query for each users warns
        * for every single message.
@@ -160,8 +159,6 @@ export default class ViviBot extends Discord.Client {
           activeWarns++;
         }
 
-        const id = match[0];
-
         activeWarns++;
         if (activeWarns > config.maxWarns!) {
           message.channel.send(
@@ -175,7 +172,7 @@ export default class ViviBot extends Discord.Client {
             guild.id,
             message.author.id,
             this.user?.id || '731987022008418334',
-            `Saying a banned word. ${id}`
+            `Saying a banned word. (Matched ${word})`
           );
 
           await message.member
@@ -193,7 +190,7 @@ export default class ViviBot extends Discord.Client {
           this.logIssue(
             guild.id,
             'ban',
-            `Strike! You're out! (Banned word: ||${id}||)`,
+            `Strike! You're out! (Banned word matched: ||${word}||)`,
             this.user!,
             message.author
           );
@@ -207,20 +204,20 @@ export default class ViviBot extends Discord.Client {
             message.guild!.id,
             message.author.id,
             this.user?.id || '731987022008418334',
-            `Saying a banned word. ${id}`
+            `Saying a banned word. Matched: ${word}`
           );
 
           this.logIssue(
             guild.id,
             'warn',
-            `Warned for saying a banned word. ||${id}||`,
+            `Warned for saying a banned word. Matched: ||${word}||`,
             this.user!,
             message.author,
             config.nextWarnId
           );
           message.author
             .send(
-              `You have been warned!\n**Reason:** Warned for saying a banned word. ${id}`
+              `You have been warned!\n**Reason:** Warned for saying a banned word. Matched: ${word}`
             )
             .catch(() =>
               console.error(`Can't DM user, probably has friends on.`)
