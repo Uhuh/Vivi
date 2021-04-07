@@ -125,7 +125,7 @@ const warn = {
         .catch(() => console.error(`Can't DM user, probably has friends on.`));
       message
         .delete()
-        .catch(() => console.error(`Issues deleting the message!`));
+        .catch(() => console.error(`Issues deleting the warn message!`));
     }
 
     return;

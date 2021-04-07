@@ -34,7 +34,15 @@ const say = {
       return channel.send(args.join(' '));
     }
 
-    message.delete();
+    message
+      .delete()
+      .catch(() =>
+        console.error(
+          `Failed to delete say message for guild[${
+            message.guild?.id || 'could not load guild'
+          }]`
+        )
+      );
     return message.channel.send(message.content.slice(5) || 'Nothing to say!');
   },
 };

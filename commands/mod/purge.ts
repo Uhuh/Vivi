@@ -38,7 +38,9 @@ export default {
             for (; amount > 0; amount--) {
               const m = channel.lastMessage;
               if (!m) continue;
-              m.delete();
+              m.delete().catch(() =>
+                console.error(`I failed to bulk delete messages.`)
+              );
             }
           });
       })

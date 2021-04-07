@@ -36,7 +36,11 @@ const reason = {
       );
     }
 
-    message.delete().catch(console.error);
+    message
+      .delete()
+      .catch(() =>
+        console.error(`Failed to delete reason message for guild[${guild.id}]`)
+      );
 
     const caseId = args.shift();
 
