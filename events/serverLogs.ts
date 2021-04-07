@@ -64,6 +64,8 @@ export const MemberUpdated = async (
     config?.serverLog
   ) as Discord.TextChannel;
 
+  if (!channel) return;
+
   const embed = new Discord.MessageEmbed();
 
   embed
@@ -105,6 +107,8 @@ export const MessageDelete = async (message: DMsg) => {
   const channel = message.guild.channels.cache.get(
     config?.serverLog
   ) as Discord.TextChannel;
+
+  if (!channel) return;
 
   if (message.attachments?.size) {
     for (const [, att] of message.attachments) {
@@ -148,6 +152,8 @@ export const MessageEdit = async (oldMsg: DMsg, newMsg: DMsg) => {
   const channel = oldMsg.guild.channels.cache.get(
     config?.serverLog
   ) as Discord.TextChannel;
+
+  if (!channel) return;
 
   embed
     .setTitle('**Message Edited**')

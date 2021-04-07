@@ -63,7 +63,7 @@ These changes include:
     </div>
     <div>
       <img style="border-radius:10px;height:300px" src="https://media.discordapp.net/attachments/773580650255089675/774420822643179520/unknown.png"/>
-  <strong style="padding-left:15px">Config settings are easily setup through command lines and can be changed at any time.
+  <strong style="padding-left:22px">Config settings are easily setup through command lines and can be changed at any time.
 </strong>
   	</div>
   </div>
@@ -96,6 +96,14 @@ These changes include:
           Warns will remain on record even if the user is no longer a member of the server. Because Vivi doesn't forget.<br><br>
           Checking a users warnings will show the time they were warned, the warn ID on the left indicated by the <span style="color: red">#</span> sign and the mod that issued the warn.
         </strong>
+      </div>
+      <div style="display:flex;top:94%;">
+      <strong style="padding: 100px 30px">Do you want to welcome your users with a sweet calming banner? Use one of two default designs!</strong>
+        <div>
+        <img style="border-radius:10px;width:500px" src="https://cdn.discordapp.com/attachments/733160959954386986/828722670510145576/welcome-image.png">
+        <br>
+        <img style="border-radius:10px;width:500px" src="https://cdn.discordapp.com/attachments/733160959954386986/828731705689899068/welcome-image.png">
+        </div>
       </div>
     </div>
   </div>
@@ -237,9 +245,9 @@ tr td:last-child {
     <td>Set the message that gets sent to users right before they're banned.</td>
   </tr>
   <tr>
-    <td>v.config logs &lt;mod | server&gt; &lt;#channel | ID&gt;</td>
-    <td>v.config logs mod #mod-logs<br>v.config logs mod 773580650255089675<br>v.config logs server #server-logs</td>
-    <td>Set specific log channels</td>
+    <td>v.config logs &lt;mod | server&gt; &lt;#channel | ID | remove&gt;</td>
+    <td>v.config logs mod #mod-logs<br>v.config logs mod 773580650255089675<br>v.config logs server #server-logs<br>v.config logs mod remove</td>
+    <td>Set specific log channels or remove them if you set them accidently!</td>
   </tr>
   <tr>
     <td>v.config mute &lt;@role | id | none&gt;</td>
@@ -270,6 +278,16 @@ tr td:last-child {
     <td>v.config setup</td>
     <td>v.config setup</td>
     <td>If Vivi failed to generate your servers config run this command to fix it.<br>Can only be run once if the server doesn't have a config.</td>
+  </tr>
+  <tr>
+    <td>v.config banner &lt;left | center&gt;</td>
+    <td>v.config banner center<br>v.config banner left</td>
+    <td>Display Vivi's welcome banners! There are currently only two default ones. A left avatar, or a center avatar.</td>
+  </tr>
+  <tr>
+    <td>v.config welcome &lt;add | remove&gt; &lt;#channel | channel-id&gt;</td>
+    <td>v.config welcome add #welcome<br>v.config welcome add 773580650255089675<br>v.config welcome remove</td>
+    <td><span style="color:red">By default vivi doesn't have a welcome channel for you.</span> You use this command to tell Vivi which channel to use when welcoming users with a banner.</td>
   </tr>
 </table>
 

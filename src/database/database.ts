@@ -259,6 +259,31 @@ export const SET_SERVER_CHANNEL = (guildId: string, serverLog: string) => {
 };
 
 /**
+ * For some reason the empty CB function HAS to be there for it to work.
+ * @param guildId To get configmodel to alter
+ */
+export const REMOVE_SERVER_CHANNEL = (guildId: string) => {
+  ConfigModel.findOneAndUpdate(
+    { guildId },
+    { $unset: { serverLog: 1 } },
+    { new: true },
+    () => {}
+  );
+};
+/**
+ * For some reason the empty CB function HAS to be there for it to work.
+ * @param guildId To get configmodel to alter
+ */
+export const REMOVE_MOD_CHANNEL = (guildId: string) => {
+  ConfigModel.findOneAndUpdate(
+    { guildId },
+    { $unset: { modLog: 1 } },
+    { new: true },
+    () => {}
+  );
+};
+
+/**
  * Add a channel ID to list of ignored channels for server logging.
  * @param guildId Guild ID for ConfigModel
  * @param channelId Channel ID for serverlogging to ignore.
