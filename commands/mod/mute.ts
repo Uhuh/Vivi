@@ -97,6 +97,8 @@ const mute = {
 
       if (Number.isNaN(Number(num))) {
         return message.reply(`oops! That's not a number for time.`);
+      } else if (Number(num) < 1) {
+        return message.reply(`please return a time at least 1 or greater.`);
       }
 
       switch (timeFormat) {
@@ -106,6 +108,9 @@ const mute = {
         case 'w':
         case 'y':
           unmuteTime = moment().add(Number(num), timeFormat).unix();
+          break;
+        default:
+          time = '1h';
       }
     } else time = '1h';
 
