@@ -289,16 +289,23 @@ export default class ViviBot extends Discord.Client {
 
     try {
       if (channel && channel instanceof Discord.TextChannel) {
-        channel.send(embed).then((m) => {
-          NEW_CASE(
-            guildId,
-            mod.id,
-            typeof user === 'string' ? user : user.id,
-            m.id,
-            type,
-            warnId
+        channel
+          .send(embed)
+          .then((m) => {
+            NEW_CASE(
+              guildId,
+              mod.id,
+              typeof user === 'string' ? user : user.id,
+              m.id,
+              type,
+              warnId
+            );
+          })
+          .catch(() =>
+            console.error(
+              `Failed to send case embed to mod channel[${config.modLog}] for guild[${config.guildId}]`
+            )
           );
-        });
       }
     } catch {
       console.error(`Issue when trying to write log case`);

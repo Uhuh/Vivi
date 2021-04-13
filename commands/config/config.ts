@@ -473,9 +473,13 @@ const logs = {
         } else if (channel) {
           SET_MOD_CHANNEL(message.guild.id, id);
           message.react('✅');
-          channel.send(
-            `I'm configured to send any mod actions here now! :tada:`
-          );
+          channel
+            .send(`I'm configured to send any mod actions here now! :tada:`)
+            .catch(() => {
+              message.reply(
+                `I don't seem to have send message perms for that channel! Please make sure I can send messages **and** embeds, as well as attachments.`
+              );
+            });
         }
         break;
       case 'server':
@@ -485,9 +489,13 @@ const logs = {
         } else if (channel) {
           SET_SERVER_CHANNEL(message.guild.id, id);
           message.react('✅');
-          channel.send(
-            `I'm configured to send server updates here now! :tada:`
-          );
+          channel
+            .send(`I'm configured to send server updates here now! :tada:`)
+            .catch(() => {
+              message.reply(
+                `I don't seem to have send message perms for that channel! Please make sure I can send messages **and** embeds, as well as attachments.`
+              );
+            });
         }
         break;
       default:

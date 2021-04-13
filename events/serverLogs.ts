@@ -83,7 +83,13 @@ export const MemberUpdated = async (
       .addField('**ID**', member.user?.id);
   }
 
-  channel.send(embed);
+  channel
+    .send(embed)
+    .catch(() =>
+      console.error(
+        `Failed to send member updated message for guild[${member.guild.id}]`
+      )
+    );
 };
 
 /**
@@ -127,7 +133,13 @@ export const MessageDelete = async (message: DMsg) => {
     .setFooter(`ID: ${message.id}`)
     .setTimestamp(new Date());
 
-  channel.send(embed);
+  channel
+    .send(embed)
+    .catch(() =>
+      console.error(
+        `Failed to send message deleted event for guild[${message.guild?.id}]`
+      )
+    );
 };
 
 /**
@@ -178,7 +190,13 @@ export const MessageEdit = async (oldMsg: DMsg, newMsg: DMsg) => {
     `**Message author:** <@${newMsg.author?.id}>\n**Channel:** <#${newMsg.channel?.id}>\n[Jump to message](${newMsg.url})`
   );
 
-  channel.send(embed);
+  channel
+    .send(embed)
+    .catch(() =>
+      console.error(
+        `Failed to send message edit event for guild[${newMsg.guild?.id}]`
+      )
+    );
 };
 
 function split(input: string): string[] {
@@ -296,7 +314,13 @@ export const userBanner = async (
     'welcome-image.png'
   );
 
-  channel.send(attachment);
+  channel
+    .send(attachment)
+    .catch(() =>
+      console.error(
+        `Failed to send welcome banner[${config.bannerType}] for guild[${member.guild.id}]`
+      )
+    );
 };
 
 const applyText = (canvas: Canvas.Canvas, text: string, banner: any) => {
