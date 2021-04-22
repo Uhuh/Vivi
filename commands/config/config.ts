@@ -1,4 +1,10 @@
-import { GuildChannel, Message, MessageEmbed, TextChannel } from 'discord.js';
+import {
+  GuildChannel,
+  Message,
+  MessageEmbed,
+  Role,
+  TextChannel,
+} from 'discord.js';
 import ViviBot from '../../src/bot';
 import {
   ADD_CHANNEL_WHITELIST,
@@ -75,14 +81,14 @@ const config = {
         .addField(
           'Mute role:',
           guildConfig.muteRole
-            ? guild.roles.cache.get(guildConfig.muteRole)
+            ? guild.roles.cache.get(guildConfig.muteRole) || 'Not set!'
             : 'Not set!',
           true
         )
         .addField(
           'Mod role:',
           guildConfig.modRole
-            ? guild.roles.cache.get(guildConfig.modRole)
+            ? guild.roles.cache.get(guildConfig.modRole) || 'Not set!'
             : 'Not set!',
           true
         )
@@ -278,12 +284,14 @@ const joinRole = {
           return message.reply(`you need to include the role name or ID.`);
         }
 
-        let role = undefined;
+        let role: Role | undefined = undefined;
 
         if (roleId instanceof String) {
           role = message.guild.roles.cache.find(
             (r) => r.id === roleId || r.name.toLowerCase() === roleId
           );
+        } else if (roleId instanceof Role) {
+          role = roleId;
         }
 
         if (!role) {
@@ -515,7 +523,7 @@ const logs = {
 const mute = {
   desc: 'Set the mute role for the server',
   name: 'mute',
-  args: '<@role | id | none>',
+  args: '<@role | id | remove>',
   alias: ['mr'],
   type: 'config',
   run: async (message: Message, args: string[]) => {
@@ -524,11 +532,11 @@ const mute = {
 
     if (!args.length) {
       return message.reply(
-        `you need to send either a role mention, id of 'none'.`
+        `you need to send either a role mention, id or 'remove'.`
       );
     }
 
-    if (args.length && args[0] === 'none') {
+    if (args.length && args[0] === 'remove') {
       const config = await GET_GUILD_CONFIG(message.guild.id);
       if (!config?.muteRole) {
         return message.reply(
@@ -538,16 +546,30 @@ const mute = {
 
       REMOVE_MUTE_ROLE(message.guild.id);
 
-      return message.reply(`successfully remove mute role.`);
+      return message.reply(`successfully removed mute role.`);
     }
 
-    const roleId = message.mentions.roles.first()?.id || args.shift();
+    const roleId = message.mentions.roles.first() || args.shift();
 
     if (!roleId) {
       return message.reply(`did you not pass a role id or not mention a role?`);
     }
 
-    SET_MUTE_ROLE(message.guild.id, roleId);
+    let role: Role | undefined = undefined;
+
+    if (roleId instanceof String) {
+      role = message.guild.roles.cache.find(
+        (r) => r.id === roleId || r.name.toLowerCase() === roleId
+      );
+    } else if (roleId instanceof Role) {
+      role = roleId;
+    }
+
+    if (!role) {
+      return message.reply(`couldn't find a role with that name or ID`);
+    }
+
+    SET_MUTE_ROLE(message.guild.id, role.id);
 
     return message.reply(`successfully set mute role.`);
   },
@@ -689,7 +711,7 @@ const modRole = {
   desc:
     'Set the mod role, anyone with this role will be presumed as a mod and can use the mod commands.',
   name: 'mod',
-  args: '<@role | id | none>',
+  args: '<@role | id | remove>',
   alias: [''],
   type: 'config',
   run: async (message: Message, args: string[]) => {
@@ -698,11 +720,11 @@ const modRole = {
 
     if (!args.length) {
       return message.reply(
-        `you need to send either a role mention, id of 'none'.`
+        `you need to send either a role mention, id or 'remove'.`
       );
     }
 
-    if (args.length && args[0] === 'none') {
+    if (args.length && args[0] === 'remove') {
       const config = await GET_GUILD_CONFIG(message.guild.id);
       if (!config?.modRole) {
         return message.reply(
@@ -712,16 +734,30 @@ const modRole = {
 
       REMOVE_MOD_ROLE(message.guild.id);
 
-      return message.reply(`successfully remove mod role.`);
+      return message.reply(`successfully removed mod role.`);
     }
 
-    const roleId = message.mentions.roles.first()?.id || args.shift();
+    const roleId = message.mentions.roles.first() || args.shift();
 
     if (!roleId) {
       return message.reply(`did you not pass a role id or not mention a role?`);
     }
 
-    SET_MOD_ROLE(message.guild.id, roleId);
+    let role: Role | undefined = undefined;
+
+    if (roleId instanceof String) {
+      role = message.guild.roles.cache.find(
+        (r) => r.id === roleId || r.name.toLowerCase() === roleId
+      );
+    } else if (roleId instanceof Role) {
+      role = roleId;
+    }
+
+    if (!role) {
+      return message.reply(`couldn't find a role with that name or ID`);
+    }
+
+    SET_MOD_ROLE(message.guild.id, role.id);
 
     return message.reply(`successfully set mod role.`);
   },
