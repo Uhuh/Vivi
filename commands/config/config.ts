@@ -1,10 +1,4 @@
-import {
-  GuildChannel,
-  Message,
-  MessageEmbed,
-  Role,
-  TextChannel,
-} from 'discord.js';
+import { GuildChannel, Message, MessageEmbed, TextChannel } from 'discord.js';
 import ViviBot from '../../src/bot';
 import {
   ADD_CHANNEL_WHITELIST,
