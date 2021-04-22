@@ -1,4 +1,10 @@
-import { GuildChannel, Message, MessageEmbed, TextChannel } from 'discord.js';
+import {
+  GuildChannel,
+  Message,
+  MessageEmbed,
+  Role,
+  TextChannel,
+} from 'discord.js';
 import ViviBot from '../../src/bot';
 import {
   ADD_CHANNEL_WHITELIST,
@@ -258,7 +264,7 @@ const banner = {
 const joinRole = {
   desc: 'Add, remove or list the guilds join roles.',
   name: 'join',
-  args: '<add | remove | list> <Role name | Role ID>',
+  args: '<add | remove | list> <@Role | Role ID>',
   alias: ['j'],
   type: 'config',
   run: async (message: Message, args: string[], client: ViviBot) => {
@@ -270,7 +276,7 @@ const joinRole = {
       return;
 
     const command = args.shift()?.toLowerCase();
-    const roleId = args.join(' ');
+    const roleId = message.mentions.roles.first() || args.shift();
     switch (command) {
       case 'add':
       case 'remove':
@@ -278,9 +284,13 @@ const joinRole = {
           return message.reply(`you need to include the role name or ID.`);
         }
 
-        const role = message.guild.roles.cache.find(
-          (r) => r.id === roleId || r.name.toLowerCase() === roleId
-        );
+        let role = undefined;
+
+        if (roleId instanceof String) {
+          role = message.guild.roles.cache.find(
+            (r) => r.id === roleId || r.name.toLowerCase() === roleId
+          );
+        }
 
         if (!role) {
           return message.reply(`couldn't find a role with that name or ID`);
