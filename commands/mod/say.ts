@@ -34,6 +34,17 @@ const say = {
       return channel.send(args.join(' '));
     }
 
+    let content = '';
+
+    if (args[0] === config.prefix) {
+      content = message.content.slice(config.prefix?.length).trim().slice(3);
+    } else {
+      const preparse = message.content
+        .substr(message.content.indexOf(' ') + 1)
+        .trim();
+      content = preparse.startsWith('say') ? preparse.slice(3) : preparse;
+    }
+
     message
       .delete()
       .catch(() =>
@@ -43,7 +54,7 @@ const say = {
           }]`
         )
       );
-    return message.channel.send(message.content.slice(5) || 'Nothing to say!');
+    return message.channel.send(content || 'Nothing to say!');
   },
 };
 
