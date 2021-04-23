@@ -7,7 +7,7 @@ const msg = (client: ViviBot, message: Message) => {
 
   // If the guild doesn't exist it's a DM from a user. Default to v. as the prefix.
   const prefix = client.guildPrefix.get(message.guild?.id || '') || 'v.';
-  const prefixUsed = message.content.toLowerCase().startsWith(prefix);
+  const prefixUsed = message.content.startsWith(prefix);
   const clientMention = message.mentions.members?.first()?.id;
 
   if (client.user?.id === clientMention || prefixUsed) {
