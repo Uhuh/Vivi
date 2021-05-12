@@ -65,7 +65,9 @@ const warn = {
 
     if (!userWarnings) userWarnings = [];
 
-    const WEEK_OLD = moment().subtract(8, 'days').startOf('day');
+    const WEEK_OLD = moment()
+      .subtract(config?.warnLifeSpan, 'days')
+      .startOf('day');
     let activeWarns = 0;
 
     for (const warn of userWarnings) {
