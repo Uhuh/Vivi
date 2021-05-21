@@ -74,14 +74,10 @@ export const MemberUpdated = async (
     .setThumbnail(member.user?.avatarURL() || '')
     .addField('Member', member, true)
     .setFooter(`ID: ${member.id}`)
-    .setTimestamp(new Date());
-
-  if (type === 'join') {
-    embed
-      .addField('**Created**', member.user?.createdAt.toDateString(), true)
-      .addField('**Username**', member.user?.tag, true)
-      .addField('**ID**', member.user?.id);
-  }
+    .setTimestamp(new Date())
+    .addField('**Created**', member.user?.createdAt.toDateString(), true)
+    .addField('**Username**', member.user?.tag, true)
+    .addField('**ID**', member.user?.id);
 
   channel
     .send(embed)
