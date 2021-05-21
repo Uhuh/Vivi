@@ -6,6 +6,7 @@ import {
   GUILD_JOIN_ROLES,
 } from '../src/database/database';
 import { IGuildConfigDoc } from '../src/database/guildConfig';
+import * as moment from 'moment';
 
 // Discord Message
 type DMsg = Discord.Message | Discord.PartialMessage;
@@ -69,15 +70,37 @@ export const MemberUpdated = async (
   const embed = new Discord.MessageEmbed();
 
   embed
-    .setTitle(`**User ${type} (${member.id})**`)
+    .setTitle(`**User ${type}**`)
     .setColor(color)
-    .setThumbnail(member.user?.avatarURL() || '')
+    .setThumbnail(
+      member.user?.avatarURL() ||
+        'https://cdn.discordapp.com/embed/avatars/0.png'
+    )
     .addField('Member', member, true)
     .setFooter(`ID: ${member.id}`)
     .setTimestamp(new Date())
     .addField('**Created**', member.user?.createdAt.toDateString(), true)
     .addField('**Username**', member.user?.tag, true)
     .addField('**ID**', member.user?.id);
+
+  if (type === 'join') {
+    const userMomentObject = moment(member.user?.createdTimestamp);
+    const days = moment().diff(userMomentObject, 'days');
+    let description = '';
+
+    if (days < 30) {
+      const sinceDate = userMomentObject.fromNow();
+      description += `New account alert: ${sinceDate}`;
+    }
+    if (!member.user?.avatarURL()) {
+      description = description ? description + '\n' : '';
+      description += 'Default avatar';
+    }
+
+    if (description !== '') {
+      embed.setDescription(`\`\`\`${description}\`\`\``);
+    }
+  }
 
   channel
     .send(embed)
