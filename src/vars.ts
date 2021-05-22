@@ -1,5 +1,5 @@
 export const TOKEN = process.env.TOKEN || '';
-export const BOT_OWNER = process.env.BOT_OWNER || '289151449412141076';
+export const BOT_OWNER = '289151449412141076';
 export const DATABASE_TYPE = process.env.DATABASE || 'betadb';
 export const DEFAULT_BANNED = process.env.DEFAULT_BANNED_WORDS || '';
 export const DBLTOKEN = process.env.DBLTOKEN || '';
