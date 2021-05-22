@@ -1,7 +1,7 @@
-import VV from './bot';
+import ViviBot from './bot';
 
-const ViviBot = new VV({
+const Vivi = new ViviBot({
   intents: ['GUILDS', 'GUILD_MESSAGES', 'GUILD_MEMBERS', 'DIRECT_MESSAGES'],
 });
 
-ViviBot.start().catch((e) => console.error(`Caught an error!\n${e}`));
+Vivi.start().catch((e) => console.error(`Caught an error!\n${e}`));
