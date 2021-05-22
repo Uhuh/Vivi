@@ -35,6 +35,9 @@ export default {
       .addField(`**The bot is watching:**`, `${userCount} users`, true)
       .addField(`**The bot is watching:**`, `${channelCount} channels`, true)
       .addField(`**Bot OS:**`, `${OS.platform()}`, true);
-    message.channel.send(embed);
+
+    message.channel
+      .send(embed)
+      .catch(() => client.missingPerms(message, 'embed'));
   },
 };
