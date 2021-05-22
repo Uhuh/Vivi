@@ -34,6 +34,7 @@ import {
   SET_WELCOME,
 } from '../../src/database/database';
 import { CLIENT_ID } from '../../src/vars';
+import { missingPerms } from '../../utilities/functions/missingPerm';
 
 const config = {
   desc: 'Show the servers current config',
@@ -175,7 +176,7 @@ const config = {
         listWords.run(message);
         break;
       case 'join':
-        joinRole.run(message, args, client);
+        joinRole.run(message, args);
         break;
       case 'banner':
         banner.run(message, args);
@@ -269,7 +270,7 @@ const joinRole = {
   args: '<add | remove | list> <@Role | Role ID>',
   alias: ['j'],
   type: 'config',
-  run: async (message: Message, args: string[], client: ViviBot) => {
+  run: async (message: Message, args: string[]) => {
     if (
       !message.guild ||
       !message.member?.hasPermission(['MANAGE_GUILD']) ||
@@ -355,9 +356,7 @@ const joinRole = {
             }`
           );
 
-        message.channel
-          .send(embed)
-          .catch(() => client.missingPerms(message, 'embed'));
+        message.channel.send(embed).catch(() => missingPerms(message, 'embed'));
         break;
     }
 
