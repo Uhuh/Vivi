@@ -85,7 +85,9 @@ const checkwarns = {
       );
     }
 
-    return message.channel.send(embed);
+    return message.channel
+      .send(embed)
+      .catch(() => client.missingPerms(message, 'embed'));
   },
 };
 

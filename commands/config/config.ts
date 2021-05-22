@@ -34,6 +34,12 @@ import {
   SET_WELCOME,
 } from '../../src/database/database';
 
+function missingPerms(msg: Message, perm: string) {
+  msg.channel.send(
+    `I seem to be missing ${perm} perms, please make sure I have it to be able to function properly.`
+  );
+}
+
 const config = {
   desc: 'Show the servers current config',
   name: 'config',
@@ -113,7 +119,9 @@ const config = {
           guildConfig.banMessage || `You've been banned from ${guild.name}.`
         );
 
-      return message.channel.send(embed);
+      return message.channel
+        .send(embed)
+        .catch(() => missingPerms(message, 'embed'));
     }
 
     const configType = args.shift()?.toLowerCase();
@@ -139,7 +147,9 @@ const config = {
           );
         }
 
-        message.channel.send(embed);
+        message.channel
+          .send(embed)
+          .catch(() => client.missingPerms(message, 'embed'));
         break;
       case 'prefix':
         prefix.run(message, args, client);
@@ -351,7 +361,9 @@ const joinRole = {
             }`
           );
 
-        message.channel.send(embed);
+        message.channel
+          .send(embed)
+          .catch(() => client.missingPerms(message, 'embed'));
         break;
     }
 
@@ -819,7 +831,9 @@ const setup = {
         guildConfig.banMessage || `You've been banned from ${guild.name}.`
       );
 
-    return message.channel.send(embed);
+    return message.channel
+      .send(embed)
+      .catch(() => missingPerms(message, 'embed'));
   },
 };
 

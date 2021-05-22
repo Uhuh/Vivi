@@ -31,6 +31,8 @@ export default {
     );
     embed.setImage(m.user.avatarURL({ dynamic: true, size: 2048 }) || '');
 
-    message.channel.send(embed);
+    message.channel
+      .send(embed)
+      .catch(() => client.missingPerms(message, 'embed'));
   },
 };

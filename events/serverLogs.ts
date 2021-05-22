@@ -70,14 +70,14 @@ export const MemberUpdated = async (
   const embed = new Discord.MessageEmbed();
 
   embed
-    .setTitle(`**User ${type}**`)
+    .setTitle(`**Member ${type}**`)
     .setColor(color)
     .setThumbnail(
       member.user?.avatarURL() ||
         'https://cdn.discordapp.com/embed/avatars/0.png'
     )
     .addField('Member', member, true)
-    .setFooter(`ID: ${member.id}`)
+    .setFooter(`ID: ${member.id} | ${member.guild.memberCount} members`)
     .setTimestamp(new Date())
     .addField('**Created**', member.user?.createdAt.toDateString(), true)
     .addField('**Username**', member.user?.tag, true)
