@@ -33,12 +33,7 @@ import {
   SET_WARN_LIMIT,
   SET_WELCOME,
 } from '../../src/database/database';
-
-function missingPerms(msg: Message, perm: string) {
-  msg.channel.send(
-    `I seem to be missing ${perm} perms, please make sure I have it to be able to function properly.`
-  );
-}
+import { CLIENT_ID } from '../../src/vars';
 
 const config = {
   desc: 'Show the servers current config',
@@ -140,16 +135,14 @@ const config = {
           .setFooter(`Replying to: ${message.author.tag}`)
           .setTimestamp(new Date());
 
-        for (const func of configFuncs) {
+        configFuncs.forEach((func) =>
           embed.addField(
             `**${guildConfig.prefix}config ${func.name} ${func.args}**`,
             func.desc
-          );
-        }
+          )
+        );
 
-        message.channel
-          .send(embed)
-          .catch(() => client.missingPerms(message, 'embed'));
+        message.channel.send(embed).catch(() => missingPerms(message, 'embed'));
         break;
       case 'prefix':
         prefix.run(message, args, client);
@@ -209,6 +202,7 @@ const welcome = {
   run: async (message: Message, args: string[]) => {
     if (!message.guild || !message.member?.hasPermission(['MANAGE_GUILD']))
       return;
+    const { guild } = message;
 
     if (!args.length || (args[0] !== 'add' && args[0] !== 'remove')) {
       return message.reply(
@@ -217,19 +211,17 @@ const welcome = {
     }
 
     if (args[0] === 'remove') {
-      return REMOVE_WELCOME(message.guild.id)
+      return REMOVE_WELCOME(guild.id)
         .then(() => message.reply(`successfully removed the welcome channel.`))
         .catch(() => message.reply(`I had an issue removing the channel.`));
     }
 
     const channelId = message.mentions.channels.first()?.id || args[0];
-    let channel:
-      | GuildChannel
-      | null
-      | undefined = message.guild.channels.cache.get(channelId);
+    let channel: GuildChannel | null | undefined =
+      guild.channels.cache.get(channelId);
 
     if (!channel) {
-      channel = message.guild.channels.resolve(channelId);
+      channel = guild.channels.resolve(channelId);
     }
     if (!channel) {
       return message.reply(
@@ -237,7 +229,7 @@ const welcome = {
       );
     }
 
-    return SET_WELCOME(message.guild.id, channelId)
+    return SET_WELCOME(guild.id, channelId)
       .then(() => message.reply(`successfully set the welcome channel.`))
       .catch(() =>
         message.reply(`I had an issue trying to set the welcome channel.`)
@@ -285,6 +277,8 @@ const joinRole = {
     )
       return;
 
+    const { guild } = message;
+
     const command = args.shift()?.toLowerCase();
     const roleId = message.mentions.roles.first() || args.shift();
     switch (command) {
@@ -297,7 +291,7 @@ const joinRole = {
         let role: Role | undefined = undefined;
 
         if (roleId instanceof String) {
-          role = message.guild.roles.cache.find(
+          role = guild.roles.cache.find(
             (r) => r.id === roleId || r.name.toLowerCase() === roleId
           );
         } else if (roleId instanceof Role) {
@@ -308,8 +302,8 @@ const joinRole = {
           return message.reply(`couldn't find a role with that name or ID`);
         }
 
-        const clientMember = message.guild.members.cache.find(
-          (m) => m.id === client.user?.id
+        const clientMember = guild.members.cache.find(
+          (m) => m.id === CLIENT_ID
         );
 
         if (!clientMember) {
@@ -327,7 +321,7 @@ const joinRole = {
           );
         }
         if (command === 'add') {
-          ADD_JOIN_ROLE(message.guild.id, role.id)
+          ADD_JOIN_ROLE(guild.id, role.id)
             .then(() =>
               message.reply(`successfully added the role to the join list.`)
             )
@@ -335,7 +329,7 @@ const joinRole = {
               message.reply(`issue adding role. :(`);
             });
         } else {
-          REMOVE_JOIN_ROLE(message.guild.id, role.id)
+          REMOVE_JOIN_ROLE(guild.id, role.id)
             .then(() =>
               message.reply(`successfully removed the role from the join list.`)
             )
@@ -345,7 +339,7 @@ const joinRole = {
         }
         break;
       case 'list':
-        const roles = await GUILD_JOIN_ROLES(message.guild.id);
+        const roles = await GUILD_JOIN_ROLES(guild.id);
         if (!roles) {
           return message.reply(`no join roles!`);
         }
@@ -395,8 +389,7 @@ const prefix = {
 };
 
 const word = {
-  desc:
-    'Add or delete a word or list of words for the banned list. Everything added will be case sensitive.\n',
+  desc: 'Add or delete a word or list of words for the banned list. Everything added will be case sensitive.\n',
   name: 'word',
   args: '<add | delete> <list of words seperated by comma>',
   alias: ['aw'],
@@ -404,6 +397,8 @@ const word = {
   run: async (message: Message, args: string[], client: ViviBot) => {
     if (!message.guild || !message.member?.hasPermission(['MANAGE_GUILD']))
       return;
+
+    const { guild } = message;
 
     if (!args.length) {
       return message.reply(
@@ -415,24 +410,19 @@ const word = {
 
     switch (wordType) {
       case 'add':
-        NEW_BANNED_WORD(message.guild.id!, args.join('').split(',')).then(
-          async () => {
-            client.bannedWords.set(
-              message.guild!.id,
-              await GET_BANNED_WORDS(message.guild!.id)
-            );
-          }
-        );
+        NEW_BANNED_WORD(guild.id, args.join('').split(',')).then(async () => {
+          client.bannedWords.set(
+            message.guild!.id,
+            await GET_BANNED_WORDS(guild.id)
+          );
+        });
         message.reply(`successfully added the words to the banned list.`);
         break;
       case 'delete':
-        REMOVE_BANNED_WORD(message.guild.id!, args.join('').split(',')).then(
+        REMOVE_BANNED_WORD(guild.id, args.join('').split(',')).then(
           async () => {
             message.channel.send(`Successfully removed the words.`);
-            client.bannedWords.set(
-              message.guild!.id,
-              await GET_BANNED_WORDS(message.guild!.id)
-            );
+            client.bannedWords.set(guild.id, await GET_BANNED_WORDS(guild.id));
           }
         );
         break;
@@ -476,12 +466,14 @@ const logs = {
       return;
     let [type, id] = args;
 
+    const { guild } = message;
+
     if (message.mentions.channels.size) {
       id = message.mentions.channels.first()?.id || id;
     }
 
     //const channel = message.guild.channels.resolve(id) as TextChannel;
-    const channel = message.guild.channels.cache.get(id) as TextChannel;
+    const channel = guild.channels.cache.get(id) as TextChannel;
 
     if (!channel && id !== 'remove') {
       return message.channel.send(
@@ -492,10 +484,10 @@ const logs = {
     switch (type.toLowerCase()) {
       case 'mod':
         if (id === 'remove') {
-          REMOVE_MOD_CHANNEL(message.guild.id);
+          REMOVE_MOD_CHANNEL(guild.id);
           message.reply(`I will no longer send mog logs there!`);
         } else if (channel) {
-          SET_MOD_CHANNEL(message.guild.id, id);
+          SET_MOD_CHANNEL(guild.id, id);
           message.react('✅');
           channel
             .send(`I'm configured to send any mod actions here now! :tada:`)
@@ -508,10 +500,10 @@ const logs = {
         break;
       case 'server':
         if (id === 'remove') {
-          REMOVE_SERVER_CHANNEL(message.guild.id);
+          REMOVE_SERVER_CHANNEL(guild.id);
           message.reply(`I will no longer send server logs there!`);
         } else if (channel) {
-          SET_SERVER_CHANNEL(message.guild.id, id);
+          SET_SERVER_CHANNEL(guild.id, id);
           message.react('✅');
           channel
             .send(`I'm configured to send server updates here now! :tada:`)
@@ -542,6 +534,8 @@ const mute = {
     if (!message.guild || !message.member?.hasPermission(['MANAGE_GUILD']))
       return;
 
+    const { guild } = message;
+
     if (!args.length) {
       return message.reply(
         `you need to send either a role mention, id or 'remove'.`
@@ -549,14 +543,14 @@ const mute = {
     }
 
     if (args.length && args[0] === 'remove') {
-      const config = await GET_GUILD_CONFIG(message.guild.id);
+      const config = await GET_GUILD_CONFIG(guild.id);
       if (!config?.muteRole) {
         return message.reply(
           `the server doesn't have a mute role setup already!`
         );
       }
 
-      REMOVE_MUTE_ROLE(message.guild.id);
+      REMOVE_MUTE_ROLE(guild.id);
 
       return message.reply(`successfully removed mute role.`);
     }
@@ -570,7 +564,7 @@ const mute = {
     let role: Role | undefined = undefined;
 
     if (roleId instanceof String) {
-      role = message.guild.roles.cache.find(
+      role = guild.roles.cache.find(
         (r) => r.id === roleId || r.name.toLowerCase() === roleId
       );
     } else if (roleId instanceof Role) {
@@ -581,7 +575,7 @@ const mute = {
       return message.reply(`couldn't find a role with that name or ID`);
     }
 
-    SET_MUTE_ROLE(message.guild.id, role.id);
+    SET_MUTE_ROLE(guild.id, role.id);
 
     return message.reply(`successfully set mute role.`);
   },
@@ -637,7 +631,7 @@ const warnsMax = {
       return message.reply(`That's not within the range [1, 10]`);
     }
 
-    return SET_WARN_LIMIT(message.guild.id!, maxWarns)
+    return SET_WARN_LIMIT(message.guild.id, maxWarns)
       .then(() => message.reply(`successfully set the max warns.`))
       .catch(() =>
         message.reply(`I failed to set the max warns for this guild.`)
@@ -661,13 +655,15 @@ const whitelist = {
       );
     }
 
+    const { guild } = message;
+
     let [type, id] = args;
 
     if (message.mentions.channels.size) {
       id = message.mentions.channels.first()?.id || id;
     }
 
-    const channel = message.guild.channels.cache.get(id) as TextChannel;
+    const channel = guild.channels.cache.get(id) as TextChannel;
 
     if (!channel) {
       return message.channel.send(
@@ -677,14 +673,14 @@ const whitelist = {
 
     switch (type.toLowerCase()) {
       case 'add':
-        ADD_CHANNEL_WHITELIST(message.guild.id, channel.id)
+        ADD_CHANNEL_WHITELIST(guild.id, channel.id)
           .then(() => message.reply(`successfully whitelisted channel.`))
           .catch(() =>
             message.reply(`I had issues whitelisting that channel.`)
           );
         break;
       case 'remove':
-        REMOVE_CHANNEL_WHITELIST(message.guild.id, channel.id)
+        REMOVE_CHANNEL_WHITELIST(guild.id, channel.id)
           .then(() =>
             message.reply(`successfully removed the channel from whitelist.`)
           )
@@ -720,8 +716,7 @@ const listWords = {
 };
 
 const modRole = {
-  desc:
-    'Set the mod role, anyone with this role will be presumed as a mod and can use the mod commands.',
+  desc: 'Set the mod role, anyone with this role will be presumed as a mod and can use the mod commands.',
   name: 'mod',
   args: '<@role | id | remove>',
   alias: [''],
@@ -736,15 +731,17 @@ const modRole = {
       );
     }
 
+    const { guild } = message;
+
     if (args.length && args[0] === 'remove') {
-      const config = await GET_GUILD_CONFIG(message.guild.id);
+      const config = await GET_GUILD_CONFIG(guild.id);
       if (!config?.modRole) {
         return message.reply(
           `the server doesn't have a mod role setup already!`
         );
       }
 
-      REMOVE_MOD_ROLE(message.guild.id);
+      REMOVE_MOD_ROLE(guild.id);
 
       return message.reply(`successfully removed mod role.`);
     }
@@ -758,7 +755,7 @@ const modRole = {
     let role: Role | undefined = undefined;
 
     if (roleId instanceof String) {
-      role = message.guild.roles.cache.find(
+      role = guild.roles.cache.find(
         (r) => r.id === roleId || r.name.toLowerCase() === roleId
       );
     } else if (roleId instanceof Role) {
@@ -769,7 +766,7 @@ const modRole = {
       return message.reply(`couldn't find a role with that name or ID`);
     }
 
-    SET_MOD_ROLE(message.guild.id, role.id);
+    SET_MOD_ROLE(guild.id, role.id);
 
     return message.reply(`successfully set mod role.`);
   },
