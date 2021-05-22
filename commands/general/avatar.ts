@@ -1,5 +1,6 @@
 import { Message, MessageEmbed } from 'discord.js';
 import ViviBot from '../../src/bot';
+import { CLIENT_ID } from '../../src/vars';
 
 export default {
   desc: 'Grabs users avatar link.',
@@ -13,8 +14,7 @@ export default {
      * args.shift() returns the first element and pops it out of the array.
      */
     const userId =
-      message.mentions.members?.filter((u) => u.id !== client.user?.id).first()
-        ?.id ||
+      message.mentions.members?.filter((u) => u.id !== CLIENT_ID).first()?.id ||
       args.shift() ||
       message.author.id;
 

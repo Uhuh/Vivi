@@ -1,6 +1,7 @@
 import { Message } from 'discord.js';
 import ViviBot from '../../src/bot';
 import { GET_GUILD_CONFIG } from '../../src/database/database';
+import { CLIENT_ID } from '../../src/vars';
 
 const kick = {
   desc: 'Kick a user',
@@ -22,7 +23,7 @@ const kick = {
       return message.react('👎');
     }
     if (!args.length) {
-      const prefix = client.guildPrefix.get(message.guild?.id || '') || 'v.';
+      const prefix = client.guildPrefix.get(guild.id) || 'v.';
       return message.reply(
         `you forgot some arguements. \`${prefix}kick <user id> <reason>\``
       );
@@ -32,26 +33,26 @@ const kick = {
      * args.shift() returns the first element and pops it out of the array.
      */
     const userId =
-      message.mentions.members?.filter((u) => u.id !== client.user?.id).first()
-        ?.id || args.shift();
+      message.mentions.members?.filter((u) => u.id !== CLIENT_ID).first()?.id ||
+      args.shift();
 
     if (message.mentions.members?.first()) args.shift();
 
     // Ensure the user is in the guild
-    let user = message.guild?.members.cache.get(userId || '');
+    let member = guild.members.cache.get(userId || '');
     // Try a fetch incase the user isn't cached.
-    if (!user) {
-      await message.guild?.members
+    if (!member) {
+      await guild.members
         .fetch(userId || '')
         .catch(() =>
           console.error(
             `Failed to get user to kick. ID is probably a message ID. [${userId}]`
           )
         );
-      user = message.guild?.members.cache.get(userId || '');
+      member = guild.members.cache.get(userId || '');
     }
 
-    if (!user) {
+    if (!member) {
       return console.error(`Issue getting user on guild. User ID: ${userId}`);
     }
 
@@ -60,17 +61,19 @@ const kick = {
         ? 'No reason provided.'
         : args.join(' ').trim();
 
-    user
+    member
       .kick()
       .then(() => {
         client.logIssue(
-          message.guild!.id,
+          guild.id,
           'kick',
           reason,
           message.author,
-          user!.user
+          member?.user || 'Missing user ID'
         );
-        message.channel.send(`**Kicked** ${user!.user.tag} (<@${user!.id}>)`);
+        message.channel.send(
+          `**Kicked** ${member?.user.tag} (<@${member?.id}>)`
+        );
       })
       .catch(() => message.reply(`I had issue trying to kick that user!`));
   },

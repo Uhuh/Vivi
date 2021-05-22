@@ -1,5 +1,6 @@
 import { Message } from 'discord.js';
 import ViviBot from '../src/bot';
+import { CLIENT_ID } from '../src/vars';
 
 const msg = (client: ViviBot, message: Message) => {
   // Ignore bots
@@ -10,7 +11,7 @@ const msg = (client: ViviBot, message: Message) => {
   const prefixUsed = message.content.startsWith(prefix);
   const clientMention = message.mentions.members?.first()?.id;
 
-  if (client.user?.id === clientMention || prefixUsed) {
+  if (CLIENT_ID === clientMention || prefixUsed) {
     // If prefix is used get its length, otherwise they mentioned and there SHOULD be a space after the mention.
     const length = prefixUsed
       ? prefix.length

@@ -2,6 +2,7 @@ import { Message, MessageEmbed } from 'discord.js';
 import * as moment from 'moment';
 import ViviBot from '../../src/bot';
 import { GET_GUILD_CONFIG, GET_USER_WARNS } from '../../src/database/database';
+import { CLIENT_ID } from '../../src/vars';
 
 const checkwarns = {
   desc:
@@ -33,8 +34,8 @@ const checkwarns = {
      * args.shift() returns the first element and pops it out of the array.
      */
     const userId =
-      message.mentions.members?.filter((u) => u.id !== client.user?.id).first()
-        ?.id || args.shift();
+      message.mentions.members?.filter((u) => u.id !== CLIENT_ID).first()?.id ||
+      args.shift();
 
     if (message.mentions.members?.first()) args.shift();
 
@@ -44,7 +45,7 @@ const checkwarns = {
       return message.reply(`user ids are numbers. Please try again.`);
     }
 
-    const warns = await GET_USER_WARNS(message.guild?.id!, userId);
+    const warns = await GET_USER_WARNS(guild.id, userId);
 
     const embed = new MessageEmbed();
     const active = args.shift() || 'not';

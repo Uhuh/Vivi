@@ -6,6 +6,7 @@ import {
   GET_USER_MUTE,
   MUTE_USER,
 } from '../../src/database/database';
+import { CLIENT_ID } from '../../src/vars';
 
 const mute = {
   desc: 'Mute a user',
@@ -27,7 +28,7 @@ const mute = {
       return message.react('👎');
     }
     if (!args.length) {
-      const prefix = client.guildPrefix.get(message.guild?.id || '') || 'v.';
+      const prefix = client.guildPrefix.get(guild.id) || 'v.';
       return message.reply(
         `you forgot some arguements. Example usage: \`${prefix}mute <user id> Annoying! | 5m\``
       );
@@ -44,8 +45,8 @@ const mute = {
      * args.shift() returns the first element and pops it out of the array.
      */
     const userId =
-      message.mentions.members?.filter((u) => u.id !== client.user?.id).first()
-        ?.id || args.shift();
+      message.mentions.members?.filter((u) => u.id !== CLIENT_ID).first()?.id ||
+      args.shift();
 
     if (!userId) {
       return message.reply(`missing the user id argument!`);
@@ -60,20 +61,20 @@ const mute = {
     if (message.mentions.members?.first()) args.shift();
 
     // Ensure the user is in the guild
-    let user = message.guild?.members.cache.get(userId || '');
+    let member = guild.members.cache.get(userId || '');
     // Try a fetch incase the user isn't cached.
-    if (!user) {
-      await message.guild?.members
+    if (!member) {
+      await guild.members
         .fetch(userId || '')
         .catch(() =>
           console.error(
             `Failed to get user to mute. Potentially not a user ID. [${userId}]`
           )
         );
-      user = message.guild?.members.cache.get(userId || '');
+      member = guild.members.cache.get(userId || '');
     }
 
-    if (!user) {
+    if (!member) {
       return message.reply(
         `couldn't find that user, check that the ID is correct.`
       );
@@ -119,22 +120,23 @@ const mute = {
     MUTE_USER(guild.id, userId, now, unmuteTime);
 
     client.logIssue(
-      message.guild!.id,
+      guild.id,
       'mute',
       `${reason}\n\nMuted for ${time}`,
       message.author,
-      user.user
+      member.user
     );
     message.channel.send(
-      `<@${user.id}> You've been muted for \`${reason}\`. Duration is ${time}.`
+      `<@${member.id}> You've been muted for \`${reason}\`. Duration is ${time}.`
     );
     /**
      * Mute user and set up timer to unmute them when the time is right.
      */
-    user.roles
+    member.roles
       .add(config.muteRole)
       .then(async () => {
-        await user!
+        if (!member) return;
+        await member
           .send(`You've been muted for \`${reason}\`. Duration is ${time}.`)
           .catch((e) =>
             console.error(
