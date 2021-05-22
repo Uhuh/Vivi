@@ -1,6 +1,7 @@
 import { Message, MessageEmbed } from 'discord.js';
 import ViviBot from '../../src/bot';
 import { INVITE_URL } from '../../src/vars';
+import { missingPerms } from '../../utilities/functions/missingPerm';
 
 enum Category {
   general = 'general',
@@ -53,24 +54,19 @@ const help = {
     } else if (key) {
       // If they specify a list type (general, config, etc) show those respective commands
       embed.setTitle(`**${key.toUpperCase()} commands**`);
-      let commands = `***<> = required arguments, [] = optional.***\n\n`;
 
-      const categoryCommands = client.commands
+      const hasPerm = message.member?.hasPermission('MANAGE_MESSAGES');
+      client.commands
         .filter((c) => c.type === key)
-        .values();
+        .filter((func) => !(func.type === Category.mod && !hasPerm))
+        .forEach((func) =>
+          embed.addField(`**${prefix}${func.name} ${func.args}**`, func.desc)
+        );
 
-      for (const func of categoryCommands) {
-        if (
-          func.type === Category.mod &&
-          !message.member?.hasPermission('MANAGE_MESSAGES')
-        )
-          continue;
-        embed.addField(`**${prefix}${func.name} ${func.args}**`, func.desc);
-      }
-      embed.setDescription(commands);
+      embed.setDescription('***<> = required arguments, [] = optional.***\n\n');
     }
 
-    message.channel.send({ embed });
+    message.channel.send({ embed }).catch(() => missingPerms(message, 'embed'));
   },
 };
 

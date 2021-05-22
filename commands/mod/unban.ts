@@ -1,6 +1,7 @@
 import { Message } from 'discord.js';
 import ViviBot from '../../src/bot';
 import { GET_GUILD_CONFIG } from '../../src/database/database';
+import { CLIENT_ID } from '../../src/vars';
 
 const unban = {
   desc: 'Unban a user',
@@ -29,8 +30,8 @@ const unban = {
      * args.shift() returns the first element and pops it out of the array.
      */
     const userId =
-      message.mentions.members?.filter((u) => u.id !== client.user?.id).first()
-        ?.id || args.shift();
+      message.mentions.members?.filter((u) => u.id !== CLIENT_ID).first()?.id ||
+      args.shift();
 
     if (message.mentions.members?.first()) args.shift();
 
@@ -39,11 +40,11 @@ const unban = {
         ? 'No reason provided.'
         : args.join(' ').trim();
 
-    message.guild?.members
+    guild.members
       .unban(userId || '')
       .then(() => {
         client.logIssue(
-          message.guild?.id!,
+          guild.id,
           'unban',
           reason,
           message.author,
