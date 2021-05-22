@@ -3,6 +3,7 @@ import ViviBot from '../../src/bot';
 import * as moment from 'moment';
 import { GET_USER_WARNS } from '../../src/database/database';
 import { CLIENT_ID } from '../../src/vars';
+import { missingPerms } from '../../utilities/functions/missingPerm';
 
 export default {
   desc: 'Information about user.',
@@ -68,8 +69,6 @@ export default {
           : 'No active warnings for this user'
       );
 
-    message.channel
-      .send({ embed })
-      .catch(() => client.missingPerms(message, 'embed'));
+    message.channel.send({ embed }).catch(() => missingPerms(message, 'embed'));
   },
 };

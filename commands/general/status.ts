@@ -1,4 +1,5 @@
 import { Message, MessageEmbed } from 'discord.js';
+import { missingPerms } from '../../utilities/functions/missingPerm';
 
 export default {
   desc: 'Gets the server info',
@@ -40,6 +41,6 @@ export default {
       .addField(`**Text Channels**`, `\`${textC}\``)
       .addField(`**Voice Channels**`, `\`${voiceC}\``);
 
-    message.channel.send(embed);
+    message.channel.send(embed).catch(() => missingPerms(message, 'embed'));
   },
 };

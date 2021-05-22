@@ -1,6 +1,7 @@
 import { Message, MessageEmbed } from 'discord.js';
 import * as OS from 'os';
 import ViviBot from '../../src/bot';
+import { missingPerms } from '../../utilities/functions/missingPerm';
 
 export default {
   desc: 'Gives a list of things about the bot',
@@ -36,8 +37,6 @@ export default {
       .addField(`**The bot is watching:**`, `${channelCount} channels`, true)
       .addField(`**Bot OS:**`, `${OS.platform()}`, true);
 
-    message.channel
-      .send(embed)
-      .catch(() => client.missingPerms(message, 'embed'));
+    message.channel.send(embed).catch(() => missingPerms(message, 'embed'));
   },
 };

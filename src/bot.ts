@@ -1,8 +1,9 @@
 import * as Discord from 'discord.js';
 import * as DBL from 'dblapi.js';
-import * as dotenv from 'dotenv';
 import * as moment from 'moment';
 import * as mongoose from 'mongoose';
+import * as dotenv from 'dotenv';
+dotenv.config();
 import commandHandler from '../commands/commandHandler';
 import msg from '../events/message';
 import {
@@ -23,7 +24,6 @@ import {
   REMOVE_JOIN_ROLE,
   UNMUTE_USER,
 } from './database/database';
-dotenv.config();
 import * as config from './vars';
 
 interface Command {
@@ -364,7 +364,6 @@ export default class ViviBot extends Discord.Client {
     });
     mongoose.set('useFindAndModify', false);
     await this.login(this.config.TOKEN);
-    await this.loadGuildPrefixes();
-    await this.loadBannedWords();
+    await Promise.all([this.loadBannedWords(), this.loadGuildPrefixes()]);
   };
 }

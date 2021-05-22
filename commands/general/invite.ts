@@ -1,5 +1,7 @@
 import { Message, MessageEmbed } from 'discord.js';
 import ViviBot from '../../src/bot';
+import { AVATAR_URL, INVITE_URL, SUPPORT_URL, VOTE_URL } from '../../src/vars';
+import { missingPerms } from '../../utilities/functions/missingPerm';
 
 export default {
   desc: 'Get links related to Vivi like invite/support.',
@@ -9,12 +11,6 @@ export default {
   type: 'general',
   run: (message: Message, _args: string[], client: ViviBot) => {
     const embed = new MessageEmbed();
-    const avatarUrl =
-      'https://images.discordapp.net/avatars/773437651780894722/fd951f54c1e0d73fe69fd99d3e17ec78.png?size=256';
-    const voteUrl = 'https://top.gg/bot/773437651780894722/vote';
-    const inviteUrl =
-      'https://discord.com/oauth2/authorize?client_id=773437651780894722&scope=bot&permissions=67497190';
-    const serverUrl = 'https://discord.gg/AJ58SKFBNf';
 
     embed
       .setTitle('General info for Vivi')
@@ -28,15 +24,13 @@ Latency is ${
           Date.now() - message.createdTimestamp
         }ms. API Latency is ${Math.round(client.ws.ping)}ms.
 
-[Click to invite Vivi!](${inviteUrl})
-[Click to Vote!](${voteUrl})
-[Join the support server!](${serverUrl})
+[Click to invite Vivi!](${INVITE_URL})
+[Click to Vote!](${VOTE_URL})
+[Join the support server!](${SUPPORT_URL})
 `
       )
-      .setThumbnail(avatarUrl);
+      .setThumbnail(AVATAR_URL);
 
-    message.channel
-      .send(embed)
-      .catch(() => client.missingPerms(message, 'embed'));
+    message.channel.send(embed).catch(() => missingPerms(message, 'embed'));
   },
 };

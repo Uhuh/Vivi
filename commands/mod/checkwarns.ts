@@ -1,8 +1,8 @@
 import { Message, MessageEmbed } from 'discord.js';
 import * as moment from 'moment';
-import ViviBot from '../../src/bot';
 import { GET_GUILD_CONFIG, GET_USER_WARNS } from '../../src/database/database';
 import { CLIENT_ID } from '../../src/vars';
+import { missingPerms } from '../../utilities/functions/missingPerm';
 
 const checkwarns = {
   desc:
@@ -12,7 +12,7 @@ const checkwarns = {
   args: '<user id> [active]',
   alias: ['cw'],
   type: 'mod',
-  run: async (message: Message, args: string[], client: ViviBot) => {
+  run: async (message: Message, args: string[]) => {
     if (!message.guild) return;
     const { guild } = message;
     const config = await GET_GUILD_CONFIG(guild.id);
@@ -88,7 +88,7 @@ const checkwarns = {
 
     return message.channel
       .send(embed)
-      .catch(() => client.missingPerms(message, 'embed'));
+      .catch(() => missingPerms(message, 'embed'));
   },
 };
 
