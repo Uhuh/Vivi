@@ -40,5 +40,3 @@ export const botstatus = {
     message.channel.send(embed).catch(() => missingPerms(message, 'embed'));
   },
 };
-
-export default botstatus;

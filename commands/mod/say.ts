@@ -56,5 +56,3 @@ export const say = {
     return message.channel.send(content || 'Nothing to say!');
   },
 };
-
-export default say;

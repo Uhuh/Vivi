@@ -44,5 +44,3 @@ export const status = {
     message.channel.send(embed).catch(() => missingPerms(message, 'embed'));
   },
 };
-
-export default status;

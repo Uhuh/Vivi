@@ -63,5 +63,3 @@ export const setup = {
       .catch(() => missingPerms(message, 'embed'));
   },
 };
-
-export default setup;

@@ -91,5 +91,3 @@ export const checkwarns = {
       .catch(() => missingPerms(message, 'embed'));
   },
 };
-
-export default checkwarns;

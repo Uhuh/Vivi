@@ -61,5 +61,3 @@ export const modRole = {
     return message.reply(`successfully set mod role.`);
   },
 };
-
-export default modRole;

@@ -25,5 +25,3 @@ export const warnsMax = {
       );
   },
 };
-
-export default warnsMax;

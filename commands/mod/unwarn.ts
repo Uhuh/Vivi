@@ -72,5 +72,3 @@ export const unwarn = {
     return;
   },
 };
-
-export default unwarn;

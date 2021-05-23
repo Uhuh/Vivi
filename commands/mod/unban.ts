@@ -56,5 +56,3 @@ export const unban = {
     return;
   },
 };
-
-export default unban;

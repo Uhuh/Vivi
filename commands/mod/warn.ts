@@ -135,5 +135,3 @@ export const warn = {
     return;
   },
 };
-
-export default warn;

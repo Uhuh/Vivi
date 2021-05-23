@@ -61,5 +61,3 @@ export const mute = {
     return message.reply(`successfully set mute role.`);
   },
 };
-
-export default mute;

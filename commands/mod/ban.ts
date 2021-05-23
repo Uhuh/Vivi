@@ -91,5 +91,3 @@ export const ban = {
     return;
   },
 };
-
-export default ban;

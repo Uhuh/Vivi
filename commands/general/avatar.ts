@@ -34,5 +34,3 @@ export const avatar = {
     message.channel.send(embed).catch(() => missingPerms(message, 'embed'));
   },
 };
-
-export default avatar;

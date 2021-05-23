@@ -20,5 +20,3 @@ export const listWords = {
     );
   },
 };
-
-export default listWords;

@@ -49,5 +49,3 @@ export const purge = {
     return;
   },
 };
-
-export default purge;

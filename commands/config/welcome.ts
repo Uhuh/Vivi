@@ -44,5 +44,3 @@ export const welcome = {
       );
   },
 };
-
-export default welcome;

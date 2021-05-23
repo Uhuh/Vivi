@@ -95,5 +95,3 @@ export const unmute = {
     return;
   },
 };
-
-export default unmute;

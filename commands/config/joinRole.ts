@@ -106,5 +106,3 @@ export const joinRole = {
     return;
   },
 };
-
-export default joinRole;

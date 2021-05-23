@@ -34,5 +34,3 @@ Latency is ${
     message.channel.send(embed).catch(() => missingPerms(message, 'embed'));
   },
 };
-
-export default invite;

@@ -33,5 +33,3 @@ export const warnExpire = {
       );
   },
 };
-
-export default warnExpire;

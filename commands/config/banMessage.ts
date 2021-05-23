@@ -24,5 +24,3 @@ export const banMsg = {
       .catch(() => message.reply(`I failed to set that as the ban message.`));
   },
 };
-
-export default banMsg;

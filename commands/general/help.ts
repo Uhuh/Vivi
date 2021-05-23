@@ -62,5 +62,3 @@ export const help = {
     message.channel.send({ embed }).catch(() => missingPerms(message, 'embed'));
   },
 };
-
-export default help;

@@ -72,5 +72,3 @@ export const userinfo = {
     message.channel.send({ embed }).catch(() => missingPerms(message, 'embed'));
   },
 };
-
-export default userinfo;

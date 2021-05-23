@@ -48,5 +48,3 @@ export const word = {
     return;
   },
 };
-
-export default word;

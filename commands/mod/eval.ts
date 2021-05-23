@@ -31,5 +31,3 @@ export const evalFunction = {
     }
   },
 };
-
-export default evalFunction;

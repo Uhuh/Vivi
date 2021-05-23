@@ -24,5 +24,3 @@ export const prefix = {
       .catch(() => message.reply(`I failed to set the prefix to that!`));
   },
 };
-
-export default prefix;

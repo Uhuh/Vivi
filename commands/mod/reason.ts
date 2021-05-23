@@ -204,5 +204,3 @@ const muteDurationChange = async (
 
   return;
 };
-
-export default reason;

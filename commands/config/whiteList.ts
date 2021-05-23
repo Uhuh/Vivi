@@ -59,5 +59,3 @@ export const whitelist = {
     return;
   },
 };
-
-export default whitelist;

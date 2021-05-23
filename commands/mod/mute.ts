@@ -151,5 +151,3 @@ export const mute = {
     return;
   },
 };
-
-export default mute;

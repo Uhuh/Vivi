@@ -78,5 +78,3 @@ export const kick = {
       .catch(() => message.reply(`I had issue trying to kick that user!`));
   },
 };
-
-export default kick;
