@@ -1,7 +1,7 @@
 import { Message } from 'discord.js';
 import ViviBot from '../../src/bot';
 import { GET_GUILD_CONFIG } from '../../src/database/database';
-import { CLIENT_ID } from '../../src/vars';
+import { getUserId } from '../../utilities/functions/getUserId';
 
 export const ban = {
   desc: 'Ban a user',
@@ -26,13 +26,7 @@ export const ban = {
       return message.reply(`you forgot some arguements.`);
     }
 
-    /**
-     * If they mention the user then use that otherwise they should've sent the user id
-     * args.shift() returns the first element and pops it out of the array.
-     */
-    const userId =
-      message.mentions.members?.filter((u) => u.id !== CLIENT_ID).first()?.id ||
-      args.shift();
+    const userId = getUserId(message, args);
 
     if (message.mentions.members?.first()) args.shift();
 

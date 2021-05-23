@@ -6,7 +6,7 @@ import {
   GET_GUILD_CONFIG,
   GET_USER_WARNS,
 } from '../../src/database/database';
-import { CLIENT_ID } from '../../src/vars';
+import { getUserId } from '../../utilities/functions/getUserId';
 
 export const warn = {
   desc: 'warn a user',
@@ -35,25 +35,26 @@ export const warn = {
       );
     }
 
-    /**
-     * If they mention the user then use that otherwise they should've sent the user id
-     * args.shift() returns the first element and pops it out of the array.
-     */
-    const userId =
-      message.mentions.members?.filter((u) => u.id !== CLIENT_ID).first()?.id ||
-      args.shift();
+    const userId = getUserId(message, args);
+
+    if (!userId) {
+      return message.reply(
+        `please mention a user or pass their ID to warn them.`
+      );
+    }
 
     if (message.mentions.members?.first()) args.shift();
 
     // Ensure the user is in the guild
     await guild.members
-      .fetch(userId || '')
+      .fetch(userId)
       .catch(() =>
         console.error(
           `Failed to get user to warn. Probably message ID. [${userId}]`
         )
       );
-    const user = guild.members.cache.get(userId || '');
+
+    const user = guild.members.cache.get(userId);
 
     if (!user) {
       return message.reply(
@@ -84,7 +85,11 @@ export const warn = {
         ? 'No reason provided.'
         : args.join(' ').trim();
 
-    if (activeWarns > config.maxWarns!) {
+    if (!config.maxWarns) {
+      return console.error(`Missing maxWarns for guild[${guild.id}]`);
+    }
+
+    if (activeWarns > config.maxWarns) {
       message.channel.send(
         `Banned ${user.displayName} for getting more than ${config.maxWarns} warns.`
       );
@@ -105,7 +110,7 @@ export const warn = {
         reason === 'No reason provided.' ? '' : reason,
         message.author,
         user.user,
-        config.nextWarnId!
+        config.nextWarnId
       );
     } else {
       message.channel.send(
@@ -120,7 +125,7 @@ export const warn = {
         reason === 'No reason provided.' ? '' : reason,
         message.author,
         user.user,
-        config.nextWarnId!
+        config.nextWarnId
       );
       user
         .send(
