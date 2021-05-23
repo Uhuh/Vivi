@@ -2,7 +2,7 @@ import { Message, MessageEmbed } from 'discord.js';
 import ViviBot from '../../src/bot';
 import { GET_GUILD_CONFIG } from '../../src/database/database';
 import { missingPerms } from '../../utilities/functions/missingPerm';
-import { Category } from '../../utilities/types/commands';
+import { Category, COLOR } from '../../utilities/types/commands';
 
 export const config = {
   desc: 'Show the servers current config',
@@ -98,7 +98,7 @@ export const config = {
           .setDescription(
             `All config commands require MANAGE_GUILD permissions.`
           )
-          .setColor(16711684)
+          .setColor(COLOR.AQUA)
           .setAuthor(client.user?.username, client.user?.avatarURL() || '')
           .setThumbnail(client.user?.avatarURL() || '')
           .setFooter(`Replying to: ${message.author.tag}`)

@@ -21,4 +21,5 @@ export enum COLOR {
   RED = 16711684,
   YELLOW = 15844367,
   GREEN = 3066993,
+  AQUA = '#1ABC9C',
 }

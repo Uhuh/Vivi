@@ -2,6 +2,7 @@ import { Message, MessageEmbed } from 'discord.js';
 import ViviBot from '../../src/bot';
 import { AVATAR_URL, INVITE_URL, SUPPORT_URL, VOTE_URL } from '../../src/vars';
 import { missingPerms } from '../../utilities/functions/missingPerm';
+import { COLOR } from '../../utilities/types/commands';
 
 export const invite = {
   desc: 'Get links related to Vivi like invite/support.',
@@ -14,7 +15,7 @@ export const invite = {
 
     embed
       .setTitle('General info for Vivi')
-      .setColor('#1ABC9C')
+      .setColor(COLOR.AQUA)
       .setDescription(
         `
 Thanks for using Vivi! If you'd like to support her more use her in more servers, vote for her or even leave feedback in the support server!

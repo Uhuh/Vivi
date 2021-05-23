@@ -59,7 +59,7 @@ export const ban = {
             'ban',
             reason,
             message.author,
-            member?.user || userId || 'User'
+            member.user || userId || 'User'
           );
           message.channel.send(
             `**Banned** ${member?.user.tag || 'User'} (<@${userId}>)`

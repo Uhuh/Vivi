@@ -2,6 +2,7 @@ import { Message, MessageEmbed } from 'discord.js';
 import * as OS from 'os';
 import ViviBot from '../../src/bot';
 import { missingPerms } from '../../utilities/functions/missingPerm';
+import { COLOR } from '../../utilities/types/commands';
 
 export const botstatus = {
   desc: 'Gives a list of things about the bot',
@@ -24,7 +25,7 @@ export const botstatus = {
     }
 
     embed
-      .setColor(16711683)
+      .setColor(COLOR.AQUA)
       .setTitle(`**Bot Status**`)
       .setThumbnail(user.avatarURL() || '')
       .addField(`**Bot Developer:**`, `Panku#0721`, true)

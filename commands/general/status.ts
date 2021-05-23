@@ -1,5 +1,6 @@
 import { Message, MessageEmbed } from 'discord.js';
 import { missingPerms } from '../../utilities/functions/missingPerm';
+import { COLOR } from '../../utilities/types/commands';
 
 export const status = {
   desc: 'Gets the server info',
@@ -29,7 +30,7 @@ export const status = {
     const { owner } = guild;
 
     embed
-      .setColor(16772864)
+      .setColor(COLOR.AQUA)
       .setThumbnail(guild.iconURL({ dynamic: true }) || '')
       .setDescription(`**Server information for _${guild.name}_**`);
 

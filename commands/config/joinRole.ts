@@ -6,6 +6,7 @@ import {
 } from '../../src/database/database';
 import { CLIENT_ID } from '../../src/vars';
 import { missingPerms } from '../../utilities/functions/missingPerm';
+import { COLOR } from '../../utilities/types/commands';
 
 export const joinRole = {
   desc: 'Add, remove or list the guilds join roles.',
@@ -90,7 +91,7 @@ export const joinRole = {
         const embed = new MessageEmbed();
         embed
           .setTitle(`Roles users get when joining`)
-          .setColor(16580705)
+          .setColor(COLOR.AQUA)
           .setDescription(
             `${
               !roles.joinRoles?.length

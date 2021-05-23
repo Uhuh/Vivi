@@ -4,6 +4,7 @@ import * as moment from 'moment';
 import { GET_USER_WARNS } from '../../src/database/database';
 import { CLIENT_ID } from '../../src/vars';
 import { missingPerms } from '../../utilities/functions/missingPerm';
+import { COLOR } from '../../utilities/types/commands';
 
 export const userinfo = {
   desc: 'Information about user.',
@@ -42,7 +43,7 @@ export const userinfo = {
 
     embed
       .setTitle(`**User Info**`)
-      .setColor(7419530)
+      .setColor(COLOR.AQUA)
       .setThumbnail(member.user.avatarURL({ dynamic: true }) || '')
       .setFooter(`Replying to: ${message.author.tag}`)
       .setTimestamp(new Date());

@@ -2,7 +2,11 @@ import { Message, MessageEmbed } from 'discord.js';
 import ViviBot from '../../src/bot';
 import { INVITE_URL } from '../../src/vars';
 import { missingPerms } from '../../utilities/functions/missingPerm';
-import { Category, CategoryStrings } from '../../utilities/types/commands';
+import {
+  Category,
+  CategoryStrings,
+  COLOR,
+} from '../../utilities/types/commands';
 
 export const help = {
   desc: 'Sends a list of all available commands.',
@@ -24,7 +28,7 @@ export const help = {
 
     embed
       .setTitle('**Commands**')
-      .setColor(16711684)
+      .setColor(COLOR.AQUA)
       .setURL(INVITE_URL)
       .setAuthor(user.username, user.avatarURL() || '')
       .setThumbnail(user.avatarURL() || '')
