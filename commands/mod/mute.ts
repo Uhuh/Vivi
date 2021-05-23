@@ -8,7 +8,7 @@ import {
 } from '../../src/database/database';
 import { CLIENT_ID } from '../../src/vars';
 
-const mute = {
+export const mute = {
   desc: 'Mute a user',
   name: 'mute',
   args: '<user id or mention> <reason> | [number {m,h,d,w,y}]',

@@ -3,7 +3,7 @@ import ViviBot from '../../src/bot';
 import { AVATAR_URL, INVITE_URL, SUPPORT_URL, VOTE_URL } from '../../src/vars';
 import { missingPerms } from '../../utilities/functions/missingPerm';
 
-export default {
+export const invite = {
   desc: 'Get links related to Vivi like invite/support.',
   name: 'info',
   args: '',
@@ -34,3 +34,5 @@ Latency is ${
     message.channel.send(embed).catch(() => missingPerms(message, 'embed'));
   },
 };
+
+export default invite;

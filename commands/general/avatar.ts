@@ -2,7 +2,7 @@ import { Message, MessageEmbed } from 'discord.js';
 import { CLIENT_ID } from '../../src/vars';
 import { missingPerms } from '../../utilities/functions/missingPerm';
 
-export default {
+export const avatar = {
   desc: 'Grabs users avatar link.',
   name: 'avatar',
   args: '[user: mention/id]',
@@ -34,3 +34,5 @@ export default {
     message.channel.send(embed).catch(() => missingPerms(message, 'embed'));
   },
 };
+
+export default avatar;

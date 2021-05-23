@@ -1,7 +1,7 @@
 import * as Discord from 'discord.js';
 import ViviBot from '../../src/bot';
 
-export default {
+export const evalFunction = {
   desc: '',
   name: 'eval',
   args: '',
@@ -31,3 +31,5 @@ export default {
     }
   },
 };
+
+export default evalFunction;

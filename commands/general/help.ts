@@ -2,16 +2,9 @@ import { Message, MessageEmbed } from 'discord.js';
 import ViviBot from '../../src/bot';
 import { INVITE_URL } from '../../src/vars';
 import { missingPerms } from '../../utilities/functions/missingPerm';
+import { Category, CategoryStrings } from '../../utilities/types/commands';
 
-enum Category {
-  general = 'general',
-  config = 'config',
-  mod = 'mod',
-}
-
-type CategoryStrings = keyof typeof Category;
-
-const help = {
+export const help = {
   desc: 'Sends a list of all available commands.',
   name: 'help',
   args: '',

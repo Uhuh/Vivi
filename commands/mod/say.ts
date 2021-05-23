@@ -1,9 +1,8 @@
 import { Message } from 'discord.js';
 import { GET_GUILD_CONFIG } from '../../src/database/database';
 
-const say = {
-  desc:
-    'Say something in chat. If you mention a channel the bot will speak there instead.',
+export const say = {
+  desc: 'Say something in chat. If you mention a channel the bot will speak there instead.',
   name: 'say',
   args: '',
   alias: [],

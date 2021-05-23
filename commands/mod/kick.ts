@@ -3,7 +3,7 @@ import ViviBot from '../../src/bot';
 import { GET_GUILD_CONFIG } from '../../src/database/database';
 import { CLIENT_ID } from '../../src/vars';
 
-const kick = {
+export const kick = {
   desc: 'Kick a user',
   name: 'kick',
   args: '<user id> <reason>',

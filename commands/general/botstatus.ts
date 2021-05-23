@@ -3,7 +3,7 @@ import * as OS from 'os';
 import ViviBot from '../../src/bot';
 import { missingPerms } from '../../utilities/functions/missingPerm';
 
-export default {
+export const botstatus = {
   desc: 'Gives a list of things about the bot',
   name: 'botstatus',
   args: '',
@@ -40,3 +40,5 @@ export default {
     message.channel.send(embed).catch(() => missingPerms(message, 'embed'));
   },
 };
+
+export default botstatus;

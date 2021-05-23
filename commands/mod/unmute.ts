@@ -3,7 +3,7 @@ import ViviBot from '../../src/bot';
 import { GET_GUILD_CONFIG, UNMUTE_USER } from '../../src/database/database';
 import { CLIENT_ID } from '../../src/vars';
 
-const unmute = {
+export const unmute = {
   desc: 'Unmute a user',
   name: 'unmute',
   args: '<user id or mention> <reason>',

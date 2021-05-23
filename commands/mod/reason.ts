@@ -8,7 +8,7 @@ import {
   UPDATE_WARN_REASON,
 } from '../../src/database/database';
 
-const reason = {
+export const reason = {
   desc: 'Change the reason for a mod case in #mod-logs',
   name: 'reason',
   args: '<case #> <reason>',
@@ -159,9 +159,11 @@ const muteDurationChange = async (
   message: Message
 ) => {
   let [, time] = words.split('|');
+  const { guild } = message;
+  if (!guild) return;
 
   // Default is infinite
-  const mutedUser = await GET_USER_MUTE(message.guild?.id!, userId);
+  const mutedUser = await GET_USER_MUTE(guild.id, userId);
 
   if (!mutedUser) {
     return message.reply(`that user is no longer muted. Remute them!`);
@@ -190,10 +192,10 @@ const muteDurationChange = async (
     }
   } else time = '1h';
 
-  UPDATE_USER_MUTE(message.guild?.id!, userId, unmuteTime);
+  UPDATE_USER_MUTE(guild.id, userId, unmuteTime);
 
-  await message.guild?.members.fetch(userId);
-  const user = message.guild?.members.cache.get(userId);
+  await guild.members.fetch(userId);
+  const user = guild.members.cache.get(userId);
   await user
     ?.send(`Your mute duration has been changed to ${time.trim()}.`)
     .catch(() =>

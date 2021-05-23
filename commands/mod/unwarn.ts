@@ -6,7 +6,7 @@ import {
   GET_WARN,
 } from '../../src/database/database';
 
-const unwarn = {
+export const unwarn = {
   desc: 'Remove a warning from a user',
   name: 'unwarn',
   args: '<warn id> <reason>',

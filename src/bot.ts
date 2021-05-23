@@ -25,23 +25,7 @@ import {
   UNMUTE_USER,
 } from './database/database';
 import * as config from './vars';
-
-interface Command {
-  desc: string;
-  name: string;
-  args: string;
-  alias: string[];
-  type: 'general' | 'mod' | 'config';
-  run: Function;
-}
-
-// Discord embed sidebar colors.
-enum COLOR {
-  DEFAULT = 15158332,
-  RED = 16711684,
-  YELLOW = 15844367,
-  GREEN = 3066993,
-}
+import { COLOR, Command } from '../utilities/types/commands';
 
 export default class ViviBot extends Discord.Client {
   config: any;
@@ -54,11 +38,14 @@ export default class ViviBot extends Discord.Client {
     this.commands = new Discord.Collection();
     this.bannedWords = new Discord.Collection();
     this.guildPrefix = new Discord.Collection();
+    // Load all the commands into the clients commands var.
     commandHandler(this);
+
     this.once('ready', () => {
       const dblapi = new DBL(this.config.DBLTOKEN, this);
       console.info(`[Started]: ${new Date()}\n`);
       console.info('Vivi reporting for duty!');
+      // Post bot stats to top.gg
       setInterval(() => dblapi.postStats(this.guilds.cache.size), 1800000);
       setInterval(() => this.randomPres(), 10000);
       setInterval(() => this.checkMutes(), 60000); // 1 minute // 600000 = 10minutes

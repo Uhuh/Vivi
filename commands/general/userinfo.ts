@@ -5,7 +5,7 @@ import { GET_USER_WARNS } from '../../src/database/database';
 import { CLIENT_ID } from '../../src/vars';
 import { missingPerms } from '../../utilities/functions/missingPerm';
 
-export default {
+export const userinfo = {
   desc: 'Information about user.',
   name: 'userinfo',
   args: '[user: mention/id]',
@@ -72,3 +72,5 @@ export default {
     message.channel.send({ embed }).catch(() => missingPerms(message, 'embed'));
   },
 };
+
+export default userinfo;

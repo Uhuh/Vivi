@@ -8,7 +8,7 @@ import {
 } from '../../src/database/database';
 import { CLIENT_ID } from '../../src/vars';
 
-const warn = {
+export const warn = {
   desc: 'warn a user',
   name: 'warn',
   args: '<user id> <reason>',

@@ -1,7 +1,7 @@
 import { Message, MessageEmbed } from 'discord.js';
 import { missingPerms } from '../../utilities/functions/missingPerm';
 
-export default {
+export const status = {
   desc: 'Gets the server info',
   name: 'status',
   args: '',
@@ -44,3 +44,5 @@ export default {
     message.channel.send(embed).catch(() => missingPerms(message, 'embed'));
   },
 };
+
+export default status;

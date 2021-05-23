@@ -7,6 +7,7 @@ import {
 } from '../src/database/database';
 import { IGuildConfigDoc } from '../src/database/guildConfig';
 import * as moment from 'moment';
+import { BannerDims } from '../utilities/objects/bannerDimensions';
 
 // Discord Message
 type DMsg = Discord.Message | Discord.PartialMessage;
@@ -135,11 +136,8 @@ export const MessageDelete = async (message: DMsg) => {
 
   if (!channel) return;
 
-  if (message.attachments?.size) {
-    for (const [, att] of message.attachments) {
-      embed.attachFiles([att.proxyURL]);
-    }
-  }
+  message.attachments.forEach((att) => embed.attachFiles([att.proxyURL]));
+
   embed
     .setTitle('**Message Deleted**')
     .setColor(Color.MustardYellow)
@@ -221,59 +219,6 @@ export const MessageEdit = async (oldMsg: DMsg, newMsg: DMsg) => {
 function split(input: string): string[] {
   return input.match(/.{1,1024}/g) || [input];
 }
-
-const BannerDims = {
-  center: {
-    offset: 150,
-    circle: {
-      x: 350,
-      y: 120,
-    },
-    avatar: {
-      x: 300,
-      y: 145,
-      draw: {
-        x: 250,
-        y: 20,
-      },
-    },
-    text: {
-      msg: {
-        x: 350,
-        y: 260,
-      },
-      user: {
-        x: 350,
-        y: 310,
-      },
-    },
-  },
-  left: {
-    offset: 300,
-    circle: {
-      x: 170,
-      y: 175,
-    },
-    avatar: {
-      x: 170,
-      y: 175,
-      draw: {
-        x: 70,
-        y: 75,
-      },
-    },
-    text: {
-      msg: {
-        x: 290,
-        y: 165,
-      },
-      user: {
-        x: 290,
-        y: 215,
-      },
-    },
-  },
-};
 
 export const userBanner = async (
   member: Discord.GuildMember | Discord.PartialGuildMember,

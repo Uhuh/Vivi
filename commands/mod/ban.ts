@@ -3,7 +3,7 @@ import ViviBot from '../../src/bot';
 import { GET_GUILD_CONFIG } from '../../src/database/database';
 import { CLIENT_ID } from '../../src/vars';
 
-const ban = {
+export const ban = {
   desc: 'Ban a user',
   name: 'ban',
   args: '<user id> <reason>',
