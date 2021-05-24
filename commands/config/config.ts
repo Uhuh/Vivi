@@ -90,32 +90,29 @@ export const config = {
 
     const configType = args.shift()?.toLowerCase() || '';
 
-    switch (configType) {
-      case 'help':
-        const embed = new MessageEmbed();
-        embed
-          .setTitle('**Config commands**')
-          .setDescription(
-            `All config commands require MANAGE_GUILD permissions.`
+    if (configType === 'help') {
+      const embed = new MessageEmbed();
+      embed
+        .setTitle('**Config commands**')
+        .setDescription(`All config commands require MANAGE_GUILD permissions.`)
+        .setColor(COLOR.AQUA)
+        .setAuthor(client.user?.username, client.user?.avatarURL() || '')
+        .setThumbnail(client.user?.avatarURL() || '')
+        .setFooter(`Replying to: ${message.author.tag}`)
+        .setTimestamp(new Date());
+
+      client.commands
+        .filter((c) => c.type === Category.config)
+        .forEach((func) =>
+          embed.addField(
+            `**${guildConfig.prefix}config ${func.name} ${func.args}**`,
+            func.desc
           )
-          .setColor(COLOR.AQUA)
-          .setAuthor(client.user?.username, client.user?.avatarURL() || '')
-          .setThumbnail(client.user?.avatarURL() || '')
-          .setFooter(`Replying to: ${message.author.tag}`)
-          .setTimestamp(new Date());
+        );
 
-        client.commands
-          .filter((c) => c.type === Category.config)
-          .forEach((func) =>
-            embed.addField(
-              `**${guildConfig.prefix}config ${func.name} ${func.args}**`,
-              func.desc
-            )
-          );
-
-        message.channel.send(embed).catch(() => missingPerms(message, 'embed'));
-        break;
-      default:
+      return message.channel
+        .send(embed)
+        .catch(() => missingPerms(message, 'embed'));
     }
 
     const command = client.commands.get(configType);
