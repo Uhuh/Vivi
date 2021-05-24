@@ -132,7 +132,8 @@ export default class ViviBot extends Discord.Client {
       if (match) {
         let userWarnings = await GET_USER_WARNS(guild.id, message.author.id);
         const config = await GET_GUILD_CONFIG(guild.id);
-        if (!config) return;
+        if (!config || message.member?.roles.cache.has(config.modRole || ''))
+          return;
 
         if (!userWarnings) userWarnings = [];
 
@@ -149,7 +150,7 @@ export default class ViviBot extends Discord.Client {
         activeWarns++;
         if (activeWarns > config.maxWarns!) {
           message.channel.send(
-            `Banned ${message.author.username} for getting more than ${config.maxWarns} strikes.`
+            `Banned ${message.author.username} for getting more than ${config.maxWarns} warns.`
           );
           message
             .delete()
@@ -232,7 +233,7 @@ export default class ViviBot extends Discord.Client {
         `Failed to find guild[${guildId}] config while logging issue.`
       );
     } else if (!config.modLog) {
-      return console.info(`No mod`);
+      return;
     }
 
     const embed = new Discord.MessageEmbed();
