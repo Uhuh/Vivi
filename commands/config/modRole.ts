@@ -44,7 +44,7 @@ export const modRole = {
 
     let role: Role | undefined = undefined;
 
-    if (roleId instanceof String) {
+    if (typeof roleId === 'string') {
       role = guild.roles.cache.find(
         (r) => r.id === roleId || r.name.toLowerCase() === roleId
       );
