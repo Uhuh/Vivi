@@ -91,7 +91,7 @@ export const MemberUpdated = async (
 
     if (days < 30) {
       const sinceDate = userMomentObject.fromNow();
-      description += `New account alert: ${sinceDate}`;
+      description += `New account alert. Created ${sinceDate}`;
     }
     if (!member.user?.avatarURL()) {
       description = description ? description + '\n' : '';
