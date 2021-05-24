@@ -62,6 +62,19 @@ export const reason = {
       );
     }
 
+    if (modCase.modId !== message.author.id) {
+      return message
+        .reply(
+          `you're not the original moderator of this case, please refer to the original mod.`
+        )
+        .then((m) => {
+          setTimeout(() => {
+            m.delete();
+            message.delete().catch(() => {});
+          }, 5000);
+        });
+    }
+
     const channel = message.guild.channels.cache.get(
       config?.modLog
     ) as TextChannel;
@@ -84,12 +97,14 @@ export const reason = {
     const embed = new MessageEmbed();
 
     // Just get that stuff, it probably isn't cached.
-    await message.guild.members
-      .fetch(modCase.userId)
-      .catch(() => console.error(`User is not in guild.`));
-    await message.guild.members
-      .fetch(modCase.modId)
-      .catch(() => console.error(`Mod not in guild ????`));
+    await Promise.all([
+      message.guild.members
+        .fetch(modCase.userId)
+        .catch(() => console.error(`User is not in guild.`)),
+      message.guild.members
+        .fetch(modCase.modId)
+        .catch(() => console.error(`Mod not in guild ????`)),
+    ]);
 
     const user: User | string =
       message.guild.members.cache.get(modCase.userId)?.user || modCase.userId;
@@ -142,7 +157,9 @@ export const reason = {
       )
       .addField(
         `**Reason**`,
-        reason === '' ? 'Mod please do `bbreason <case #> <reason>`' : reason
+        reason === ''
+          ? `Mod please do \`${config.prefix}reason ${modCase.caseId} <reason>\``
+          : reason
       )
       .setColor(color)
       .setTimestamp(new Date());
