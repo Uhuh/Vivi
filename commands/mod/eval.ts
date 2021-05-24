@@ -9,7 +9,7 @@ export const evalFunction = {
   type: 'owner',
   //@ts-ignore
   run: async (message: Discord.Message, args: string[], client: ViviBot) => {
-    if (message.author.id !== '125492204234997761') return;
+    if (message.author.id !== '289151449412141076') return;
 
     const clean = (text: string) => {
       if (typeof text === 'string')
