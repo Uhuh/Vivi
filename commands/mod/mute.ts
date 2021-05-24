@@ -8,6 +8,16 @@ import {
 } from '../../src/database/database';
 import { getUserId } from '../../utilities/functions/getUserId';
 
+enum timeForm {
+  h = 'hour',
+  w = 'week',
+  m = 'minute',
+  d = 'day',
+  y = 'year',
+}
+
+type timeFormStrings = keyof typeof timeForm;
+
 export const mute = {
   desc: 'Mute a user',
   name: 'mute',
@@ -36,7 +46,7 @@ export const mute = {
 
     if (!config.muteRole) {
       return message.reply(
-        `there is no mute role configured for this server. Try \`${config.prefix}config mute <@role/ID>\``
+        `there is no mute role configured for this server. Try \`${config.prefix}config mute-role <@role/ID>\``
       );
     }
 
@@ -49,7 +59,11 @@ export const mute = {
     const existingMute = await GET_USER_MUTE(guild.id, userId);
 
     if (existingMute) {
-      return message.reply(`they're already muted. Check <#${config.modLog}>`);
+      return message.reply(
+        `they're already muted.${
+          config.modLog ? ` Check <#${config.modLog}>` : ''
+        }`
+      );
     }
 
     if (message.mentions.members?.first()) args.shift();
@@ -109,29 +123,36 @@ export const mute = {
       }
     } else time = '1h';
 
-    message.delete().catch(() => console.error(`Issues deleting mute message`));
-
     MUTE_USER(guild.id, userId, now, unmuteTime);
+
+    let key = time[time.length - 1] as timeFormStrings;
+
+    if (!key) key = 'h';
+
+    const num = Number(time.slice(0, -1));
+    const muteDuration = `${num} ${
+      num > 1 ? timeForm[key] + 's' : timeForm[key]
+    }`;
 
     client.logIssue(
       guild.id,
       'mute',
-      `${reason}\n\nMuted for ${time}`,
+      `${reason}\n\nMuted for ${muteDuration}`,
       message.author,
       member.user
     );
     message.channel.send(
-      `<@${member.id}> You've been muted for \`${reason}\`. Duration is ${time}.`
+      `<@${member.id}> You've been muted for \`${reason}\`. Duration is ${muteDuration}.`
     );
-    /**
-     * Mute user and set up timer to unmute them when the time is right.
-     */
+
     member.roles
       .add(config.muteRole)
       .then(async () => {
         if (!member) return;
         await member
-          .send(`You've been muted for \`${reason}\`. Duration is ${time}.`)
+          .send(
+            `You've been muted for \`${reason}\`. Duration is ${muteDuration}.`
+          )
           .catch((e) =>
             console.error(
               `Guild[${guild.id}] - Issue sending mute reason to user. Oh well? ${e}\n`
