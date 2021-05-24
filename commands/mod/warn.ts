@@ -107,14 +107,19 @@ export const warn = {
       client.logIssue(
         guild.id,
         'ban',
-        reason === 'No reason provided.' ? '' : reason,
+        reason === 'No reason provided. User surpassed max warns' ? '' : reason,
         message.author,
         user.user,
         config.nextWarnId
       );
     } else {
+      const warnCount =
+        activeWarns < config.maxWarns
+          ? `You have ${activeWarns} out of ${config.maxWarns} warns now.`
+          : `This is your final warning.`;
+
       message.channel.send(
-        `<@${user.id}> You've been warned for \`${reason}\`. You have ${activeWarns} out of ${config.maxWarns} warns now.`
+        `<@${user.id}> You've been warned for \`${reason}\`. ${warnCount}`
       );
 
       CREATE_WARN(guild.id, user.id, message.author.id, reason);
@@ -129,7 +134,7 @@ export const warn = {
       );
       user
         .send(
-          `You have been warned in **${guild.name}**\n**Reason:** ${reason}`
+          `You have been warned in **${guild.name}**\n${warnCount}\n\n**Reason:** ${reason}`
         )
         .catch(() => console.error(`Can't DM user, probably has friends on.`));
       message
