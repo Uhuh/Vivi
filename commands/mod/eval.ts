@@ -1,5 +1,6 @@
 import * as Discord from 'discord.js';
 import ViviBot from '../../src/bot';
+import { BOT_OWNER } from '../../src/vars';
 
 export const evalFunction = {
   desc: '',
@@ -9,7 +10,7 @@ export const evalFunction = {
   type: 'owner',
   //@ts-ignore
   run: async (message: Discord.Message, args: string[], client: ViviBot) => {
-    if (message.author.id !== '289151449412141076') return;
+    if (message.author.id !== BOT_OWNER) return;
 
     const clean = (text: string) => {
       if (typeof text === 'string')
