@@ -87,19 +87,19 @@ export const MemberUpdated = async (
   if (type === 'join') {
     const userMomentObject = moment(member.user?.createdTimestamp);
     const days = moment().diff(userMomentObject, 'days');
-    let description = '';
+    let description = `\`\`\`diff\n`;
 
     if (days < 30) {
       const sinceDate = userMomentObject.fromNow();
-      description += `New account alert. Created ${sinceDate}`;
+      description += `- New account alert. Created ${sinceDate}`;
     }
     if (!member.user?.avatarURL()) {
       description = description ? description + '\n' : '';
-      description += 'Default avatar';
+      description += '- Account has no avatar';
     }
 
-    if (description !== '') {
-      embed.setDescription(`\`\`\`${description}\`\`\``);
+    if (description !== '```diff\n') {
+      embed.setDescription(`${description}\`\`\``);
     }
   }
 
