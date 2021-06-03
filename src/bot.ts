@@ -346,7 +346,7 @@ export default class ViviBot extends Discord.Client {
   };
 
   start = async () => {
-    await mongoose.connect(`mongodb://localhost/${config.DATABASE_TYPE}`, {
+    await mongoose.connect(`mongodb://mongodb:27017/${config.DATABASE_TYPE}`, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       useCreateIndex: true,
