@@ -1,7 +1,7 @@
 import { Message, TextChannel } from 'discord.js';
 import { GET_GUILD_CONFIG } from '../../src/database/database';
 
-export default {
+export const purge = {
   desc: 'Clear messages in a channel.',
   name: 'purge',
   args: '<amount>',

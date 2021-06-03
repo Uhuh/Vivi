@@ -1,8 +1,9 @@
 import * as Discord from 'discord.js';
 import * as DBL from 'dblapi.js';
-import * as dotenv from 'dotenv';
 import * as moment from 'moment';
 import * as mongoose from 'mongoose';
+import * as dotenv from 'dotenv';
+dotenv.config();
 import commandHandler from '../commands/commandHandler';
 import msg from '../events/message';
 import {
@@ -23,25 +24,9 @@ import {
   REMOVE_JOIN_ROLE,
   UNMUTE_USER,
 } from './database/database';
-dotenv.config();
 import * as config from './vars';
-
-interface Command {
-  desc: string;
-  name: string;
-  args: string;
-  alias: string[];
-  type: 'general' | 'mod' | 'config';
-  run: Function;
-}
-
-// Discord embed sidebar colors.
-enum COLOR {
-  DEFAULT = 15158332,
-  RED = 16711684,
-  YELLOW = 15844367,
-  GREEN = 3066993,
-}
+import { Command } from '../utilities/types/commands';
+import { COLOR } from '../utilities/types/global';
 
 export default class ViviBot extends Discord.Client {
   config: any;
@@ -54,11 +39,14 @@ export default class ViviBot extends Discord.Client {
     this.commands = new Discord.Collection();
     this.bannedWords = new Discord.Collection();
     this.guildPrefix = new Discord.Collection();
+    // Load all the commands into the clients commands var.
     commandHandler(this);
+
     this.once('ready', () => {
       const dblapi = new DBL(this.config.DBLTOKEN, this);
       console.info(`[Started]: ${new Date()}\n`);
       console.info('Vivi reporting for duty!');
+      // Post bot stats to top.gg
       setInterval(() => dblapi.postStats(this.guilds.cache.size), 1800000);
       setInterval(() => this.randomPres(), 10000);
       setInterval(() => this.checkMutes(), 60000); // 1 minute // 600000 = 10minutes
@@ -145,7 +133,8 @@ export default class ViviBot extends Discord.Client {
       if (match) {
         let userWarnings = await GET_USER_WARNS(guild.id, message.author.id);
         const config = await GET_GUILD_CONFIG(guild.id);
-        if (!config) return;
+        if (!config || message.member?.roles.cache.has(config.modRole || ''))
+          return;
 
         if (!userWarnings) userWarnings = [];
 
@@ -162,7 +151,7 @@ export default class ViviBot extends Discord.Client {
         activeWarns++;
         if (activeWarns > config.maxWarns!) {
           message.channel.send(
-            `Banned ${message.author.username} for getting more than ${config.maxWarns} strikes.`
+            `Banned ${message.author.username} for getting more than ${config.maxWarns} warns.`
           );
           message
             .delete()
@@ -245,7 +234,7 @@ export default class ViviBot extends Discord.Client {
         `Failed to find guild[${guildId}] config while logging issue.`
       );
     } else if (!config.modLog) {
-      return console.info(`No mod`);
+      return;
     }
 
     const embed = new Discord.MessageEmbed();
@@ -364,7 +353,6 @@ export default class ViviBot extends Discord.Client {
     });
     mongoose.set('useFindAndModify', false);
     await this.login(this.config.TOKEN);
-    await this.loadGuildPrefixes();
-    await this.loadBannedWords();
+    await Promise.all([this.loadBannedWords(), this.loadGuildPrefixes()]);
   };
 }

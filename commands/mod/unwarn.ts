@@ -6,7 +6,7 @@ import {
   GET_WARN,
 } from '../../src/database/database';
 
-const unwarn = {
+export const unwarn = {
   desc: 'Remove a warning from a user',
   name: 'unwarn',
   args: '<warn id> <reason>',
@@ -39,7 +39,9 @@ const unwarn = {
     const warn = await GET_WARN(guild.id, warnId);
 
     if (!warn) {
-      return message.reply(`that warn does not exist for `);
+      return message.reply(
+        `that warning does not exist, make sure the ID you gave me is a real warn ID.`
+      );
     }
 
     let user = guild.members.cache.get(warn.userId) || warn.userId;
@@ -58,13 +60,11 @@ const unwarn = {
     );
 
     if (typeof user !== 'string') {
-      user.send(
-        `Your warn[ID: ${warn.warnId} | Reason: "${warn.reason}"] has been removed.`
-      );
+      user.send(`Your warn "**${warn.reason}**" has been removed.`);
     }
 
     DELETE_WARN(message.guild?.id!, warnId)
-      .then(() => message.reply('I removed that warn successfully.'))
+      .then(() => message.reply('I removed the warn successfully.'))
       .catch(() =>
         message.reply('issue removing that warn. Is the ID correct?')
       );
@@ -72,5 +72,3 @@ const unwarn = {
     return;
   },
 };
-
-export default unwarn;

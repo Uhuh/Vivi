@@ -1,7 +1,9 @@
 import * as Discord from 'discord.js';
 import ViviBot from '../../src/bot';
+import { BOT_OWNER } from '../../src/vars';
+import { Emojis } from '../../utilities/types/global';
 
-export default {
+export const evalFunction = {
   desc: '',
   name: 'eval',
   args: '',
@@ -9,7 +11,7 @@ export default {
   type: 'owner',
   //@ts-ignore
   run: async (message: Discord.Message, args: string[], client: ViviBot) => {
-    if (message.author.id !== '125492204234997761') return;
+    if (message.author.id !== BOT_OWNER) return;
 
     const clean = (text: string) => {
       if (typeof text === 'string')
@@ -26,6 +28,8 @@ export default {
       if (typeof evaled !== 'string') evaled = require('util').inspect(evaled);
 
       message.channel.send(clean(evaled), { code: 'xl' });
+      const emojis = Object.values(Emojis).join(' ');
+      message.channel.send(emojis);
     } catch (err) {
       message.channel.send(`\`ERROR\` \`\`\`xl\n${clean(err)}\n\`\`\``);
     }

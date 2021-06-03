@@ -1,9 +1,8 @@
 import { Message } from 'discord.js';
 import { GET_GUILD_CONFIG } from '../../src/database/database';
 
-const say = {
-  desc:
-    'Say something in chat. If you mention a channel the bot will speak there instead.',
+export const say = {
+  desc: 'Say something in chat. If you mention a channel the bot will speak there instead.',
   name: 'say',
   args: '',
   alias: [],
@@ -34,6 +33,17 @@ const say = {
       return channel.send(args.join(' '));
     }
 
+    let content = '';
+
+    if (args[0] === config.prefix) {
+      content = message.content.slice(config.prefix?.length).trim().slice(3);
+    } else {
+      const preparse = message.content
+        .substr(message.content.indexOf(' ') + 1)
+        .trim();
+      content = preparse.startsWith('say') ? preparse.slice(3) : preparse;
+    }
+
     message
       .delete()
       .catch(() =>
@@ -43,8 +53,6 @@ const say = {
           }]`
         )
       );
-    return message.channel.send(message.content.slice(5) || 'Nothing to say!');
+    return message.channel.send(content || 'Nothing to say!');
   },
 };
-
-export default say;

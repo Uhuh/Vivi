@@ -1,9 +1,10 @@
 import { Message, MessageEmbed } from 'discord.js';
 import * as moment from 'moment';
-import ViviBot from '../../src/bot';
 import { GET_GUILD_CONFIG, GET_USER_WARNS } from '../../src/database/database';
+import { getUserId } from '../../utilities/functions/getUserId';
+import { missingPerms } from '../../utilities/functions/missingPerm';
 
-const checkwarns = {
+export const checkwarns = {
   desc:
     'List a users warnings, get their active warnings by using the active tag after the id\n' +
     'Active warns are warns that have not expired yet.',
@@ -11,7 +12,7 @@ const checkwarns = {
   args: '<user id> [active]',
   alias: ['cw'],
   type: 'mod',
-  run: async (message: Message, args: string[], client: ViviBot) => {
+  run: async (message: Message, args: string[]) => {
     if (!message.guild) return;
     const { guild } = message;
     const config = await GET_GUILD_CONFIG(guild.id);
@@ -28,13 +29,7 @@ const checkwarns = {
       return message.reply(`please supply a user id.`);
     }
 
-    /**
-     * If they mention the user then use that otherwise they should've sent the user id
-     * args.shift() returns the first element and pops it out of the array.
-     */
-    const userId =
-      message.mentions.members?.filter((u) => u.id !== client.user?.id).first()
-        ?.id || args.shift();
+    const userId = getUserId(message, args);
 
     if (message.mentions.members?.first()) args.shift();
 
@@ -44,7 +39,7 @@ const checkwarns = {
       return message.reply(`user ids are numbers. Please try again.`);
     }
 
-    const warns = await GET_USER_WARNS(message.guild?.id!, userId);
+    const warns = await GET_USER_WARNS(guild.id, userId);
 
     const embed = new MessageEmbed();
     const active = args.shift() || 'not';
@@ -85,8 +80,8 @@ const checkwarns = {
       );
     }
 
-    return message.channel.send(embed);
+    return message.channel
+      .send(embed)
+      .catch(() => missingPerms(message, 'embed'));
   },
 };
-
-export default checkwarns;

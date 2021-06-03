@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "module": "commonjs",
+    "sourceMap": true,
     "strict": true,
     "target": "es2017",
     "lib": ["es2017", "dom"],
@@ -16,6 +17,6 @@
     "noImplicitThis": true,
     "strictNullChecks": true
   },
-  "include": ["src/", "events/", "commands/", "server/"],
+  "include": ["src/", "events/", "commands/", "utilities/"],
   "compileOnSave": true
 }

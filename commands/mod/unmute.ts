@@ -1,8 +1,9 @@
 import { Message } from 'discord.js';
 import ViviBot from '../../src/bot';
 import { GET_GUILD_CONFIG, UNMUTE_USER } from '../../src/database/database';
+import { getUserId } from '../../utilities/functions/getUserId';
 
-const unmute = {
+export const unmute = {
   desc: 'Unmute a user',
   name: 'unmute',
   args: '<user id or mention> <reason>',
@@ -22,7 +23,7 @@ const unmute = {
       return message.react('👎');
     }
     if (!args.length) {
-      const prefix = client.guildPrefix.get(message.guild?.id || '') || 'v.';
+      const prefix = client.guildPrefix.get(guild.id) || 'v.';
       return message.reply(
         `you forgot some arguements. \`${prefix}unmute <user id> <reason>\``
       );
@@ -34,13 +35,7 @@ const unmute = {
       );
     }
 
-    /**
-     * If they mention the user then use that otherwise they should've sent the user id
-     * args.shift() returns the first element and pops it out of the array.
-     */
-    const userId =
-      message.mentions.members?.filter((u) => u.id !== client.user?.id).first()
-        ?.id || args.shift();
+    const userId = getUserId(message, args);
 
     if (!userId) {
       return message.reply(`missing the user id argument!`);
@@ -49,15 +44,15 @@ const unmute = {
     if (message.mentions.members?.first()) args.shift();
 
     // Ensure the user is in the guild
-    let user = message.guild?.members.cache.get(userId || '');
+    let member = guild.members.cache.get(userId || '');
 
     // Try a fetch incase the user isn't cached.
-    if (!user) {
-      await message.guild?.members.fetch(userId || '');
-      user = message.guild?.members.cache.get(userId || '');
+    if (!member) {
+      await guild.members.fetch(userId || '');
+      member = guild.members.cache.get(userId || '');
     }
 
-    if (!user) {
+    if (!member) {
       return message.reply(
         `couldn't find that user, check that the ID is correct.`
       );
@@ -65,12 +60,19 @@ const unmute = {
 
     const reason = args.join(' ').trim() === '' ? '' : args.join(' ').trim();
 
-    client.logIssue(guild.id, 'unmute', reason, message.author, user.user);
+    client.logIssue(guild.id, 'unmute', reason, message.author, member.user);
 
     UNMUTE_USER(guild.id, userId)
       .then(() => {
-        user!.roles
-          .remove(config.muteRole!)
+        if (!member) return;
+        if (!config.muteRole) {
+          return message.reply(
+            `I wasn't able to find the mute role in the config.`
+          );
+        }
+
+        return member.roles
+          .remove(config.muteRole)
           .catch(() =>
             message.reply(
               `unable to remove mute role from user. Maybe they left?`
@@ -83,9 +85,7 @@ const unmute = {
         );
       });
 
-    message.channel.send(`**Unmuted** ${user.user.tag} (<@${user.id}>)`);
+    message.channel.send(`**Unmuted** ${member.user.tag} (<@${member.id}>)`);
     return;
   },
 };
-
-export default unmute;

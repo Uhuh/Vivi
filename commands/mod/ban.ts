@@ -1,8 +1,9 @@
 import { Message } from 'discord.js';
 import ViviBot from '../../src/bot';
 import { GET_GUILD_CONFIG } from '../../src/database/database';
+import { getUserId } from '../../utilities/functions/getUserId';
 
-const ban = {
+export const ban = {
   desc: 'Ban a user',
   name: 'ban',
   args: '<user id> <reason>',
@@ -25,20 +26,14 @@ const ban = {
       return message.reply(`you forgot some arguements.`);
     }
 
-    /**
-     * If they mention the user then use that otherwise they should've sent the user id
-     * args.shift() returns the first element and pops it out of the array.
-     */
-    const userId =
-      message.mentions.members?.filter((u) => u.id !== client.user?.id).first()
-        ?.id || args.shift();
+    const userId = getUserId(message, args);
 
     if (message.mentions.members?.first()) args.shift();
 
     // Ensure the user is in the guild
-    const user = message.guild?.members.cache.get(userId || '');
+    const member = guild.members.cache.get(userId || '');
 
-    if (user?.hasPermission('BAN_MEMBERS')) {
+    if (member?.hasPermission('BAN_MEMBERS')) {
       return message.reply(`you can't ban them lol.`);
     }
 
@@ -47,32 +42,32 @@ const ban = {
         ? 'No reason provided.'
         : args.join(' ').trim();
 
-    if (user) {
+    if (member) {
       const banMessage =
         config.banMessage || `You've been banned from ${guild.name}.`;
-      await user
+      await member
         .send(banMessage)
         .catch(() =>
-          console.error('Issue sending ban appeal message to user. Oh well?')
+          console.error('Issue sending ban appeal message to member. Oh well?')
         );
 
-      user
+      member
         .ban({ reason })
         .then(() => {
           client.logIssue(
-            message.guild?.id!,
+            guild.id,
             'ban',
             reason,
             message.author,
-            user?.user || userId || 'User'
+            member.user || userId || 'User'
           );
           message.channel.send(
-            `**Banned** ${user?.user.tag || 'User'} (<@${userId}>)`
+            `**Banned** ${member?.user.tag || 'User'} (<@${userId}>)`
           );
         })
         .catch(() => message.reply(`I had issues trying to ban that user!`));
     } else {
-      message.guild?.members
+      guild.members
         .ban(userId || '')
         .then(() => {
           client.logIssue(
@@ -90,5 +85,3 @@ const ban = {
     return;
   },
 };
-
-export default ban;

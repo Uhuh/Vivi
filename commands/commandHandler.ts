@@ -1,35 +1,20 @@
 import ViviBot from '../src/bot';
-import * as fs from 'fs';
+import { Command } from '../utilities/types/commands';
+import * as configCommands from './config';
+import * as modCommands from './mod';
+import * as generalCommands from './general';
 
 const commandHandler = (client: ViviBot) => {
-  const helpCommands: string[] = [];
-  const modCommands: string[] = [];
-  const configCommands: string[] = [];
-  fs.readdirSync('commands/general/').forEach((file) =>
-    helpCommands.push(file.slice(0, -3))
-  );
-
-  fs.readdirSync('commands/mod/').forEach((file) =>
-    modCommands.push(file.slice(0, -3))
-  );
-
-  fs.readdirSync('commands/config/').forEach((file) =>
-    configCommands.push(file.slice(0, -3))
-  );
-
-  for (const file of helpCommands) {
-    const command = require(`./general/${file}`);
-    client.commands.set(command.default.name.toLowerCase(), command.default);
+  for (const cmd of Object.values(generalCommands)) {
+    client.commands.set(cmd.name.toLowerCase(), cmd as Command);
   }
 
-  for (const file of modCommands) {
-    const command = require(`./mod/${file}`);
-    client.commands.set(command.default.name.toLowerCase(), command.default);
+  for (const cmd of Object.values(modCommands)) {
+    client.commands.set(cmd.name.toLowerCase(), cmd as Command);
   }
 
-  for (const file of configCommands) {
-    const command = require(`./config/${file}`);
-    client.commands.set(command.default.name.toLowerCase(), command.default);
+  for (const cmd of Object.values(configCommands)) {
+    client.commands.set(cmd.name.toLowerCase(), cmd as Command);
   }
 };
 

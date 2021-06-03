@@ -1,6 +1,8 @@
 import { Message, MessageEmbed } from 'discord.js';
+import { missingPerms } from '../../utilities/functions/missingPerm';
+import { COLOR } from '../../utilities/types/global';
 
-export default {
+export const status = {
   desc: 'Gets the server info',
   name: 'status',
   args: '',
@@ -28,7 +30,7 @@ export default {
     const { owner } = guild;
 
     embed
-      .setColor(16772864)
+      .setColor(COLOR.AQUA)
       .setThumbnail(guild.iconURL({ dynamic: true }) || '')
       .setDescription(`**Server information for _${guild.name}_**`);
 
@@ -40,6 +42,6 @@ export default {
       .addField(`**Text Channels**`, `\`${textC}\``)
       .addField(`**Voice Channels**`, `\`${voiceC}\``);
 
-    message.channel.send(embed);
+    message.channel.send(embed).catch(() => missingPerms(message, 'embed'));
   },
 };

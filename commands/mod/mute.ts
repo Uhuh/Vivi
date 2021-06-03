@@ -6,8 +6,19 @@ import {
   GET_USER_MUTE,
   MUTE_USER,
 } from '../../src/database/database';
+import { getUserId } from '../../utilities/functions/getUserId';
 
-const mute = {
+enum timeForm {
+  h = 'hour',
+  w = 'week',
+  m = 'minute',
+  d = 'day',
+  y = 'year',
+}
+
+type timeFormStrings = keyof typeof timeForm;
+
+export const mute = {
   desc: 'Mute a user',
   name: 'mute',
   args: '<user id or mention> <reason> | [number {m,h,d,w,y}]',
@@ -27,7 +38,7 @@ const mute = {
       return message.react('👎');
     }
     if (!args.length) {
-      const prefix = client.guildPrefix.get(message.guild?.id || '') || 'v.';
+      const prefix = client.guildPrefix.get(guild.id) || 'v.';
       return message.reply(
         `you forgot some arguements. Example usage: \`${prefix}mute <user id> Annoying! | 5m\``
       );
@@ -35,17 +46,11 @@ const mute = {
 
     if (!config.muteRole) {
       return message.reply(
-        `there is no mute role configured for this server. Try \`${config.prefix}config mute <@role/ID>\``
+        `there is no mute role configured for this server. Try \`${config.prefix}config mute-role <@role/ID>\``
       );
     }
 
-    /**
-     * If they mention the user then use that otherwise they should've sent the user id
-     * args.shift() returns the first element and pops it out of the array.
-     */
-    const userId =
-      message.mentions.members?.filter((u) => u.id !== client.user?.id).first()
-        ?.id || args.shift();
+    const userId = getUserId(message, args);
 
     if (!userId) {
       return message.reply(`missing the user id argument!`);
@@ -54,26 +59,30 @@ const mute = {
     const existingMute = await GET_USER_MUTE(guild.id, userId);
 
     if (existingMute) {
-      return message.reply(`they're already muted. Check <#${config.modLog}>`);
+      return message.reply(
+        `they're already muted.${
+          config.modLog ? ` Check <#${config.modLog}>` : ''
+        }`
+      );
     }
 
     if (message.mentions.members?.first()) args.shift();
 
     // Ensure the user is in the guild
-    let user = message.guild?.members.cache.get(userId || '');
+    let member = guild.members.cache.get(userId || '');
     // Try a fetch incase the user isn't cached.
-    if (!user) {
-      await message.guild?.members
+    if (!member) {
+      await guild.members
         .fetch(userId || '')
         .catch(() =>
           console.error(
             `Failed to get user to mute. Potentially not a user ID. [${userId}]`
           )
         );
-      user = message.guild?.members.cache.get(userId || '');
+      member = guild.members.cache.get(userId || '');
     }
 
-    if (!user) {
+    if (!member) {
       return message.reply(
         `couldn't find that user, check that the ID is correct.`
       );
@@ -114,28 +123,36 @@ const mute = {
       }
     } else time = '1h';
 
-    message.delete().catch(() => console.error(`Issues deleting mute message`));
-
     MUTE_USER(guild.id, userId, now, unmuteTime);
 
+    let key = time[time.length - 1] as timeFormStrings;
+
+    if (!key) key = 'h';
+
+    const num = Number(time.slice(0, -1));
+    const muteDuration = `${num} ${
+      num > 1 ? timeForm[key] + 's' : timeForm[key]
+    }`;
+
     client.logIssue(
-      message.guild!.id,
+      guild.id,
       'mute',
-      `${reason}\n\nMuted for ${time}`,
+      `${reason}\n\nMuted for ${muteDuration}`,
       message.author,
-      user.user
+      member.user
     );
     message.channel.send(
-      `<@${user.id}> You've been muted for \`${reason}\`. Duration is ${time}.`
+      `<@${member.id}> You've been muted for \`${reason}\`. Duration is ${muteDuration}.`
     );
-    /**
-     * Mute user and set up timer to unmute them when the time is right.
-     */
-    user.roles
+
+    member.roles
       .add(config.muteRole)
       .then(async () => {
-        await user!
-          .send(`You've been muted for \`${reason}\`. Duration is ${time}.`)
+        if (!member) return;
+        await member
+          .send(
+            `You've been muted for \`${reason}\`. Duration is ${muteDuration}.`
+          )
           .catch((e) =>
             console.error(
               `Guild[${guild.id}] - Issue sending mute reason to user. Oh well? ${e}\n`
@@ -149,5 +166,3 @@ const mute = {
     return;
   },
 };
-
-export default mute;

@@ -8,7 +8,7 @@ import {
   UPDATE_WARN_REASON,
 } from '../../src/database/database';
 
-const reason = {
+export const reason = {
   desc: 'Change the reason for a mod case in #mod-logs',
   name: 'reason',
   args: '<case #> <reason>',
@@ -62,6 +62,19 @@ const reason = {
       );
     }
 
+    if (modCase.modId !== message.author.id) {
+      return message
+        .reply(
+          `you're not the original moderator of this case, please refer to the original mod.`
+        )
+        .then((m) => {
+          setTimeout(() => {
+            m.delete();
+            message.delete().catch(() => {});
+          }, 5000);
+        });
+    }
+
     const channel = message.guild.channels.cache.get(
       config?.modLog
     ) as TextChannel;
@@ -84,12 +97,14 @@ const reason = {
     const embed = new MessageEmbed();
 
     // Just get that stuff, it probably isn't cached.
-    await message.guild.members
-      .fetch(modCase.userId)
-      .catch(() => console.error(`User is not in guild.`));
-    await message.guild.members
-      .fetch(modCase.modId)
-      .catch(() => console.error(`Mod not in guild ????`));
+    await Promise.all([
+      message.guild.members
+        .fetch(modCase.userId)
+        .catch(() => console.error(`User is not in guild.`)),
+      message.guild.members
+        .fetch(modCase.modId)
+        .catch(() => console.error(`Mod not in guild ????`)),
+    ]);
 
     const user: User | string =
       message.guild.members.cache.get(modCase.userId)?.user || modCase.userId;
@@ -142,7 +157,9 @@ const reason = {
       )
       .addField(
         `**Reason**`,
-        reason === '' ? 'Mod please do `bbreason <case #> <reason>`' : reason
+        reason === ''
+          ? `Mod please do \`${config.prefix}reason ${modCase.caseId} <reason>\``
+          : reason
       )
       .setColor(color)
       .setTimestamp(new Date());
@@ -159,9 +176,11 @@ const muteDurationChange = async (
   message: Message
 ) => {
   let [, time] = words.split('|');
+  const { guild } = message;
+  if (!guild) return;
 
   // Default is infinite
-  const mutedUser = await GET_USER_MUTE(message.guild?.id!, userId);
+  const mutedUser = await GET_USER_MUTE(guild.id, userId);
 
   if (!mutedUser) {
     return message.reply(`that user is no longer muted. Remute them!`);
@@ -190,10 +209,10 @@ const muteDurationChange = async (
     }
   } else time = '1h';
 
-  UPDATE_USER_MUTE(message.guild?.id!, userId, unmuteTime);
+  UPDATE_USER_MUTE(guild.id, userId, unmuteTime);
 
-  await message.guild?.members.fetch(userId);
-  const user = message.guild?.members.cache.get(userId);
+  await guild.members.fetch(userId);
+  const user = guild.members.cache.get(userId);
   await user
     ?.send(`Your mute duration has been changed to ${time.trim()}.`)
     .catch(() =>
@@ -202,5 +221,3 @@ const muteDurationChange = async (
 
   return;
 };
-
-export default reason;

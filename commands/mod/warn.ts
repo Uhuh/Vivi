@@ -6,8 +6,9 @@ import {
   GET_GUILD_CONFIG,
   GET_USER_WARNS,
 } from '../../src/database/database';
+import { getUserId } from '../../utilities/functions/getUserId';
 
-const warn = {
+export const warn = {
   desc: 'warn a user',
   name: 'warn',
   args: '<user id> <reason>',
@@ -26,32 +27,34 @@ const warn = {
     ) {
       return message.react('👎');
     }
+
     if (!args.length) {
-      const prefix = client.guildPrefix.get(message.guild?.id || '') || 'v.';
+      const prefix = client.guildPrefix.get(guild.id) || 'v.';
       return message.reply(
         `you forgot some arguements. \`${prefix}warn <user id> <reason>\``
       );
     }
 
-    /**
-     * If they mention the user then use that otherwise they should've sent the user id
-     * args.shift() returns the first element and pops it out of the array.
-     */
-    const userId =
-      message.mentions.members?.filter((u) => u.id !== client.user?.id).first()
-        ?.id || args.shift();
+    const userId = getUserId(message, args);
+
+    if (!userId) {
+      return message.reply(
+        `please mention a user or pass their ID to warn them.`
+      );
+    }
 
     if (message.mentions.members?.first()) args.shift();
 
     // Ensure the user is in the guild
-    await message.guild?.members
-      .fetch(userId || '')
+    await guild.members
+      .fetch(userId)
       .catch(() =>
         console.error(
           `Failed to get user to warn. Probably message ID. [${userId}]`
         )
       );
-    const user = message.guild?.members.cache.get(userId || '');
+
+    const user = guild.members.cache.get(userId);
 
     if (!user) {
       return message.reply(
@@ -65,7 +68,9 @@ const warn = {
 
     if (!userWarnings) userWarnings = [];
 
-    const WEEK_OLD = moment().subtract(8, 'days').startOf('day');
+    const WEEK_OLD = moment()
+      .subtract(config?.warnLifeSpan, 'days')
+      .startOf('day');
     let activeWarns = 0;
 
     for (const warn of userWarnings) {
@@ -80,7 +85,11 @@ const warn = {
         ? 'No reason provided.'
         : args.join(' ').trim();
 
-    if (activeWarns > config.maxWarns!) {
+    if (!config.maxWarns) {
+      return console.error(`Missing maxWarns for guild[${guild.id}]`);
+    }
+
+    if (activeWarns > config.maxWarns) {
       message.channel.send(
         `Banned ${user.displayName} for getting more than ${config.maxWarns} warns.`
       );
@@ -93,22 +102,27 @@ const warn = {
         );
       user.ban().catch(() => message.channel.send(`Issues banning user.`));
 
-      CREATE_WARN(message.guild!.id, user.id, message.author.id, reason);
+      CREATE_WARN(guild.id, user.id, message.author.id, reason);
 
       client.logIssue(
         guild.id,
         'ban',
-        reason === 'No reason provided.' ? '' : reason,
+        reason === 'No reason provided. User surpassed max warns' ? '' : reason,
         message.author,
         user.user,
-        config.nextWarnId!
+        config.nextWarnId
       );
     } else {
+      const warnCount =
+        activeWarns < config.maxWarns
+          ? `You have ${activeWarns} out of ${config.maxWarns} warns now.`
+          : `This is your final warning.`;
+
       message.channel.send(
-        `<@${user.id}> You've been warned for \`${reason}\`. You have ${activeWarns} out of ${config.maxWarns} warns now.`
+        `<@${user.id}> You've been warned for \`${reason}\`. ${warnCount}`
       );
 
-      CREATE_WARN(message.guild!.id, user.id, message.author.id, reason);
+      CREATE_WARN(guild.id, user.id, message.author.id, reason);
 
       client.logIssue(
         guild.id,
@@ -116,11 +130,11 @@ const warn = {
         reason === 'No reason provided.' ? '' : reason,
         message.author,
         user.user,
-        config.nextWarnId!
+        config.nextWarnId
       );
       user
         .send(
-          `You have been warned in **${message.guild?.name}**\n**Reason:** ${reason}`
+          `You have been warned in **${guild.name}**\n${warnCount}\n\n**Reason:** ${reason}`
         )
         .catch(() => console.error(`Can't DM user, probably has friends on.`));
       message
@@ -131,5 +145,3 @@ const warn = {
     return;
   },
 };
-
-export default warn;
