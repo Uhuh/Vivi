@@ -8,6 +8,5 @@ services:
       target: base
     volumes:
       - ./src:/home/panku/Vivi/src
-      #- ./nodemon.json:/home/node/app/nodemon.json
     container_name: vivi-docker
     command: node build/src/index.js
