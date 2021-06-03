@@ -2,7 +2,8 @@ import { Message, MessageEmbed } from 'discord.js';
 import ViviBot from '../../src/bot';
 import { GET_GUILD_CONFIG } from '../../src/database/database';
 import { missingPerms } from '../../utilities/functions/missingPerm';
-import { Category, COLOR } from '../../utilities/types/commands';
+import { Category } from '../../utilities/types/commands';
+import { COLOR } from '../../utilities/types/global';
 
 export const config = {
   desc: 'Show the servers current config',

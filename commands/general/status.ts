@@ -1,6 +1,6 @@
 import { Message, MessageEmbed } from 'discord.js';
 import { missingPerms } from '../../utilities/functions/missingPerm';
-import { COLOR } from '../../utilities/types/commands';
+import { COLOR } from '../../utilities/types/global';
 
 export const status = {
   desc: 'Gets the server info',

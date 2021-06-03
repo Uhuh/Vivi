@@ -2,7 +2,7 @@ import { Message, MessageEmbed } from 'discord.js';
 import ViviBot from '../../src/bot';
 import { AVATAR_URL, INVITE_URL, SUPPORT_URL, VOTE_URL } from '../../src/vars';
 import { missingPerms } from '../../utilities/functions/missingPerm';
-import { COLOR } from '../../utilities/types/commands';
+import { COLOR } from '../../utilities/types/global';
 
 export const invite = {
   desc: 'Get links related to Vivi like invite/support.',

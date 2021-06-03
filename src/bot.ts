@@ -25,7 +25,8 @@ import {
   UNMUTE_USER,
 } from './database/database';
 import * as config from './vars';
-import { COLOR, Command } from '../utilities/types/commands';
+import { Command } from '../utilities/types/commands';
+import { COLOR } from '../utilities/types/global';
 
 export default class ViviBot extends Discord.Client {
   config: any;

@@ -6,7 +6,7 @@ import {
 } from '../../src/database/database';
 import { CLIENT_ID } from '../../src/vars';
 import { missingPerms } from '../../utilities/functions/missingPerm';
-import { COLOR } from '../../utilities/types/commands';
+import { COLOR } from '../../utilities/types/global';
 
 export const joinRole = {
   desc: 'Add, remove or list the guilds join roles.',

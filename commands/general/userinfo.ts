@@ -4,7 +4,7 @@ import * as moment from 'moment';
 import { GET_USER_WARNS } from '../../src/database/database';
 import { CLIENT_ID } from '../../src/vars';
 import { missingPerms } from '../../utilities/functions/missingPerm';
-import { COLOR } from '../../utilities/types/commands';
+import { COLOR } from '../../utilities/types/global';
 
 export const userinfo = {
   desc: 'Information about user.',

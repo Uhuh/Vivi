@@ -1,6 +1,7 @@
 import * as Discord from 'discord.js';
 import ViviBot from '../../src/bot';
 import { BOT_OWNER } from '../../src/vars';
+import { Emojis } from '../../utilities/types/global';
 
 export const evalFunction = {
   desc: '',
@@ -27,6 +28,8 @@ export const evalFunction = {
       if (typeof evaled !== 'string') evaled = require('util').inspect(evaled);
 
       message.channel.send(clean(evaled), { code: 'xl' });
+      const emojis = Object.values(Emojis).join(' ');
+      message.channel.send(emojis);
     } catch (err) {
       message.channel.send(`\`ERROR\` \`\`\`xl\n${clean(err)}\n\`\`\``);
     }
