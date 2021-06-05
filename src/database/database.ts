@@ -20,8 +20,8 @@ export type CaseType =
  * Create a new config model for guild.
  * @param guildId Newly joined guild or setup command guild id.
  */
-export const GENERATE_GUILD_CONFIG = async (guildId: string) => {
-  return await ConfigModel.create({ guildId }).catch(() =>
+export const GENERATE_GUILD_CONFIG = (guildId: string) => {
+  return ConfigModel.create({ guildId }).catch(() =>
     console.error(`Failed to generate a config for guild[${guildId}]`)
   );
 };
@@ -30,23 +30,23 @@ export const GENERATE_GUILD_CONFIG = async (guildId: string) => {
  * Get a specific guild config.
  * @param guildId Guild Id to retrieve specific guild config.
  */
-export const GET_GUILD_CONFIG = async (guildId: string) => {
-  return await ConfigModel.findOne({ guildId });
+export const GET_GUILD_CONFIG = (guildId: string) => {
+  return ConfigModel.findOne({ guildId });
 };
 
 /**
  * Get all guild prefixes.
  */
-export const ALL_GUILD_PREFIXES = async () => {
-  return await ConfigModel.find({}, 'guildId prefix');
+export const ALL_GUILD_PREFIXES = () => {
+  return ConfigModel.find({}, 'guildId prefix');
 };
 
 /**
  * Get joinRoles for a single guild.
  * @param guildId Guild ID
  */
-export const GUILD_JOIN_ROLES = async (guildId: string) => {
-  return await ConfigModel.findOne({ guildId }, 'joinRoles');
+export const GUILD_JOIN_ROLES = (guildId: string) => {
+  return ConfigModel.findOne({ guildId }, 'joinRoles');
 };
 
 /**
@@ -54,8 +54,8 @@ export const GUILD_JOIN_ROLES = async (guildId: string) => {
  * @param guildId Guild ID
  * @param roleId Role ID to be added to joinRoles
  */
-export const ADD_JOIN_ROLE = async (guildId: string, roleId: string) => {
-  return await ConfigModel.findOneAndUpdate(
+export const ADD_JOIN_ROLE = (guildId: string, roleId: string) => {
+  return ConfigModel.findOneAndUpdate(
     { guildId },
     {
       $push: {
@@ -72,8 +72,8 @@ export const ADD_JOIN_ROLE = async (guildId: string, roleId: string) => {
  * @param guildId Guild ID
  * @param roleId Role ID to be removed from joinRoles
  */
-export const REMOVE_JOIN_ROLE = async (guildId: string, roleId: string) => {
-  return await ConfigModel.findOneAndUpdate(
+export const REMOVE_JOIN_ROLE = (guildId: string, roleId: string) => {
+  return ConfigModel.findOneAndUpdate(
     { guildId },
     {
       $pull: {
@@ -132,8 +132,8 @@ export const NEW_CASE = async (
  * Return a mod log case with the given case ID.
  * @param caseId ID from mongoose. Displayed on each modlog case message.
  */
-export const GET_CASE = async (guildId: string, caseId: number) => {
-  return await CaseModel.findOne({ guildId, caseId });
+export const GET_CASE = (guildId: string, caseId: number) => {
+  return CaseModel.findOne({ guildId, caseId });
 };
 
 /**
@@ -176,7 +176,7 @@ export const CREATE_WARN = async (
  * Delete a users warning.
  * @param id ID from mongoose.
  */
-export const DELETE_WARN = async (guildId: string, warnId: number) => {
+export const DELETE_WARN = (guildId: string, warnId: number) => {
   return WarnModel.findOneAndDelete({ guildId, warnId });
 };
 
@@ -205,16 +205,16 @@ export const UPDATE_WARN_REASON = (
  * Grab all warnings of a user.
  * @param userId User ID to get warns of.
  */
-export const GET_USER_WARNS = async (guildId: string, userId: string) => {
-  return await WarnModel.find({ guildId, userId });
+export const GET_USER_WARNS = (guildId: string, userId: string) => {
+  return WarnModel.find({ guildId, userId });
 };
 
 /**
  * Grab a single warn for a user.
  * @param userId User ID to get warn
  */
-export const GET_USER_WARN = async (guildId: string, userId: string) => {
-  return await WarnModel.findOne({ guildId, userId });
+export const GET_USER_WARN = (guildId: string, userId: string) => {
+  return WarnModel.findOne({ guildId, userId });
 };
 
 /**
@@ -222,8 +222,8 @@ export const GET_USER_WARN = async (guildId: string, userId: string) => {
  * @param guildId Guild ID
  * @param warnId Warn ID to find specific warn.
  */
-export const GET_WARN = async (guildId: string, warnId: number) => {
-  return await WarnModel.findOne({ guildId, warnId });
+export const GET_WARN = (guildId: string, warnId: number) => {
+  return WarnModel.findOne({ guildId, warnId });
 };
 
 /**
@@ -288,10 +288,7 @@ export const REMOVE_MOD_CHANNEL = (guildId: string) => {
  * @param guildId Guild ID for ConfigModel
  * @param channelId Channel ID for serverlogging to ignore.
  */
-export const ADD_CHANNEL_WHITELIST = async (
-  guildId: string,
-  channelId: string
-) => {
+export const ADD_CHANNEL_WHITELIST = (guildId: string, channelId: string) => {
   return ConfigModel.findOneAndUpdate(
     { guildId },
     {
@@ -309,7 +306,7 @@ export const ADD_CHANNEL_WHITELIST = async (
  * @param guildId Guild ID for ConfigModel
  * @param channelId Channel ID to remove from whitelist.
  */
-export const REMOVE_CHANNEL_WHITELIST = async (
+export const REMOVE_CHANNEL_WHITELIST = (
   guildId: string,
   channelId: string
 ) => {
@@ -344,7 +341,7 @@ export const GET_BANNED_WORDS = async (guildId: string) => {
  * @param guildId Guild ID to add new banned word to
  * @param words The word(s) to be added to banned list
  */
-export const NEW_BANNED_WORD = async (guildId: string, words: string[]) => {
+export const NEW_BANNED_WORD = (guildId: string, words: string[]) => {
   return ConfigModel.findOneAndUpdate(
     { guildId },
     {
@@ -366,7 +363,7 @@ export const NEW_BANNED_WORD = async (guildId: string, words: string[]) => {
  * @param guildId The guild to remove a banned word from.
  * @param worda The word(s) to remove.
  */
-export const REMOVE_BANNED_WORD = async (guildId: string, words: string[]) => {
+export const REMOVE_BANNED_WORD = (guildId: string, words: string[]) => {
   return ConfigModel.findOneAndUpdate(
     { guildId },
     {
@@ -392,7 +389,7 @@ export const REMOVE_BANNED_WORD = async (guildId: string, words: string[]) => {
  * @param guildId Guild to set banned message for.
  * @param message Banned message, max length is 1020 chars.
  */
-export const SET_BANNED_MSG = async (guildId: string, banMessage: string) => {
+export const SET_BANNED_MSG = (guildId: string, banMessage: string) => {
   return ConfigModel.findOneAndUpdate({ guildId }, { banMessage });
 };
 
@@ -401,7 +398,7 @@ export const SET_BANNED_MSG = async (guildId: string, banMessage: string) => {
  * @param guildId Guild Id to get ConfigModel.
  * @param prefix Prefix to set for guild.
  */
-export const SET_GUILD_PREFIX = async (guildId: string, prefix: string) => {
+export const SET_GUILD_PREFIX = (guildId: string, prefix: string) => {
   return ConfigModel.findOneAndUpdate({ guildId }, { prefix });
 };
 
@@ -429,10 +426,9 @@ export const SET_MUTE_ROLE = (guildId: string, muteRole: string) => {
  * @param guildId Guild ID to get ConfigModel.
  */
 export const REMOVE_MUTE_ROLE = (guildId: string) => {
-  ConfigModel.findOneAndUpdate(
-    { guildId },
-    { $unset: { muteRole: 1 } }
-  ).catch(() => console.error(`Error on removing mute role`));
+  ConfigModel.findOneAndUpdate({ guildId }, { $unset: { muteRole: 1 } }).catch(
+    () => console.error(`Error on removing mute role`)
+  );
 };
 
 /**
@@ -556,10 +552,9 @@ export const SET_MOD_ROLE = async (guildId: string, modRole: string) => {
  * @param guildId Guild ID to get ConfigModel
  */
 export const REMOVE_MOD_ROLE = async (guildId: string) => {
-  ConfigModel.findOneAndUpdate(
-    { guildId },
-    { $unset: { modRole: 1 } }
-  ).catch(() => console.error(`Error on removing mute role`));
+  ConfigModel.findOneAndUpdate({ guildId }, { $unset: { modRole: 1 } }).catch(
+    () => console.error(`Error on removing mute role`)
+  );
 };
 
 export const SET_BANNER = async (
