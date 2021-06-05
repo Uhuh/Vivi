@@ -1,11 +1,16 @@
 import { Message } from 'discord.js';
 import ViviBot from '../src/bot';
 import { CLIENT_ID } from '../src/vars';
+import { generateCaptcha } from '../utilities/functions/captcha';
 
 const msg = (client: ViviBot, message: Message) => {
   // Ignore bots
   if (message.author.bot) return;
 
+  if (message.content.includes('captcha')) {
+    // For testing purposes.
+    generateCaptcha(message);
+  }
   // If the guild doesn't exist it's a DM from a user. Default to v. as the prefix.
   const prefix = client.guildPrefix.get(message.guild?.id || '') || 'v.';
   const prefixUsed = message.content.startsWith(prefix);

@@ -55,6 +55,33 @@ export default class ViviBot extends Discord.Client {
     //CMD Handling
     this.on('message', (message) => {
       if (message.author?.bot) return;
+
+      /* if (message.channel.type === 'dm') {
+        /**
+         {
+            user_id: '',
+            guild_id: '',
+            captcha: '',
+            verified_role: '',
+            created_at: '',
+            attempts: 0
+          }
+        
+        const userCaptcha = this.pendingCaptchas.get(message.author.id);
+
+        if (message.content === userCaptcha.captcha) {
+          return this.verifyUserCaptcha(userCaptcha);
+        }
+
+        userCaptcha.attempts++;
+        if (userCaptcha.attempts === 3) {
+          this.pendingCaptchas.delete(userCaptcha.user_id);
+          return message.reply(`you failed the captcha. Try again.`);
+        }
+
+        this.pendingCaptchas.set(userCaptcha.user_id, userCaptcha);
+      } */
+
       msg(this, message as Discord.Message);
       // Verify user message into the server.
       if (
@@ -98,7 +125,7 @@ export default class ViviBot extends Discord.Client {
     this.on('roleDelete', (role) => REMOVE_JOIN_ROLE(role.guild.id, role.id));
   }
 
-  randomPres = () => {
+  randomPres() {
     const user = this.user;
     if (!user) return console.log('Client dead?');
 
@@ -111,9 +138,9 @@ export default class ViviBot extends Discord.Client {
         status: 'online',
       })
       .catch(console.error);
-  };
+  }
 
-  filterWords = async (message: Discord.Message) => {
+  async filterWords(message: Discord.Message) {
     const { guild } = message;
 
     if (!guild) return;
@@ -217,7 +244,7 @@ export default class ViviBot extends Discord.Client {
         }
       }
     }
-  };
+  }
 
   logIssue = async (
     guildId: string,
@@ -346,7 +373,7 @@ export default class ViviBot extends Discord.Client {
   };
 
   start = async () => {
-    await mongoose.connect(`mongodb://mongodb:27017/${config.DATABASE_TYPE}`, {
+    await mongoose.connect(`mongodb://localhost/${config.DATABASE_TYPE}`, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       useCreateIndex: true,
