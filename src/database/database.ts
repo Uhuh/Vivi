@@ -385,6 +385,21 @@ export const REMOVE_BANNED_WORD = (guildId: string, words: string[]) => {
 };
 
 /**
+ * Purge all banned words for a guild.
+ * Helps for servers that don't need the bot to moderate.
+ * @param guildId Guild to purge.
+ * @returns Promise<void>
+ */
+export const PURGE_BANNED_WORDS = (guildId: string) => {
+  return ConfigModel.findOneAndUpdate(
+    { guildId },
+    {
+      bannedWords: [],
+    }
+  );
+};
+
+/**
  * Set a guilds ban message. This gets sent to users when they're banned.
  * @param guildId Guild to set banned message for.
  * @param message Banned message, max length is 1020 chars.

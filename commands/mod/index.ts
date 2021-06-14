@@ -10,3 +10,4 @@ export { unban } from './unban';
 export { unmute } from './unmute';
 export { unwarn } from './unwarn';
 export { warn } from './warn';
+export { blacklist } from './server-blacklist';
