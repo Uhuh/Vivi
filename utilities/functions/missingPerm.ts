@@ -7,7 +7,13 @@ export const missingPerms = (msg: Message, perm: string) => {
     }]`
   );
 
-  msg.channel.send(
-    `I seem to be missing ${perm} perms, please make sure I have it to be able to function properly.`
-  );
+  msg.channel
+    .send(
+      `I seem to be missing ${perm} perms, please make sure I have it to be able to function properly.`
+    )
+    .catch(() => {
+      msg.author.send(
+        `I appear to be missing send message perms in that channel. <#${msg.channel.id}>`
+      );
+    });
 };

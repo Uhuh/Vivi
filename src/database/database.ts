@@ -218,6 +218,13 @@ export const GET_USER_WARN = (guildId: string, userId: string) => {
 };
 
 /**
+ * Remove all warns from a user in a guild.
+ */
+export const CLEAR_USER_WARNS = (guildId: string, userId: string) => {
+  return WarnModel.deleteMany({ guildId, userId });
+};
+
+/**
  * Get a single warning for a specific guild.
  * @param guildId Guild ID
  * @param warnId Warn ID to find specific warn.
