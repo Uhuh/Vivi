@@ -1,5 +1,4 @@
 import * as Discord from 'discord.js';
-import * as DBL from 'dblapi.js';
 import * as moment from 'moment';
 import * as mongoose from 'mongoose';
 import * as dotenv from 'dotenv';
@@ -43,11 +42,9 @@ export default class ViviBot extends Discord.Client {
     commandHandler(this);
 
     this.once('ready', () => {
-      const dblapi = new DBL(this.config.DBLTOKEN, this);
       console.info(`[Started]: ${new Date()}\n`);
       console.info('Vivi reporting for duty!');
       // Post bot stats to top.gg
-      setInterval(() => dblapi.postStats(this.guilds.cache.size), 1800000);
       setInterval(() => this.randomPres(), 10000);
       setInterval(() => this.checkMutes(), 60000); // 1 minute // 600000 = 10minutes
     });
