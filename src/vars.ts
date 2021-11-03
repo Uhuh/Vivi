@@ -10,3 +10,4 @@ export const SUPPORT_URL = 'https://discord.gg/AJ58SKFBNf'; // Vivi support serv
 export const VOTE_URL = `https://top.gg/bot/${CLIENT_ID}/vote`;
 export const AVATAR_URL =
   'https://images.discordapp.net/avatars/773437651780894722/fd951f54c1e0d73fe69fd99d3e17ec78.png?size=256';
+export const MONGODB = process.env.MONGODB || 'mongod';
