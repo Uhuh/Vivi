@@ -6,9 +6,24 @@ const Cases = new Schema({
   messageId: { type: String, required: true, default: null },
   userId: { type: String, required: true, default: null },
   modId: { type: String, required: true, default: null },
-  warnId: { type: Number, default: null },
   type: { type: String, required: true, default: null },
+  reason: { type: String, required: true, default: null },
+  punishmentLength: { type: Date, default: new Date() },
+  creationDate: { type: Date, default: new Date() },
+
+  // Legacy warnID.
+  warnId: { type: Number, default: null },
 });
+
+export enum CaseType {
+  mute = 'mute',
+  warn = 'warn',
+  ban = 'ban',
+  kick = 'kick',
+  unban = 'unban',
+  unmute = 'unmute',
+  unwarn = 'unwarn',
+}
 
 export interface ICases {
   guildId: string;
@@ -16,8 +31,13 @@ export interface ICases {
   messageId: string;
   userId: string;
   modId: string;
+  reason: string;
+  type: CaseType;
+  punishmentLength: Date;
+  creationDate: Date;
+
+  // Legacy system
   warnId?: number;
-  type: string;
 }
 
 export interface ICasesDoc extends ICases, Document {}
