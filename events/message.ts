@@ -36,8 +36,7 @@ const msg = (client: ViviBot, message: Message) => {
       clientCommand.run(message, args, client);
     } catch (e) {
       message.reply(
-        'something went wrong! Please join the support server at discord.gg/C9skyMBn33 and report this issue.',
-        e
+        'something went wrong! Please join the support server at discord.gg/C9skyMBn33 and report this issue.'
       );
       console.error(e);
     }
