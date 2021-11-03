@@ -5,7 +5,7 @@ import {
   GET_USER_MUTE,
   GUILD_JOIN_ROLES,
 } from '../src/database/database';
-import { IGuildConfigDoc } from '../src/database/guildConfig';
+import { IGuildConfigDoc } from '../src/database/guild';
 import * as moment from 'moment';
 import { BannerDims } from '../utilities/objects/bannerDimensions';
 
@@ -77,7 +77,7 @@ export const MemberUpdated = async (
       member.user?.avatarURL() ||
         'https://cdn.discordapp.com/embed/avatars/0.png'
     )
-    .addField('Member', member, true)
+    .addField('Member', `${member}`, true)
     .setFooter(`ID: ${member.id} | ${member.guild.memberCount} members`)
     .setTimestamp(new Date())
     .addField('**Created**', member.user?.createdAt.toDateString(), true)
@@ -104,7 +104,7 @@ export const MemberUpdated = async (
   }
 
   channel
-    .send(embed)
+    .send({ embeds: [embed] })
     .catch(() =>
       console.error(
         `Failed to send member updated message for guild[${member.guild.id}]`
@@ -136,13 +136,15 @@ export const MessageDelete = async (message: DMsg) => {
 
   if (!channel) return;
 
-  message.attachments.forEach((att) => embed.attachFiles([att.proxyURL]));
+  message.attachments.forEach((att) => channel.send(att.proxyURL));
 
   embed
     .setTitle('**Message Deleted**')
     .setColor(Color.MustardYellow)
-    .setAuthor(message.author?.tag, message.author?.avatarURL() || '')
-    .setDescription(message.content === '' ? 'Vivi: Empty' : message.content)
+    .setAuthor(`${message.author?.tag}`, message.author?.avatarURL() || '')
+    .setDescription(
+      `${message.content === '' ? 'Vivi: Empty' : message.content}`
+    )
     .addField(
       '**---**',
       `**Message author:** <@${message.author?.id}>\n**Channel:** <#${message.channel?.id}>`
@@ -151,7 +153,7 @@ export const MessageDelete = async (message: DMsg) => {
     .setTimestamp(new Date());
 
   channel
-    .send(embed)
+    .send({ embeds: [embed] })
     .catch(() =>
       console.error(
         `Failed to send message deleted event for guild[${message.guild?.id}]`
@@ -187,7 +189,7 @@ export const MessageEdit = async (oldMsg: DMsg, newMsg: DMsg) => {
   embed
     .setTitle('**Message Edited**')
     .setColor(Color.DarkOrange)
-    .setAuthor(newMsg.author?.tag, newMsg.author?.avatarURL() || '')
+    .setAuthor(`${newMsg.author?.tag}`, newMsg.author?.avatarURL() || '')
     .setDescription(
       (oldMsg?.content === '' ? 'Vivi: Empty!' : oldMsg.content) ||
         'Vivi: Empty!'
@@ -208,16 +210,16 @@ export const MessageEdit = async (oldMsg: DMsg, newMsg: DMsg) => {
   );
 
   channel
-    .send(embed)
-    .catch(() =>
+    .send({ embeds: [embed] })
+    .catch((e) =>
       console.error(
-        `Failed to send message edit event for guild[${newMsg.guild?.id}]`
+        `Failed to send message edit event for guild[${newMsg.guild?.id}]\n\n${e}`
       )
     );
 };
 
 function split(input: string): string[] {
-  return input.match(/.{1,1024}/g) || [input];
+  return input.match(/(.|[\r\n]){1,1024}/g) || [input];
 }
 
 export const userBanner = async (
@@ -279,10 +281,12 @@ export const userBanner = async (
   );
 
   channel
-    .send(attachment)
-    .catch(() =>
+    .send({
+      files: [attachment],
+    })
+    .catch((e) =>
       console.error(
-        `Failed to send welcome banner[${config.bannerType}] for guild[${member.guild.id}]`
+        `Failed to send welcome banner[${config.bannerType}] for guild[${member.guild.id}]\n\n${e}`
       )
     );
 };
