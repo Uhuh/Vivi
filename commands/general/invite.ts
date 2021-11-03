@@ -32,6 +32,8 @@ Latency is ${
       )
       .setThumbnail(AVATAR_URL);
 
-    message.channel.send(embed).catch(() => missingPerms(message, 'embed'));
+    message.channel
+      .send({ embeds: [embed] })
+      .catch(() => missingPerms(message, 'embed'));
   },
 };

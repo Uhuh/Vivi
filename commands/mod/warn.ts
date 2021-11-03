@@ -1,12 +1,9 @@
 import { Message } from 'discord.js';
 import ViviBot from '../../src/bot';
 import * as moment from 'moment';
-import {
-  CREATE_WARN,
-  GET_GUILD_CONFIG,
-  GET_USER_WARNS,
-} from '../../src/database/database';
+import { GET_GUILD_CONFIG, GET_USER_WARNS } from '../../src/database/database';
 import { getUserId } from '../../utilities/functions/getUserId';
+import { CaseType } from '../../src/database/cases';
 
 export const warn = {
   desc: 'warn a user',
@@ -22,7 +19,7 @@ export const warn = {
     if (!config) return;
 
     if (
-      !message.member?.hasPermission('MANAGE_MESSAGES') &&
+      !message.member?.permissions.has('MANAGE_MESSAGES') &&
       !(config.modRole && message.member?.roles.cache.has(config.modRole))
     ) {
       return message.react('👎');
@@ -54,6 +51,7 @@ export const warn = {
         )
       );
 
+    // User to warns
     const user = guild.members.cache.get(userId);
 
     if (!user) {
@@ -74,7 +72,7 @@ export const warn = {
     let activeWarns = 0;
 
     for (const warn of userWarnings) {
-      if (moment.unix(warn.date).isBefore(WEEK_OLD)) continue;
+      if (moment(warn.creationDate).isBefore(WEEK_OLD)) continue;
       activeWarns++;
     }
 
@@ -90,29 +88,35 @@ export const warn = {
     }
 
     if (activeWarns > config.maxWarns) {
+      // Tell everyone how bad this user is lol
       message.channel.send(
         `Banned ${user.displayName} for getting more than ${config.maxWarns} warns.`
       );
+
       const banMessage =
         config.banMessage || `You've been banned from ${guild.name}.`;
+
+      // Send the user the servers ban message.
       await user
         .send(banMessage)
         .catch(() =>
           console.error('Issue sending ban appeal message to user. Oh well?')
         );
+
+      // After sending the ban message, ban the user.
       user.ban().catch(() => message.channel.send(`Issues banning user.`));
 
-      CREATE_WARN(guild.id, user.id, message.author.id, reason);
-
-      client.logIssue(
+      client._warnService.logIssue(
         guild.id,
-        'ban',
+        CaseType.ban,
         reason === 'No reason provided. User surpassed max warns' ? '' : reason,
         message.author,
-        user.user,
-        config.nextWarnId
+        user.user
       );
     } else {
+      /**
+       * This happens if the warns DON'T exceed the max warns, so normally warn the user.
+       */
       const warnCount =
         activeWarns < config.maxWarns
           ? `You have ${activeWarns} out of ${config.maxWarns} warns now.`
@@ -122,16 +126,14 @@ export const warn = {
         `<@${user.id}> You've been warned for \`${reason}\`. ${warnCount}`
       );
 
-      CREATE_WARN(guild.id, user.id, message.author.id, reason);
-
-      client.logIssue(
+      client._warnService.logIssue(
         guild.id,
-        'warn',
+        CaseType.warn,
         reason === 'No reason provided.' ? '' : reason,
         message.author,
-        user.user,
-        config.nextWarnId
+        user.user
       );
+
       user
         .send(
           `You have been warned in **${guild.name}**\n${warnCount}\n\n**Reason:** ${reason}`

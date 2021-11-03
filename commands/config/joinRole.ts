@@ -17,7 +17,7 @@ export const joinRole = {
   run: async (message: Message, args: string[]) => {
     if (
       !message.guild ||
-      !message.member?.hasPermission(['MANAGE_GUILD']) ||
+      !message.member?.permissions.has(['MANAGE_GUILD']) ||
       args.length === 0
     )
       return;
@@ -100,7 +100,9 @@ export const joinRole = {
             }`
           );
 
-        message.channel.send(embed).catch(() => missingPerms(message, 'embed'));
+        message.channel
+          .send({ embeds: [embed] })
+          .catch(() => missingPerms(message, 'embed'));
         break;
     }
 

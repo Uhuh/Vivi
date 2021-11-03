@@ -20,7 +20,7 @@ export const checkwarns = {
     if (!config) return;
 
     if (
-      !message.member?.hasPermission('MANAGE_MESSAGES') &&
+      !message.member?.permissions.has('MANAGE_MESSAGES') &&
       !(config.modRole && message.member?.roles.cache.has(config.modRole))
     ) {
       return message.react('👎');
@@ -55,33 +55,29 @@ export const checkwarns = {
       )
       .setDescription(
         `**Total:** \`${warns.length}\`**IDs**: ${warns
-          .map((w) => w.warnId)
+          .map((w) => w.caseId)
           .join(', ')}`
       );
 
     for (const warn of warns) {
       if (
         active.includes('active') &&
-        moment.unix(Number(warn.date)).isBefore(WARN_EXPIRE_DATE)
+        moment(warn.creationDate).isBefore(WARN_EXPIRE_DATE)
       )
         continue;
       const user = message.guild?.members.cache.get(warn.modId);
       embed.addField(
-        `#${warn.warnId}: ${
-          moment.unix(Number(warn.date)).isBefore(WARN_EXPIRE_DATE)
-            ? '❌'
-            : '✅'
-        } \`${moment
-          .unix(Number(warn.date))
-          .format('MMMM Do YYYY, h:mm:ss a')}\` - By: **${
-          user?.user.tag || 'Unknown'
-        }** (${warn.modId})`,
+        `#${warn.caseId}: ${
+          moment(warn.creationDate).isBefore(WARN_EXPIRE_DATE) ? '❌' : '✅'
+        } \`${moment(warn.creationDate).format(
+          'MMMM Do YYYY, h:mm:ss a'
+        )}\` - By: **${user?.user.tag || 'Unknown'}** (${warn.modId})`,
         `**Reason:** ${warn.reason}`
       );
     }
 
     return message.channel
-      .send(embed)
+      .send({ embeds: [embed] })
       .catch(() => missingPerms(message, 'embed'));
   },
 };

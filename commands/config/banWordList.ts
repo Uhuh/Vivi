@@ -8,7 +8,7 @@ export const listWords = {
   alias: ['bwl'],
   type: 'config',
   run: async (message: Message) => {
-    if (!message.guild || !message.member?.hasPermission(['MANAGE_GUILD']))
+    if (!message.guild || !message.member?.permissions.has(['MANAGE_GUILD']))
       return;
 
     const words = await GET_BANNED_WORDS(message.guild.id);

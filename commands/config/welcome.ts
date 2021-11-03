@@ -8,7 +8,7 @@ export const welcome = {
   alias: [],
   type: 'config',
   run: async (message: Message, args: string[]) => {
-    if (!message.guild || !message.member?.hasPermission(['MANAGE_GUILD']))
+    if (!message.guild || !message.member?.permissions.has(['MANAGE_GUILD']))
       return;
     const { guild } = message;
 
@@ -25,8 +25,7 @@ export const welcome = {
     }
 
     const channelId = message.mentions.channels.first()?.id || args[0];
-    let channel: GuildChannel | null | undefined =
-      guild.channels.cache.get(channelId);
+    let channel = guild.channels.cache.get(channelId) || null;
 
     if (!channel) {
       channel = guild.channels.resolve(channelId);

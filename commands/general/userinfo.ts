@@ -39,7 +39,7 @@ export const userinfo = {
     const WEEK_OLD = moment().subtract(7, 'days').startOf('day');
     const warnings = await GET_USER_WARNS(guild.id, userId);
     const activeWarns =
-      warnings.filter((w) => !moment.unix(w.date).isBefore(WEEK_OLD)) || [];
+      warnings.filter((w) => !moment(w.creationDate).isBefore(WEEK_OLD)) || [];
 
     embed
       .setTitle(`**User Info**`)
@@ -50,7 +50,11 @@ export const userinfo = {
 
     embed
       .addField('**Created**', member.user.createdAt.toDateString(), true)
-      .addField('**Joined**', member.joinedAt?.toDateString(), true)
+      .addField(
+        '**Joined**',
+        member.joinedAt?.toDateString() || new Date().toString(),
+        true
+      )
       .addField('**Username**', member.user.tag, true)
       .addField('**ID**', member.user.id)
       .addField(
@@ -58,18 +62,20 @@ export const userinfo = {
         warnings.length
           ? `Total: ${warnings.length} | Active: ${
               activeWarns.length
-            }\n\nIDs: ${warnings.map((w) => w.warnId)}`
+            }\n\nIDs: ${warnings.map((w) => w.caseId)}`
           : 'No warnings for this user'
       )
       .addField(
         'Active Warnings',
         activeWarns.length
           ? activeWarns
-              .map((w) => `ID: ${w.warnId} | Reason: ${w.reason}\n`)
+              .map((w) => `ID: ${w.caseId} | Reason: ${w.reason}\n`)
               .join('')
           : 'No active warnings for this user'
       );
 
-    message.channel.send({ embed }).catch(() => missingPerms(message, 'embed'));
+    message.channel
+      .send({ embeds: [embed] })
+      .catch(() => missingPerms(message, 'embed'));
   },
 };

@@ -1,7 +1,8 @@
 import { Message } from 'discord.js';
 import ViviBot from '../../src/bot';
+import { CaseType } from '../../src/database/cases';
 import {
-  DELETE_WARN,
+  DELETE_CASE,
   GET_GUILD_CONFIG,
   GET_WARN,
 } from '../../src/database/database';
@@ -20,7 +21,7 @@ export const unwarn = {
     if (!config) return;
 
     if (
-      !message.member?.hasPermission('MANAGE_MESSAGES') &&
+      !message.member?.permissions.has('MANAGE_MESSAGES') &&
       !(config.modRole && message.member?.roles.cache.has(config.modRole))
     ) {
       return message.react('👎');
@@ -51,9 +52,9 @@ export const unwarn = {
         ? 'No reason provided.'
         : args.join(' ').trim();
 
-    client.logIssue(
+    client._warnService.logIssue(
       guild.id,
-      'unwarn',
+      CaseType.unwarn,
       reason,
       message.author,
       typeof user === 'string' ? user : user.user
@@ -63,7 +64,7 @@ export const unwarn = {
       user.send(`Your warn "**${warn.reason}**" has been removed.`);
     }
 
-    DELETE_WARN(message.guild?.id!, warnId)
+    DELETE_CASE(message.guild?.id!, warnId)
       .then(() => message.reply('I removed the warn successfully.'))
       .catch(() =>
         message.reply('issue removing that warn. Is the ID correct?')

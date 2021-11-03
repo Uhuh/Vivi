@@ -11,7 +11,7 @@ export const prefix = {
   run: (message: Message, args: string[], client: ViviBot) => {
     if (
       !message.guild ||
-      !message.member?.hasPermission(['MANAGE_GUILD']) ||
+      !message.member?.permissions.has(['MANAGE_GUILD']) ||
       args.length === 0
     )
       return;

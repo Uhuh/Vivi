@@ -1,12 +1,9 @@
 import { Message } from 'discord.js';
 import ViviBot from '../../src/bot';
 import * as moment from 'moment';
-import {
-  GET_GUILD_CONFIG,
-  GET_USER_MUTE,
-  MUTE_USER,
-} from '../../src/database/database';
+import { GET_GUILD_CONFIG, GET_USER_MUTE } from '../../src/database/database';
 import { getUserId } from '../../utilities/functions/getUserId';
+import { CaseType } from '../../src/database/cases';
 
 enum timeForm {
   h = 'hour',
@@ -32,13 +29,13 @@ export const mute = {
     if (!config) return;
 
     if (
-      !message.member?.hasPermission('MANAGE_MESSAGES') &&
+      !message.member?.permissions.has('MANAGE_MESSAGES') &&
       !(config.modRole && message.member?.roles.cache.has(config.modRole))
     ) {
       return message.react('👎');
     }
     if (!args.length) {
-      const prefix = client.guildPrefix.get(guild.id) || 'v.';
+      const prefix = config.prefix || 'v.';
       return message.reply(
         `you forgot some arguements. Example usage: \`${prefix}mute <user id> Annoying! | 5m\``
       );
@@ -69,18 +66,7 @@ export const mute = {
     if (message.mentions.members?.first()) args.shift();
 
     // Ensure the user is in the guild
-    let member = guild.members.cache.get(userId || '');
-    // Try a fetch incase the user isn't cached.
-    if (!member) {
-      await guild.members
-        .fetch(userId || '')
-        .catch(() =>
-          console.error(
-            `Failed to get user to mute. Potentially not a user ID. [${userId}]`
-          )
-        );
-      member = guild.members.cache.get(userId || '');
-    }
+    let member = await ViviBot.getGuildMember(guild, userId);
 
     if (!member) {
       return message.reply(
@@ -96,9 +82,7 @@ export const mute = {
     let [reason, time] = words.split('|').map((t) => t.trim());
     if (reason === '') reason = 'No reason provided.';
 
-    // Default is infinite
-    const now = moment().unix();
-    let unmuteTime = moment().add(1, 'h').unix();
+    let unmuteTime = moment().add(1, 'h').toDate();
 
     if (time && time !== '') {
       const timeFormat = time[time.length - 1];
@@ -116,14 +100,12 @@ export const mute = {
         case 'd':
         case 'w':
         case 'y':
-          unmuteTime = moment().add(Number(num), timeFormat).unix();
+          unmuteTime = moment().add(Number(num), timeFormat).toDate();
           break;
         default:
           time = '1h';
       }
     } else time = '1h';
-
-    MUTE_USER(guild.id, userId, now, unmuteTime);
 
     let key = time[time.length - 1] as timeFormStrings;
 
@@ -134,24 +116,29 @@ export const mute = {
       num > 1 ? timeForm[key] + 's' : timeForm[key]
     }`;
 
-    client.logIssue(
-      guild.id,
-      'mute',
-      `${reason}\n\nMuted for ${muteDuration}`,
-      message.author,
-      member.user
-    );
-    message.channel.send(
-      `<@${member.id}> You've been muted for \`${reason}\`. Duration is ${muteDuration}.`
-    );
-
     member.roles
       .add(config.muteRole)
       .then(async () => {
         if (!member) return;
+
+        client._warnService.logIssue(
+          guild.id,
+          CaseType.mute,
+          `${reason}\n\nMuted for ${muteDuration}`,
+          message.author,
+          member.user,
+          unmuteTime
+        );
+
+        message.channel.send(
+          `<@${member.id}> You've been muted for \`${reason}\`. Duration is ${muteDuration}.`
+        );
+
         await member
           .send(
-            `You've been muted for \`${reason}\`. Duration is ${muteDuration}.`
+            `You've been muted for \`${reason}\`. Duration is ${muteDuration}. You will be unmuted <t:${moment(
+              unmuteTime
+            ).unix()}:R>`
           )
           .catch((e) =>
             console.error(
@@ -159,9 +146,10 @@ export const mute = {
             )
           );
       })
-      .catch(() =>
-        message.reply(`I was unable to give that user the mute role!`)
-      );
+      .catch(() => {
+        message.reply(`I was unable to give that user the mute role!`);
+        console.log(config.muteRole);
+      });
 
     return;
   },

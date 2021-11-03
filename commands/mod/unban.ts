@@ -1,5 +1,6 @@
 import { Message } from 'discord.js';
 import ViviBot from '../../src/bot';
+import { CaseType } from '../../src/database/cases';
 import { GET_GUILD_CONFIG } from '../../src/database/database';
 import { getUserId } from '../../utilities/functions/getUserId';
 
@@ -17,7 +18,7 @@ export const unban = {
     if (!config) return;
 
     if (
-      !message.member?.hasPermission('BAN_MEMBERS') &&
+      !message.member?.permissions.has('BAN_MEMBERS') &&
       !(config.modRole && message.member?.roles.cache.has(config.modRole))
     ) {
       return message.react('👎');
@@ -38,9 +39,9 @@ export const unban = {
     guild.members
       .unban(userId || '')
       .then(() => {
-        client.logIssue(
+        client._warnService.logIssue(
           guild.id,
-          'unban',
+          CaseType.unban,
           reason,
           message.author,
           userId || 'User'

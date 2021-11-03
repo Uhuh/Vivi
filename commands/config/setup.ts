@@ -10,7 +10,7 @@ export const setup = {
   type: 'setup',
   run: async (message: Message) => {
     const { guild } = message;
-    if (!guild || !message.member?.hasPermission(['MANAGE_GUILD'])) return;
+    if (!guild || !message.member?.permissions.has(['MANAGE_GUILD'])) return;
 
     const guildConfig = await GENERATE_GUILD_CONFIG(guild.id);
 
@@ -25,7 +25,7 @@ export const setup = {
       .setThumbnail(guild.iconURL() || '')
       .addField('Guild prefix:', `\`${guildConfig.prefix}\``, true)
       .addField('Warns expire after:', `${guildConfig.warnLifeSpan} days`, true)
-      .addField('Max warns before banning:', guildConfig.maxWarns, true)
+      .addField('Max warns before banning:', `${guildConfig.maxWarns}`, true)
       .addField(
         'Mod logging channel:',
         guildConfig.modLog ? `<#${guildConfig.modLog}>` : 'Not set!',
@@ -38,19 +38,16 @@ export const setup = {
       )
       .addField(
         'Mute role:',
-        guildConfig.muteRole
-          ? guild.roles.cache.get(guildConfig.muteRole)
-          : 'Not set!',
+        `${
+          guildConfig.muteRole
+            ? guild.roles.cache.get(guildConfig.muteRole)
+            : 'Not set!'
+        }`,
         true
       )
       .addField(
         'Current amount of mod cases:',
-        guildConfig.nextCaseId! - 1,
-        true
-      )
-      .addField(
-        'Amount of warns handed out:',
-        guildConfig.nextWarnId! - 1,
+        `${guildConfig.nextCaseId! - 1}`,
         true
       )
       .addField(
@@ -59,7 +56,7 @@ export const setup = {
       );
 
     return message.channel
-      .send(embed)
+      .send({ embeds: [embed] })
       .catch(() => missingPerms(message, 'embed'));
   },
 };

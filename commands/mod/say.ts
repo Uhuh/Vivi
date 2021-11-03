@@ -1,4 +1,4 @@
-import { Message } from 'discord.js';
+import { Message, TextChannel } from 'discord.js';
 import { GET_GUILD_CONFIG } from '../../src/database/database';
 
 export const say = {
@@ -15,7 +15,7 @@ export const say = {
     if (!config) return;
 
     if (
-      !message.member?.hasPermission('MANAGE_MESSAGES') &&
+      !message.member?.permissions.has('MANAGE_MESSAGES') &&
       !(config.modRole && message.member?.roles.cache.has(config.modRole))
     ) {
       return message.react('👎');
@@ -25,12 +25,12 @@ export const say = {
 
     let image = message.attachments.first();
 
-    if (channel) {
+    if (channel && channel.type === 'GUILD_TEXT') {
       if (image) {
-        return channel.send(image.proxyURL);
+        return (channel as TextChannel).send(image.proxyURL);
       }
 
-      return channel.send(args.join(' '));
+      return (channel as TextChannel).send(args.join(' '));
     }
 
     let content = '';

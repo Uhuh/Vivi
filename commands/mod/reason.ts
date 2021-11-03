@@ -4,9 +4,10 @@ import {
   GET_CASE,
   GET_GUILD_CONFIG,
   GET_USER_MUTE,
+  UPDATE_CASE_REASON,
   UPDATE_USER_MUTE,
-  UPDATE_WARN_REASON,
 } from '../../src/database/database';
+import { COLOR } from '../../utilities/types/global';
 
 export const reason = {
   desc: 'Change the reason for a mod case in #mod-logs',
@@ -22,7 +23,7 @@ export const reason = {
     if (!config) return;
 
     if (
-      !message.member?.hasPermission('MANAGE_MESSAGES') &&
+      !message.member?.permissions.has('MANAGE_MESSAGES') &&
       !(config.modRole && message.member?.roles.cache.has(config.modRole))
     ) {
       return message.react('👎');
@@ -86,7 +87,7 @@ export const reason = {
         .fetch(modCase.messageId)
         .catch(() =>
           console.error(
-            `Failed to fetch mod log case message: Caase ID: ${modCase.id}`
+            `Failed to fetch mod log case message: Case ID: ${modCase.id}`
           )
         );
       caseMessage = channel.messages.cache.get(modCase.messageId);
@@ -111,33 +112,34 @@ export const reason = {
     const mod: User | string =
       message.guild.members.cache.get(modCase.modId)?.user || modCase.modId;
 
-    let color = 15158332;
+    let color = COLOR.DEFAULT;
 
     switch (modCase.type.toLowerCase()) {
       case 'ban':
-        color = 15158332;
+        color = COLOR.RED;
         break;
       case 'warn':
-        UPDATE_WARN_REASON(
+        UPDATE_CASE_REASON(
           message.guild.id,
-          modCase.warnId!,
+          modCase.caseId,
           args.join(' ').trim()
         );
         if (user instanceof User) {
           user.send(
-            `Your warning (ID: ${modCase.warnId}) has a new reason: ${args
+            `Your warning (ID: ${modCase.caseId}) has a new reason: ${args
               .join(' ')
               .trim()}`
           );
         }
         break;
       case 'mute':
-        color = 15844367;
+        color = COLOR.YELLOW;
         muteDurationChange(modCase.userId, args.join(' '), message);
         break;
       case 'unmute':
       case 'unban':
-        color = 3066993;
+      case 'unwarn':
+        color = COLOR.GREEN;
         break;
     }
 
@@ -157,14 +159,14 @@ export const reason = {
       )
       .addField(
         `**Reason**`,
-        reason === ''
+        reason === '' || !reason
           ? `Mod please do \`${config.prefix}reason ${modCase.caseId} <reason>\``
           : reason
       )
       .setColor(color)
       .setTimestamp(new Date());
 
-    caseMessage.edit(embed);
+    caseMessage.edit({ embeds: [embed] });
 
     return;
   },
@@ -186,7 +188,7 @@ const muteDurationChange = async (
     return message.reply(`that user is no longer muted. Remute them!`);
   }
 
-  let unmuteTime = moment().add(1, 'h').unix();
+  let unmuteTime = moment().add(1, 'h').toDate();
 
   if (time && time !== '') {
     const timeFormat = time[time.length - 1];
@@ -202,10 +204,9 @@ const muteDurationChange = async (
       case 'd':
       case 'w':
       case 'y':
-        unmuteTime = moment
-          .unix(mutedUser.dateMuted)
+        unmuteTime = moment(mutedUser.creationDate)
           .add(Number(num), timeFormat)
-          .unix();
+          .toDate();
     }
   } else time = '1h';
 
@@ -214,7 +215,11 @@ const muteDurationChange = async (
   await guild.members.fetch(userId);
   const user = guild.members.cache.get(userId);
   await user
-    ?.send(`Your mute duration has been changed to ${time.trim()}.`)
+    ?.send(
+      `Your mute duration has been changed. You will now be unmuted <t:${moment(
+        unmuteTime
+      ).unix()}:R>.`
+    )
     .catch(() =>
       console.error(`Issues updating user on their mute duration change.`)
     );

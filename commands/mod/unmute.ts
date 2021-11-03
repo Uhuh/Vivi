@@ -1,5 +1,6 @@
 import { Message } from 'discord.js';
 import ViviBot from '../../src/bot';
+import { CaseType } from '../../src/database/cases';
 import { GET_GUILD_CONFIG, UNMUTE_USER } from '../../src/database/database';
 import { getUserId } from '../../utilities/functions/getUserId';
 
@@ -17,7 +18,7 @@ export const unmute = {
     if (!config) return;
 
     if (
-      !message.member?.hasPermission('MANAGE_MESSAGES') &&
+      !message.member?.permissions.has('MANAGE_MESSAGES') &&
       !(config.modRole && message.member?.roles.cache.has(config.modRole))
     ) {
       return message.react('👎');
@@ -60,7 +61,13 @@ export const unmute = {
 
     const reason = args.join(' ').trim() === '' ? '' : args.join(' ').trim();
 
-    client.logIssue(guild.id, 'unmute', reason, message.author, member.user);
+    client._warnService.logIssue(
+      guild.id,
+      CaseType.unmute,
+      reason,
+      message.author,
+      member.user
+    );
 
     UNMUTE_USER(guild.id, userId)
       .then(() => {

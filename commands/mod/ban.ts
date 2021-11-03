@@ -1,5 +1,6 @@
 import { Message } from 'discord.js';
 import ViviBot from '../../src/bot';
+import { CaseType } from '../../src/database/cases';
 import { GET_GUILD_CONFIG } from '../../src/database/database';
 import { getUserId } from '../../utilities/functions/getUserId';
 
@@ -17,7 +18,7 @@ export const ban = {
     if (!config) return;
 
     if (
-      !message.member?.hasPermission('BAN_MEMBERS') &&
+      !message.member?.permissions.has('BAN_MEMBERS') &&
       !(config.modRole && message.member?.roles.cache.has(config.modRole))
     ) {
       return message.react('👎');
@@ -33,7 +34,7 @@ export const ban = {
     // Ensure the user is in the guild
     const member = guild.members.cache.get(userId || '');
 
-    if (member?.hasPermission('BAN_MEMBERS')) {
+    if (member?.permissions.has('BAN_MEMBERS')) {
       return message.reply(`you can't ban them lol.`);
     }
 
@@ -54,9 +55,9 @@ export const ban = {
       member
         .ban({ reason })
         .then(() => {
-          client.logIssue(
+          client._warnService.logIssue(
             guild.id,
-            'ban',
+            CaseType.ban,
             reason,
             message.author,
             member.user || userId || 'User'
@@ -70,9 +71,9 @@ export const ban = {
       guild.members
         .ban(userId || '')
         .then(() => {
-          client.logIssue(
+          client._warnService.logIssue(
             guild.id,
-            'ban',
+            CaseType.ban,
             reason,
             message.author,
             userId || 'User'

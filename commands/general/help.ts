@@ -38,7 +38,7 @@ export const help = {
     if (!args.length) {
       embed.setTitle('**Command Categories**');
       embed.addField(`**General**`, `Try out \`${prefix}help general\``);
-      if (message.member?.hasPermission('MANAGE_MESSAGES')) {
+      if (message.member?.permissions.has('MANAGE_MESSAGES')) {
         embed.addField(
           `**Config**`,
           `Try out \`${prefix}config help\`\nAll config commands require MANAGE_GUILD permissions.`
@@ -49,7 +49,7 @@ export const help = {
       // If they specify a list type (general, config, etc) show those respective commands
       embed.setTitle(`**${key.toUpperCase()} commands**`);
 
-      const hasPerm = message.member?.hasPermission('MANAGE_MESSAGES');
+      const hasPerm = message.member?.permissions.has('MANAGE_MESSAGES');
       client.commands
         .filter((c) => c.type === key)
         .filter((func) => !(func.type === Category.mod && !hasPerm))
@@ -60,6 +60,8 @@ export const help = {
       embed.setDescription('***<> = required arguments, [] = optional.***\n\n');
     }
 
-    message.channel.send({ embed }).catch(() => missingPerms(message, 'embed'));
+    message.channel
+      .send({ embeds: [embed] })
+      .catch(() => missingPerms(message, 'embed'));
   },
 };

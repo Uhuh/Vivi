@@ -8,7 +8,7 @@ export const banner = {
   alias: [],
   type: 'config',
   run: async (message: Message, args: string[]) => {
-    if (!message.guild || !message.member?.hasPermission(['MANAGE_GUILD']))
+    if (!message.guild || !message.member?.permissions.has(['MANAGE_GUILD']))
       return;
 
     if (!args.length || (args[0] !== 'left' && args[0] !== 'center')) {

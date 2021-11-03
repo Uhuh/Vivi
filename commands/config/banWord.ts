@@ -13,7 +13,7 @@ export const word = {
   alias: ['bw'],
   type: 'config',
   run: async (message: Message, args: string[], client: ViviBot) => {
-    if (!message.guild || !message.member?.hasPermission(['MANAGE_GUILD']))
+    if (!message.guild || !message.member?.permissions.has(['MANAGE_GUILD']))
       return;
 
     const { guild } = message;

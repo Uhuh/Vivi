@@ -38,6 +38,8 @@ export const botstatus = {
       .addField(`**The bot is watching:**`, `${channelCount} channels`, true)
       .addField(`**Bot OS:**`, `${OS.platform()}`, true);
 
-    message.channel.send(embed).catch(() => missingPerms(message, 'embed'));
+    message.channel
+      .send({ embeds: [embed] })
+      .catch(() => missingPerms(message, 'embed'));
   },
 };

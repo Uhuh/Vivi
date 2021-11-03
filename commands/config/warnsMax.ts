@@ -8,7 +8,7 @@ export const warnsMax = {
   alias: ['mw'],
   type: 'config',
   run: (message: Message, args: string[]) => {
-    if (!message.guild || !message.member?.hasPermission(['MANAGE_GUILD']))
+    if (!message.guild || !message.member?.permissions.has(['MANAGE_GUILD']))
       return;
 
     const maxWarns = Number(args[0]);

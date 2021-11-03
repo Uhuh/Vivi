@@ -27,6 +27,8 @@ export const avatar = {
     );
     embed.setImage(user.avatarURL({ dynamic: true, size: 2048 }) || '');
 
-    message.channel.send(embed).catch(() => missingPerms(message, 'embed'));
+    message.channel
+      .send({ embeds: [embed] })
+      .catch(() => missingPerms(message, 'embed'));
   },
 };

@@ -13,7 +13,7 @@ export const logs = {
   alias: ['l'],
   type: 'config',
   run: async (message: Message, args: string[]) => {
-    if (!message.guild || !message.member?.hasPermission(['MANAGE_GUILD']))
+    if (!message.guild || !message.member?.permissions.has(['MANAGE_GUILD']))
       return;
     let [type, id] = args;
 

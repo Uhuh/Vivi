@@ -13,35 +13,33 @@ export const status = {
     const { guild } = message;
     let textC = 0;
     let voiceC = 0;
-    if (message.channel.type === 'dm') {
+    if (message.channel.type === 'DM') {
       return;
     }
 
     if (!guild) return;
 
     for (const [, channel] of guild.channels.cache) {
-      if (channel.type === 'text') {
+      if (channel.type === 'GUILD_TEXT') {
         textC++;
-      } else if (channel.type === 'voice') {
+      } else if (channel.type === 'GUILD_VOICE') {
         voiceC++;
       }
     }
-
-    const { owner } = guild;
 
     embed
       .setColor(COLOR.AQUA)
       .setThumbnail(guild.iconURL({ dynamic: true }) || '')
       .setDescription(`**Server information for _${guild.name}_**`);
 
-    if (owner) embed.addField(`**Owner**`, `\`${owner.user.tag}\``);
-
     embed
-      .addField(`**OwnerID**`, `\`${guild.ownerID}\``)
+      .addField(`**OwnerID**`, `\`${guild.ownerId}\``)
       .addField(`**Users**`, `\`${guild.memberCount}\``)
       .addField(`**Text Channels**`, `\`${textC}\``)
       .addField(`**Voice Channels**`, `\`${voiceC}\``);
 
-    message.channel.send(embed).catch(() => missingPerms(message, 'embed'));
+    message.channel
+      .send({ embeds: [embed] })
+      .catch(() => missingPerms(message, 'embed'));
   },
 };

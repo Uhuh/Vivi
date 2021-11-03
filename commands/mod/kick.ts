@@ -1,5 +1,6 @@
 import { Message } from 'discord.js';
 import ViviBot from '../../src/bot';
+import { CaseType } from '../../src/database/cases';
 import { GET_GUILD_CONFIG } from '../../src/database/database';
 import { getUserId } from '../../utilities/functions/getUserId';
 
@@ -17,7 +18,7 @@ export const kick = {
     if (!config) return;
 
     if (
-      !message.member?.hasPermission('KICK_MEMBERS') &&
+      !message.member?.permissions.has('KICK_MEMBERS') &&
       !(config.modRole && message.member?.roles.cache.has(config.modRole))
     ) {
       return message.react('👎');
@@ -34,18 +35,7 @@ export const kick = {
     if (message.mentions.members?.first()) args.shift();
 
     // Ensure the user is in the guild
-    let member = guild.members.cache.get(userId || '');
-    // Try a fetch incase the user isn't cached.
-    if (!member) {
-      await guild.members
-        .fetch(userId || '')
-        .catch(() =>
-          console.error(
-            `Failed to get user to kick. ID is probably a message ID. [${userId}]`
-          )
-        );
-      member = guild.members.cache.get(userId || '');
-    }
+    let member = await ViviBot.getGuildMember(guild, userId);
 
     if (!member) {
       return console.error(`Issue getting user on guild. User ID: ${userId}`);
@@ -59,9 +49,9 @@ export const kick = {
     member
       .kick()
       .then(() => {
-        client.logIssue(
+        client._warnService.logIssue(
           guild.id,
-          'kick',
+          CaseType.kick,
           reason,
           message.author,
           member?.user || 'Missing user ID'

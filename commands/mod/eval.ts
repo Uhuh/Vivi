@@ -27,10 +27,9 @@ export const evalFunction = {
 
       if (typeof evaled !== 'string') evaled = require('util').inspect(evaled);
 
-      message.channel.send(clean(evaled), { code: 'xl' });
-      const emojis = Object.values(Emojis).join(' ');
-      message.channel.send(emojis);
+      message.channel.send(clean(evaled));
     } catch (err) {
+      //@ts-ignore
       message.channel.send(`\`ERROR\` \`\`\`xl\n${clean(err)}\n\`\`\``);
     }
   },

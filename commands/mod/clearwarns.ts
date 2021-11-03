@@ -1,5 +1,6 @@
 import { Message } from 'discord.js';
 import ViviBot from '../../src/bot';
+import { CaseType } from '../../src/database/cases';
 import {
   CLEAR_USER_WARNS,
   GET_GUILD_CONFIG,
@@ -20,7 +21,7 @@ export const clearwarns = {
     if (!config) return;
 
     if (
-      !message.member?.hasPermission('MANAGE_MESSAGES') &&
+      !message.member?.permissions.has('MANAGE_MESSAGES') &&
       !(config.modRole && message.member?.roles.cache.has(config.modRole))
     ) {
       return message.react('👎');
@@ -57,9 +58,9 @@ export const clearwarns = {
         ? `<@${message.author.id}> has removed all warnings for user <@${userId}>`
         : args.join(' ').trim();
 
-    client.logIssue(
+    client._warnService.logIssue(
       guild.id,
-      'unwarn',
+      CaseType.unwarn,
       reason,
       message.author,
       typeof user === 'string' ? user : user.user
