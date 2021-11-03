@@ -1,9 +1,8 @@
-import { Message, MessageEmbed } from 'discord.js';
+import { Message } from 'discord.js';
+import { EmbedService } from '../../src/services/embedService';
 import ViviBot from '../../src/bot';
 import { GET_GUILD_CONFIG } from '../../src/database/database';
 import { missingPerms } from '../../utilities/functions/missingPerm';
-import { Category } from '../../utilities/types/commands';
-import { COLOR } from '../../utilities/types/global';
 
 export const config = {
   desc: 'Show the servers current config',
@@ -13,7 +12,7 @@ export const config = {
   type: 'config',
   run: async (message: Message, args: string[], client: ViviBot) => {
     const { guild } = message;
-    if (!guild || !message.member?.hasPermission(['MANAGE_GUILD'])) return;
+    if (!guild || !message.member?.permissions.has(['MANAGE_GUILD'])) return;
 
     if (args.length && args[0].toLowerCase() === 'setup') {
       return client.commands.get('setup')?.run(message, args, client);
@@ -28,91 +27,16 @@ export const config = {
     }
 
     if (args.length === 0) {
-      const embed = new MessageEmbed();
-      embed
-        .setTitle(`Configuration for **${guild.name}**`)
-        .setThumbnail(guild.iconURL() || '')
-        .addField('Guild prefix:', `\`${guildConfig.prefix}\``, true)
-        .addField(
-          'Warns expire after:',
-          `${guildConfig.warnLifeSpan} days`,
-          true
-        )
-        .addField('Max warns before banning:', guildConfig.maxWarns, true)
-        .addField(
-          'Mod logging channel:',
-          guildConfig.modLog ? `<#${guildConfig.modLog}>` : 'Not set!',
-          true
-        )
-        .addField(
-          'Server logging channel:',
-          guildConfig.serverLog ? `<#${guildConfig.serverLog}>` : 'Not set!',
-          true
-        )
-        .addField(
-          'Mute role:',
-          guildConfig.muteRole
-            ? guild.roles.cache.get(guildConfig.muteRole) || 'Not set!'
-            : 'Not set!',
-          true
-        )
-        .addField(
-          'Mod role:',
-          guildConfig.modRole
-            ? guild.roles.cache.get(guildConfig.modRole) || 'Not set!'
-            : 'Not set!',
-          true
-        )
-        .addField(
-          'Current amount of mod cases:',
-          guildConfig.nextCaseId! - 1,
-          true
-        )
-        .addField(
-          'Amount of warns handed out:',
-          guildConfig.nextWarnId! - 1,
-          true
-        )
-        .addField(
-          'Whitelisted channels:',
-          guildConfig.serverLogWhitelist?.length
-            ? guildConfig.serverLogWhitelist?.map((c) => `<#${c}>`)
-            : 'None!'
-        )
-        .addField(
-          'Ban message:',
-          guildConfig.banMessage || `You've been banned from ${guild.name}.`
-        );
-
       return message.channel
-        .send(embed)
+        .send({ embeds: [EmbedService.guildConfigEmbed(guild, guildConfig)] })
         .catch(() => missingPerms(message, 'embed'));
     }
 
     const configType = args.shift()?.toLowerCase() || '';
 
     if (configType === 'help') {
-      const embed = new MessageEmbed();
-      embed
-        .setTitle('**Config commands**')
-        .setDescription(`All config commands require MANAGE_GUILD permissions.`)
-        .setColor(COLOR.AQUA)
-        .setAuthor(client.user?.username, client.user?.avatarURL() || '')
-        .setThumbnail(client.user?.avatarURL() || '')
-        .setFooter(`Replying to: ${message.author.tag}`)
-        .setTimestamp(new Date());
-
-      client.commands
-        .filter((c) => c.type === Category.config)
-        .forEach((func) =>
-          embed.addField(
-            `**${guildConfig.prefix}config ${func.name} ${func.args}**`,
-            func.desc
-          )
-        );
-
       return message.channel
-        .send(embed)
+        .send({ embeds: [EmbedService.configHelpEmbed(client, guildConfig)] })
         .catch(() => missingPerms(message, 'embed'));
     }
 
