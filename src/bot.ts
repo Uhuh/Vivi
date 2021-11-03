@@ -13,28 +13,38 @@ import {
 } from '../events/serverLogs';
 import {
   ALL_GUILD_PREFIXES,
-  CREATE_WARN,
   GENERATE_GUILD_CONFIG,
   GET_BANNED_WORDS,
+  GET_CASES_PASSED_PUNISHMENTDATE,
   GET_GUILD_CONFIG,
-  GET_UNMUTED_USERS,
-  GET_USER_WARNS,
-  NEW_CASE,
   REMOVE_JOIN_ROLE,
   UNMUTE_USER,
 } from './database/database';
 import * as config from './vars';
 import { Command } from '../utilities/types/commands';
-import { COLOR } from '../utilities/types/global';
+import { WarnService } from './services/warnService';
+import { CaseType } from './database/cases';
 
 export default class ViviBot extends Discord.Client {
   config: any;
+  _warnService: WarnService;
   commands: Discord.Collection<string, Command>;
   bannedWords: Discord.Collection<string, string[]>;
   guildPrefix: Discord.Collection<string, string>;
-  constructor(intents: Discord.WebSocketOptions) {
-    super({ ws: intents });
+  constructor() {
+    super({
+      intents: [
+        Discord.Intents.FLAGS.GUILDS,
+        Discord.Intents.FLAGS.GUILD_MESSAGES,
+        Discord.Intents.FLAGS.GUILD_MEMBERS,
+        Discord.Intents.FLAGS.DIRECT_MESSAGES,
+      ],
+    });
+
     this.config = config;
+
+    this._warnService = new WarnService(this);
+
     this.commands = new Discord.Collection();
     this.bannedWords = new Discord.Collection();
     this.guildPrefix = new Discord.Collection();
@@ -45,27 +55,27 @@ export default class ViviBot extends Discord.Client {
       console.info(`[Started]: ${new Date()}\n`);
       console.info('Vivi reporting for duty!');
       // Post bot stats to top.gg
-      setInterval(() => this.randomPres(), 10000);
+      setInterval(() => this.setBotPresence(), 10000);
       setInterval(() => this.checkMutes(), 60000); // 1 minute // 600000 = 10minutes
     });
 
     //CMD Handling
-    this.on('message', (message) => {
+    this.on('messageCreate', (message) => {
       if (message.author?.bot) return;
       msg(this, message as Discord.Message);
       // Verify user message into the server.
       if (
-        message.channel?.type !== 'dm' &&
-        !message.member?.hasPermission('MANAGE_MESSAGES')
+        message.channel?.type !== 'DM' &&
+        !message.member?.permissions.has('MANAGE_MESSAGES')
       ) {
-        this.filterWords(message as Discord.Message);
+        this._warnService.filter(message as Discord.Message);
       }
 
       return;
     });
     this.on('messageDelete', (message) => {
       try {
-        if (message.author?.bot || message.channel?.type === 'dm') return;
+        if (message.author?.bot || message.channel?.type === 'DM') return;
         MessageDelete(message);
       } catch {
         console.error(`Error on message delete!`);
@@ -73,14 +83,14 @@ export default class ViviBot extends Discord.Client {
     });
     this.on('messageUpdate', (oldMsg, newMsg) => {
       try {
-        if (oldMsg.author?.bot || oldMsg.channel?.type === 'dm') return;
+        if (oldMsg.author?.bot || oldMsg.channel?.type === 'DM') return;
         MessageEdit(oldMsg, newMsg);
         if (
-          newMsg.channel?.type !== 'dm' &&
+          newMsg.channel?.type !== 'DM' &&
           !newMsg.author?.bot &&
-          !newMsg.member?.hasPermission('MANAGE_MESSAGES')
+          !newMsg.member?.permissions.has('MANAGE_MESSAGES')
         ) {
-          this.filterWords(newMsg as Discord.Message);
+          this._warnService.filter(newMsg as Discord.Message);
         }
       } catch {
         console.error(`Error on message update!`);
@@ -91,211 +101,27 @@ export default class ViviBot extends Discord.Client {
       MemberUpdated(member, 'join');
     });
     this.on('guildMemberRemove', (member) => MemberUpdated(member, 'left'));
-    this.on('guildCreate', ({ id }) => GENERATE_GUILD_CONFIG(id));
-    this.on('roleDelete', (role) => REMOVE_JOIN_ROLE(role.guild.id, role.id));
+    this.on('guildCreate', (guild) => {
+      GENERATE_GUILD_CONFIG(guild.id);
+    });
+    this.on('roleDelete', (role) => {
+      REMOVE_JOIN_ROLE(role.guild.id, role.id);
+    });
   }
 
-  randomPres = () => {
+  setBotPresence = () => {
     const user = this.user;
     if (!user) return console.log('Client dead?');
 
-    user
-      .setPresence({
-        activity: {
+    user.setPresence({
+      activities: [
+        {
           name: '@Vivi help',
           type: 'WATCHING',
         },
-        status: 'online',
-      })
-      .catch(console.error);
-  };
-
-  filterWords = async (message: Discord.Message) => {
-    const { guild } = message;
-
-    if (!guild) return;
-    /**
-     * Loop through all the users words, check if they're in the banned list
-     */
-    const content = message.content;
-    const words = this.bannedWords.get(guild.id);
-
-    if (!words) return;
-    for (const word of words) {
-      const match = content.toLowerCase().includes(word);
-      /**
-       * Only get users warnings IF they match a banned word so that the bot doesn't query for each users warns
-       * for every single message.
-       */
-      if (match) {
-        let userWarnings = await GET_USER_WARNS(guild.id, message.author.id);
-        const config = await GET_GUILD_CONFIG(guild.id);
-        if (!config || message.member?.roles.cache.has(config.modRole || ''))
-          return;
-
-        if (!userWarnings) userWarnings = [];
-
-        const WEEK_OLD = moment()
-          .subtract(config.warnLifeSpan, 'days')
-          .startOf('day');
-        let activeWarns = 0;
-
-        for (const warn of userWarnings) {
-          if (moment.unix(warn.date).isBefore(WEEK_OLD)) continue;
-          activeWarns++;
-        }
-
-        activeWarns++;
-        if (activeWarns > config.maxWarns!) {
-          message.channel.send(
-            `Banned ${message.author.username} for getting more than ${config.maxWarns} warns.`
-          );
-          message
-            .delete()
-            .catch(() => console.error(`Issues deleting the message!`));
-
-          CREATE_WARN(
-            guild.id,
-            message.author.id,
-            this.user?.id || '731987022008418334',
-            `Saying a banned word. (Matched ${word})`
-          );
-
-          await message.member
-            ?.send(
-              config.banMessage || `You've been banned from ${guild.name}.`
-            )
-            .catch(() =>
-              console.error(
-                'Issue sending ban appeal message to user. Oh well?'
-              )
-            );
-          message.member
-            ?.ban()
-            .catch(() => message.channel.send(`Issues banning user.`));
-          this.logIssue(
-            guild.id,
-            'ban',
-            `Strike! You're out! (Banned word matched: ||${word}||)`,
-            this.user!,
-            message.author
-          );
-          return;
-        } else {
-          message.reply(
-            `warning. You gained a warn. You have ${activeWarns}/${config.maxWarns} warns.`
-          );
-
-          CREATE_WARN(
-            message.guild!.id,
-            message.author.id,
-            this.user?.id || '731987022008418334',
-            `Saying a banned word. Matched: ${word}`
-          );
-
-          this.logIssue(
-            guild.id,
-            'warn',
-            `Warned for saying a banned word. Matched: ||${word}||`,
-            this.user!,
-            message.author,
-            config.nextWarnId
-          );
-          message.author
-            .send(
-              `You have been warned!\n**Reason:** Warned for saying a banned word. Matched: ${word}`
-            )
-            .catch(() =>
-              console.error(`Can't DM user, probably has friends on.`)
-            );
-          message
-            .delete()
-            .catch(() => console.error(`Issues deleting the message!`));
-        }
-      }
-    }
-  };
-
-  logIssue = async (
-    guildId: string,
-    type: 'mute' | 'warn' | 'ban' | 'kick' | 'unban' | 'unmute' | 'unwarn',
-    reason: string,
-    mod: Discord.User,
-    user: Discord.User | string,
-    warnId?: number
-  ) => {
-    const config = await GET_GUILD_CONFIG(guildId);
-
-    if (!config) {
-      return console.error(
-        `Failed to find guild[${guildId}] config while logging issue.`
-      );
-    } else if (!config.modLog) {
-      return;
-    }
-
-    const embed = new Discord.MessageEmbed();
-    const channel = this.guilds.cache
-      .get(guildId)
-      ?.channels.cache.get(config.modLog);
-
-    let color = COLOR.DEFAULT;
-    switch (type.toLowerCase()) {
-      case 'ban':
-        color = COLOR.RED;
-        break;
-      case 'mute':
-        color = COLOR.YELLOW;
-        break;
-      case 'unmute':
-      case 'unban':
-      case 'unwarn':
-        color = COLOR.GREEN;
-        break;
-    }
-
-    embed
-      .setTitle(`${type} | Case #${config.nextCaseId}`)
-      .addField(
-        `**User**`,
-        `${typeof user === 'string' ? user : user?.tag} (<@${
-          typeof user === 'string' ? user : user.id
-        }>)`,
-        true
-      )
-      .addField(`**Moderator**`, mod?.tag === '' ? 'Unknown' : mod.tag, true)
-      .addField(
-        `**Reason**`,
-        reason === ''
-          ? `Mod please do \`${config.prefix}reason ${config.nextCaseId} <reason>\``
-          : reason
-      )
-      .setColor(color)
-      .setTimestamp(new Date());
-
-    try {
-      if (channel && channel instanceof Discord.TextChannel) {
-        channel
-          .send(embed)
-          .then((m) => {
-            NEW_CASE(
-              guildId,
-              mod.id,
-              typeof user === 'string' ? user : user.id,
-              m.id,
-              type,
-              warnId
-            );
-          })
-          .catch(() =>
-            console.error(
-              `Failed to send case embed to mod channel[${config.modLog}] for guild[${config.guildId}]`
-            )
-          );
-      }
-    } catch {
-      console.error(`Issue when trying to write log case`);
-    }
+      ],
+      status: 'online',
+    });
   };
 
   loadBannedWords = async () => {
@@ -321,33 +147,87 @@ export default class ViviBot extends Discord.Client {
       // If the server mute role is not configured, ignore.
       // Not sure how they muted without it.
       if (!config?.muteRole) continue;
-      const mutes = await GET_UNMUTED_USERS(id);
+      const mutes = await GET_CASES_PASSED_PUNISHMENTDATE(id, CaseType.mute);
       for (const m of mutes) {
         try {
           await guild.members.fetch(m.userId);
           const member = guild.members.cache.get(m.userId);
           if (member) {
-            member.roles.remove(config.muteRole).catch();
-            this.logIssue(id, 'unmute', 'Times up.', this.user!, member.user);
+            member.roles
+              .remove(config.muteRole)
+              .catch(() => console.error(`Permission issue.`));
+
+            this._warnService.logIssue(
+              id,
+              CaseType.unmute,
+              'Times up.',
+              this.user || 'Vivi',
+              member.user
+            );
           }
           UNMUTE_USER(id, m.userId);
         } catch {
           /**
            * If the member left the server execute this instead.
            */
-          this.logIssue(id, 'unmute', 'Times up.', this.user!, m.userId);
+          this._warnService.logIssue(
+            id,
+            CaseType.unmute,
+            'Times up.',
+            this.user || 'Vivi',
+            m.userId
+          );
           UNMUTE_USER(id, m.userId);
         }
       }
     }
   };
 
+  /**
+   * Try to find a guild channel within the cache for a specific guild.
+   * @param guildId Guild to get channels from.
+   * @param channelId The channel to grab, will most likely be modlog/server log.
+   * @returns GuildChannel | undefined
+   */
+  public getChannel(guildId: string, channelId: string) {
+    return this.guilds.cache.get(guildId)?.channels.cache.get(channelId);
+  }
+
+  /**
+   * Sometimes guildmembers aren't cached, call this to get them and it will make sure to cache them incase.
+   * @param guild Guild object with cached members
+   * @param userId User ID of the user we want to get.
+   * @returns GuildMember or undefined
+   */
+  public static async getGuildMember(
+    guild: Discord.Guild,
+    userId: string | undefined
+  ): Promise<Discord.GuildMember | undefined> {
+    let member = guild.members.cache.get(userId || '');
+    // Try a fetch incase the user isn't cached.
+    if (!member) {
+      await guild.members
+        .fetch(userId || '')
+        .catch(() =>
+          console.error(
+            `Failed to get user to mute. Potentially not a user ID. [${userId}]`
+          )
+        );
+      member = guild.members.cache.get(userId || '');
+    }
+
+    return member;
+  }
+
   start = async () => {
-    await mongoose.connect(`mongodb://mongodb:27017/${config.DATABASE_TYPE}`, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      useCreateIndex: true,
-    });
+    await mongoose.connect(
+      `mongodb://${config.MONGODB}:27017/${config.DATABASE_TYPE}`,
+      {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        useCreateIndex: true,
+      }
+    );
     mongoose.set('useFindAndModify', false);
     await this.login(this.config.TOKEN);
     await Promise.all([this.loadBannedWords(), this.loadGuildPrefixes()]);
