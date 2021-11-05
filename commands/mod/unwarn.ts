@@ -28,11 +28,11 @@ export const unwarn = {
     }
     if (!args.length) {
       return message.reply(
-        `please supply a warn id. They're shown in the \`checkwarns\` command`
+        `You need to give me a case ID, check your set modlog or use the \`checkwarns\` command.`
       );
     } else if (Number.isNaN(Number(args[0]))) {
       return message.reply(
-        `invalid warn id, make sure it's a number shown in the checkwarns command.`
+        `Case IDs are numbers, make sure it's the number shown in the checkwarns command or case in your set modlog channel.`
       );
     }
 
@@ -41,7 +41,7 @@ export const unwarn = {
 
     if (!warn) {
       return message.reply(
-        `that warning does not exist, make sure the ID you gave me is a real warn ID.`
+        `Seems that warn doesn't exist. Check the case ID and try again.`
       );
     }
 
@@ -65,9 +65,9 @@ export const unwarn = {
     }
 
     DELETE_CASE(message.guild?.id!, warnId)
-      .then(() => message.reply('I removed the warn successfully.'))
+      .then(() => message.reply('Warn successfully removed. :tada:'))
       .catch(() =>
-        message.reply('issue removing that warn. Is the ID correct?')
+        message.reply('Had some issues deleting that warn. Try again please.')
       );
 
     return;

@@ -14,7 +14,7 @@ export const warnExpire = {
     const numDays = Number(args[0]);
     if (Number.isNaN(numDays)) {
       return message.reply(
-        `you need to pass a number. The max I support up to is 30 days, and minimum 1,`
+        `You need to pass a number. The max I support up to is 30 days, and minimum 1,`
       );
     } else if (numDays > 30 || numDays < 1) {
       return message.reply(
@@ -24,7 +24,7 @@ export const warnExpire = {
 
     return SET_WARN_EXPIRE(message.guild.id, numDays)
       .then(() =>
-        message.reply(`successfully set warns to expire after ${numDays} days.`)
+        message.reply(`Successfully set warns to expire after ${numDays} days.`)
       )
       .catch(() =>
         message.reply(

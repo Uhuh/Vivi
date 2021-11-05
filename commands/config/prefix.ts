@@ -18,9 +18,9 @@ export const prefix = {
 
     SET_GUILD_PREFIX(message.guild.id, args[0])
       .then(() => {
-        message.reply(`successfully changed the guilds' prefix.`);
+        message.reply(`Successfully changed the prefix to \`${prefix}.\``);
         client.guildPrefix.set(message.guild!.id, args[0]);
       })
-      .catch(() => message.reply(`I failed to set the prefix to that!`));
+      .catch(() => message.reply(`I encoutnered an issue setting the prefix.`));
   },
 };

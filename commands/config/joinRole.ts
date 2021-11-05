@@ -44,7 +44,7 @@ export const joinRole = {
         }
 
         if (!role) {
-          return message.reply(`couldn't find a role with that name or ID`);
+          return message.reply(`I couldn't find a role with that name or ID`);
         }
 
         const clientMember = guild.members.cache.find(
@@ -62,31 +62,31 @@ export const joinRole = {
           Math.max(...clientMember.roles.cache.map((r) => r.position))
         ) {
           return message.reply(
-            `the role you're trying to add is higher in the role hierarchy so I can't give it out. Put it below my role or give me a role that's above it.`
+            `The role you're trying to add is higher in the role hierarchy so I can't give it out. Put it below my role or give me a role that's above it.`
           );
         }
         if (command === 'add') {
           ADD_JOIN_ROLE(guild.id, role.id)
             .then(() =>
-              message.reply(`successfully added the role to the join list.`)
+              message.reply(`Successfully added the role to the join list.`)
             )
             .catch(() => {
-              message.reply(`issue adding role. :(`);
+              message.reply(`Issue adding role to join roles list. :(`);
             });
         } else {
           REMOVE_JOIN_ROLE(guild.id, role.id)
             .then(() =>
-              message.reply(`successfully removed the role from the join list.`)
+              message.reply(`Successfully removed the role from the join list.`)
             )
             .catch(() => {
-              message.reply(`issue removing role. :(`);
+              message.reply(`Issue removing role from join roles list. :(`);
             });
         }
         break;
       case 'list':
         const roles = await GUILD_JOIN_ROLES(guild.id);
         if (!roles) {
-          return message.reply(`no join roles!`);
+          return message.reply(`There are no join roles set!`);
         }
         const embed = new MessageEmbed();
         embed

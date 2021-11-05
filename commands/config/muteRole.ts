@@ -19,27 +19,25 @@ export const mute = {
 
     if (!args.length) {
       return message.reply(
-        `you need to send either a role mention, id or 'remove'.`
+        `You need to include a role mention, role id or 'remove'.`
       );
     }
 
     if (args.length && args[0] === 'remove') {
       const config = await GET_GUILD_CONFIG(guild.id);
       if (!config?.muteRole) {
-        return message.reply(
-          `the server doesn't have a mute role setup already!`
-        );
+        return message.reply(`The server doesn't have a mute role setup.`);
       }
 
       REMOVE_MUTE_ROLE(guild.id);
 
-      return message.reply(`successfully removed mute role.`);
+      return message.reply(`Successfully removed the mute role.`);
     }
 
     const roleId = message.mentions.roles.first() || args.shift();
 
     if (!roleId) {
-      return message.reply(`did you not pass a role id or not mention a role?`);
+      return message.reply(`Did you not pass a role id or not mention a role?`);
     }
 
     let role: Role | undefined = undefined;
@@ -53,11 +51,11 @@ export const mute = {
     }
 
     if (!role) {
-      return message.reply(`couldn't find a role with that name or ID`);
+      return message.reply(`Couldn't find a role with that name or ID`);
     }
 
     SET_MUTE_ROLE(guild.id, role.id);
 
-    return message.reply(`successfully set mute role.`);
+    return message.reply(`Successfully set the mute role.`);
   },
 };

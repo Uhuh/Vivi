@@ -13,16 +13,16 @@ export const banner = {
 
     if (!args.length || (args[0] !== 'left' && args[0] !== 'center')) {
       return message.reply(
-        'there are currently only two banner types. `left` and `center` so please try them out!'
+        'There are currently only two banner types. `left` and `center` so please try them out!'
       );
     }
 
     return SET_BANNER(message.guild.id, args[0])
       .then(() =>
-        message.reply(`successfully changed the banner type to \`${args[0]}\``)
+        message.reply(`Successfully changed the banner type to \`${args[0]}\``)
       )
       .catch(() =>
-        message.reply(`I encounted and issue setting the banner type.`)
+        message.reply(`I encounted an issue setting the banner type.`)
       );
   },
 };

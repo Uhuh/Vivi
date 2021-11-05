@@ -44,7 +44,7 @@ export const config = {
 
     if (!command) {
       return message.reply(
-        `invalid config type! Run the config help command to see the list.`
+        `Invalid config command! Run the config help command to see the list.`
       );
     }
 

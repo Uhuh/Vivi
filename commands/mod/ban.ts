@@ -5,7 +5,7 @@ import { GET_GUILD_CONFIG } from '../../src/database/database';
 import { getUserId } from '../../utilities/functions/getUserId';
 
 export const ban = {
-  desc: 'Ban a user',
+  desc: 'Ban a user from the server.',
   name: 'ban',
   args: '<user id> <reason>',
   alias: ['b'],
@@ -24,7 +24,9 @@ export const ban = {
       return message.react('👎');
     }
     if (!args.length) {
-      return message.reply(`you forgot some arguements.`);
+      return message.reply(
+        `Please mention a user to ban. (Or pass their ID). :)`
+      );
     }
 
     const userId = getUserId(message, args);
@@ -35,7 +37,7 @@ export const ban = {
     const member = guild.members.cache.get(userId || '');
 
     if (member?.permissions.has('BAN_MEMBERS')) {
-      return message.reply(`you can't ban them lol.`);
+      return message.reply(`You can't ban them lol.`);
     }
 
     const reason =
@@ -66,7 +68,7 @@ export const ban = {
             `**Banned** ${member?.user.tag || 'User'} (<@${userId}>)`
           );
         })
-        .catch(() => message.reply(`I had issues trying to ban that user!`));
+        .catch(() => message.reply(`I had issues banning that user!`));
     } else {
       guild.members
         .ban(userId || '')
@@ -80,7 +82,7 @@ export const ban = {
           );
           message.channel.send(`**Banned** User (<@${userId}>)`);
         })
-        .catch(() => message.reply(`I had issues trying to ban that user!`));
+        .catch(() => message.reply(`I had issues banning that user!`));
     }
 
     return;

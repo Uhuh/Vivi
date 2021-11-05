@@ -31,34 +31,38 @@ export const mute = {
     if (
       !message.member?.permissions.has('MANAGE_MESSAGES') &&
       !(config.modRole && message.member?.roles.cache.has(config.modRole))
-    ) {
-      return message.react('👎');
-    }
+    )
+      return;
+
     if (!args.length) {
       const prefix = config.prefix || 'v.';
       return message.reply(
-        `you forgot some arguements. Example usage: \`${prefix}mute <user id> Annoying! | 5m\``
+        `You forgot some things, here's how to use the command: \`${prefix}mute <user id> Annoying! | 5m\``
       );
     }
 
     if (!config.muteRole) {
       return message.reply(
-        `there is no mute role configured for this server. Try \`${config.prefix}config mute-role <@role/ID>\``
+        `Sorry, you need to give me a role you want me to give to muted users. Try \`${config.prefix}config mute-role <@role/ID>\` to assign a mute role for the server.`
       );
     }
 
     const userId = getUserId(message, args);
 
     if (!userId) {
-      return message.reply(`missing the user id argument!`);
+      return message.reply(
+        `Please mention the user or their user ID to mute them.`
+      );
     }
 
     const existingMute = await GET_USER_MUTE(guild.id, userId);
 
     if (existingMute) {
       return message.reply(
-        `they're already muted.${
-          config.modLog ? ` Check <#${config.modLog}>` : ''
+        `That user is already muted.${
+          config.modLog
+            ? ` Check <#${config.modLog}> for case #${existingMute.caseId}`
+            : ' Setup a modlog channel to keep track of mutes, bans, kicks and warns with `${config.prefix}config logs mod #channel-of-choice`'
         }`
       );
     }
@@ -70,7 +74,7 @@ export const mute = {
 
     if (!member) {
       return message.reply(
-        `couldn't find that user, check that the ID is correct.`
+        `I had issues finding the user. Make sure your mentioned them correctly or passed the right user ID.`
       );
     }
 
@@ -89,9 +93,11 @@ export const mute = {
       const num = time.slice(0, -1);
 
       if (Number.isNaN(Number(num))) {
-        return message.reply(`oops! That's not a number for time.`);
+        return message.reply(
+          `Please send a number before the time format. Example \`${config.prefix}mute <@user> <reason> | 1h\` \`1h\` means 1 hour.\nIt's important to note you need to use | to separate the user mention and reason from the time.`
+        );
       } else if (Number(num) < 1) {
-        return message.reply(`please return a time at least 1 or greater.`);
+        return message.reply(`Please return a time at least 1 or greater.`);
       }
 
       switch (timeFormat) {
@@ -140,9 +146,9 @@ export const mute = {
               unmuteTime
             ).unix()}:R>`
           )
-          .catch((e) =>
+          .catch(() =>
             console.error(
-              `Guild[${guild.id}] - Issue sending mute reason to user. Oh well? ${e}\n`
+              `Guild[${guild.id}] - Issue sending mute reason to user. Oh well?`
             )
           );
       })

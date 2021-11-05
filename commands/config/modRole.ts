@@ -16,9 +16,7 @@ export const modRole = {
       return;
 
     if (!args.length) {
-      return message.reply(
-        `you need to send either a role mention, id or 'remove'.`
-      );
+      return message.reply(`You need to mention a role, role id or 'remove'.`);
     }
 
     const { guild } = message;
@@ -26,20 +24,18 @@ export const modRole = {
     if (args.length && args[0] === 'remove') {
       const config = await GET_GUILD_CONFIG(guild.id);
       if (!config?.modRole) {
-        return message.reply(
-          `the server doesn't have a mod role setup already!`
-        );
+        return message.reply(`The server doesn't have a mod role setup!`);
       }
 
       REMOVE_MOD_ROLE(guild.id);
 
-      return message.reply(`successfully removed mod role.`);
+      return message.reply(`Successfully removed mod role.`);
     }
 
     const roleId = message.mentions.roles.first() || args.shift();
 
     if (!roleId) {
-      return message.reply(`did you not pass a role id or not mention a role?`);
+      return message.reply(`Did you not pass a role id or mention a role?`);
     }
 
     let role: Role | undefined = undefined;
@@ -53,11 +49,11 @@ export const modRole = {
     }
 
     if (!role) {
-      return message.reply(`couldn't find a role with that name or ID`);
+      return message.reply(`Couldn't find a role with that name or ID`);
     }
 
     SET_MOD_ROLE(guild.id, role.id);
 
-    return message.reply(`successfully set mod role.`);
+    return message.reply(`Successfully set the mod role.`);
   },
 };

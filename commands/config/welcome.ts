@@ -14,13 +14,17 @@ export const welcome = {
 
     if (!args.length || (args[0] !== 'add' && args[0] !== 'remove')) {
       return message.reply(
-        'you need to use `add` or `remove` for channels. Example `v.config welcome add #welcome`'
+        'Please use `add` or `remove` for channels. Example `v.config welcome add #welcome`'
       );
     }
 
     if (args[0] === 'remove') {
       return REMOVE_WELCOME(guild.id)
-        .then(() => message.reply(`successfully removed the welcome channel.`))
+        .then(() =>
+          message.reply(
+            `I'll no longer posting welcome banners in that channel.`
+          )
+        )
         .catch(() => message.reply(`I had an issue removing the channel.`));
     }
 
@@ -32,14 +36,20 @@ export const welcome = {
     }
     if (!channel) {
       return message.reply(
-        `I'm having issues finding that channel. Did you pass the right ID? If you mentioned make sure you mentioned the correct one.`
+        `I'm having issues finding that channel. Did you pass the right ID? If you mentioned the channel make sure you mentioned the correct one.`
       );
     }
 
     return SET_WELCOME(guild.id, channelId)
-      .then(() => message.reply(`successfully set the welcome channel.`))
+      .then(() =>
+        message.reply(
+          `I'll send welcome banners to <#${channelId}> from now on.`
+        )
+      )
       .catch(() =>
-        message.reply(`I had an issue trying to set the welcome channel.`)
+        message.reply(
+          `I encountered an error trying to set the welcome channel.`
+        )
       );
   },
 };

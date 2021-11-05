@@ -26,7 +26,7 @@ export const kick = {
     if (!args.length) {
       const prefix = client.guildPrefix.get(guild.id) || 'v.';
       return message.reply(
-        `you forgot some arguements. \`${prefix}kick <user id> <reason>\``
+        `This command requires you to mention a user or pass their ID to work at minimum. \`${prefix}kick <user id> <reason>\``
       );
     }
 

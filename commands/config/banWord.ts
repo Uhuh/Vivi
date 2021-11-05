@@ -20,7 +20,7 @@ export const word = {
 
     if (!args.length) {
       return message.reply(
-        `you need to tell me if you're adding or deleting and what words!`
+        `You need to tell me if you're adding or deleting and what words!`
       );
     }
 
@@ -36,13 +36,13 @@ export const word = {
           );
         });
         message.reply(
-          `successfully added the word${plural} to the banned list.`
+          `Successfully added the word${plural} to the banned list.`
         );
         break;
       case 'remove':
         REMOVE_BANNED_WORD(guild.id, args.join('').split(',')).then(
           async () => {
-            message.channel.send(`Successfully removed the word${plural}.`);
+            message.reply(`Successfully removed the word${plural}.`);
             client.bannedWords.set(guild.id, await GET_BANNED_WORDS(guild.id));
           }
         );

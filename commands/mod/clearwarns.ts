@@ -29,7 +29,7 @@ export const clearwarns = {
     if (!args.length) {
       const prefix = client.guildPrefix.get(guild.id) || 'v.';
       return message.reply(
-        `you forgot some arguements. \`${prefix}clearwarns <user id> <reason>\``
+        `This command requires a user ID at minimum. Example \`${prefix}clearwarns <user id> <reason>\``
       );
     }
 
@@ -37,7 +37,7 @@ export const clearwarns = {
 
     if (!userId) {
       return message.reply(
-        `please mention a user or pass their ID to warn them.`
+        `Please mention a user or pass their ID to warn them.`
       );
     }
 
@@ -47,7 +47,7 @@ export const clearwarns = {
 
     if (!user) {
       return message.reply(
-        `Issue finding that user with that user id. Make sure you copied the ID correctly.`
+        `Issue finding a user with that user id. Make sure you copied the ID correctly.`
       );
     } else if (user.user.bot) {
       return message.reply(`what use do you have warning a bot...?`);
@@ -73,9 +73,15 @@ export const clearwarns = {
             `All of your warnings for **${guild.name}** have been removed! :tada:`
           );
         }
-        message.reply(`successfully removed all warnings for that user.`);
+        message.reply(
+          `Successfully removed all warnings for that user. :tada:`
+        );
       })
-      .catch(() => message.reply(`I had an issue trying to do that.`));
+      .catch(() =>
+        message.reply(
+          `I encountered an error trying to remove all their warnings.`
+        )
+      );
 
     return;
   },

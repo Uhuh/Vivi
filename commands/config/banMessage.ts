@@ -12,9 +12,7 @@ export const banMsg = {
       return;
 
     if (args.join(' ').length > 1020) {
-      return message.reply(
-        `the ban message can only be a max of 1020 characters.`
-      );
+      return message.reply(`Please limit the message to 1020 characters.`);
     }
 
     return SET_BANNED_MSG(message.guild.id, args.join(' '))

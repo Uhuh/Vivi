@@ -25,12 +25,13 @@ export const reason = {
     if (
       !message.member?.permissions.has('MANAGE_MESSAGES') &&
       !(config.modRole && message.member?.roles.cache.has(config.modRole))
-    ) {
-      return message.react('👎');
-    }
+    )
+      return;
 
     if (!config) {
-      return message.reply(`I somehow cannot find the guilds config file.`);
+      return message.reply(
+        `Cannot find this servers config. Try again, and if it fails try running \`v.config setup\``
+      );
     } else if (!config.modLog) {
       return message.reply(
         `I could not find a mod log channel setup for this server. Set up the mod/server log channel with the logs command.`
@@ -51,29 +52,14 @@ export const reason = {
 
     if (Number.isNaN(Number(caseId))) {
       return message.reply(
-        `make sure you entered a case ID. ${caseId} is not a proper number.`
+        `Make sure you entered a case ID. ${caseId} is not a proper number.`
       );
     }
 
     const reason = args.join(' ');
     const modCase = await GET_CASE(message.guild.id, Number(caseId));
     if (!modCase) {
-      return message.channel.send(
-        `Could not find a log with that case ID. - ${caseId}`
-      );
-    }
-
-    if (modCase.modId !== message.author.id) {
-      return message
-        .reply(
-          `you're not the original moderator of this case, please refer to the original mod.`
-        )
-        .then((m) => {
-          setTimeout(() => {
-            m.delete();
-            message.delete().catch(() => {});
-          }, 5000);
-        });
+      return message.reply(`Could not find a log with case ID ${caseId}.`);
     }
 
     const channel = message.guild.channels.cache.get(
@@ -126,7 +112,7 @@ export const reason = {
         );
         if (user instanceof User) {
           user.send(
-            `Your warning (ID: ${modCase.caseId}) has a new reason: ${args
+            `Your warning (ID: ${modCase.caseId}) has changed reason: ${args
               .join(' ')
               .trim()}`
           );
@@ -185,7 +171,7 @@ const muteDurationChange = async (
   const mutedUser = await GET_USER_MUTE(guild.id, userId);
 
   if (!mutedUser) {
-    return message.reply(`that user is no longer muted. Remute them!`);
+    return message.reply(`That user isn't currently muted.`);
   }
 
   let unmuteTime = moment().add(1, 'h').toDate();
@@ -195,7 +181,9 @@ const muteDurationChange = async (
     const num = time.slice(0, -1);
 
     if (Number.isNaN(Number(num))) {
-      return message.reply(`oops! That's not a number for time.`);
+      return message.reply(
+        `Please send a number before the time format. Example \`@Vivi mute <@user> <reason> | 1h\` \`1h\` means 1 hour.\nIt's important to note you need to use | to separate the user mention and reason from the time.`
+      );
     }
 
     switch (timeFormat) {

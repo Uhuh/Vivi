@@ -20,11 +20,13 @@ export const unban = {
     if (
       !message.member?.permissions.has('BAN_MEMBERS') &&
       !(config.modRole && message.member?.roles.cache.has(config.modRole))
-    ) {
-      return message.react('👎');
-    }
+    )
+      return;
+
     if (!args.length) {
-      return message.reply(`you forgot some arguements.`);
+      return message.reply(
+        `Unbanning a user requires a user ID. Example: \`${config.prefix}unban <user id>\``
+      );
     }
 
     const userId = getUserId(message, args);

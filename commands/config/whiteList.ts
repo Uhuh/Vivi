@@ -16,7 +16,7 @@ export const whitelist = {
 
     if (!args.length) {
       return message.reply(
-        `please mention a channel or send its ID to whitelist it.`
+        `Please mention a channel or send its ID to whitelist it. Example \`v.config whitelist #mod-chat\``
       );
     }
 
@@ -39,7 +39,11 @@ export const whitelist = {
     switch (type.toLowerCase()) {
       case 'add':
         ADD_CHANNEL_WHITELIST(guild.id, channel.id)
-          .then(() => message.reply(`successfully whitelisted channel.`))
+          .then(() =>
+            message.reply(
+              `I'll no longer monitor <#${channel.id}> for message deletions / updates.`
+            )
+          )
           .catch(() =>
             message.reply(`I had issues whitelisting that channel.`)
           );
@@ -47,14 +51,18 @@ export const whitelist = {
       case 'remove':
         REMOVE_CHANNEL_WHITELIST(guild.id, channel.id)
           .then(() =>
-            message.reply(`successfully removed the channel from whitelist.`)
+            message.reply(
+              `I'll start tracking message deletions / updates for <#${channel.id}>`
+            )
           )
           .catch(() =>
             message.reply(`I had issues removing that channel from whitelist.`)
           );
         break;
       default:
-        message.reply('you need to tell me if you want to `add` or `remove`.');
+        message.reply(
+          'Make sure to use `add` or `remove` before mentioning a channel.'
+        );
     }
     return;
   },

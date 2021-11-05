@@ -28,7 +28,7 @@ export const warn = {
     if (!args.length) {
       const prefix = client.guildPrefix.get(guild.id) || 'v.';
       return message.reply(
-        `you forgot some arguements. \`${prefix}warn <user id> <reason>\``
+        `To warn a user please mention them or pass their ID. \`${prefix}warn <user id> <reason>\``
       );
     }
 
@@ -36,7 +36,7 @@ export const warn = {
 
     if (!userId) {
       return message.reply(
-        `please mention a user or pass their ID to warn them.`
+        `Please mention a user or pass their ID to warn them.`
       );
     }
 
@@ -59,7 +59,7 @@ export const warn = {
         `Issue finding that user with that user id. Make sure you copied the ID correctly.`
       );
     } else if (user.user.bot) {
-      return message.reply(`what use do you have warning a bot...?`);
+      return message.reply(`There's no point in warning a bot.`);
     }
 
     let userWarnings = await GET_USER_WARNS(guild.id, user.id);
@@ -84,13 +84,16 @@ export const warn = {
         : args.join(' ').trim();
 
     if (!config.maxWarns) {
+      message.reply(
+        `Seems I couldn't determine the max warns for the server...`
+      );
       return console.error(`Missing maxWarns for guild[${guild.id}]`);
     }
 
     if (activeWarns > config.maxWarns) {
       // Tell everyone how bad this user is lol
       message.channel.send(
-        `Banned ${user.displayName} for getting more than ${config.maxWarns} warns.`
+        `Banned ${user.displayName} for getting more than the max warns. (${activeWarns}/${config.maxWarns})`
       );
 
       const banMessage =

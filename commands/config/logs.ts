@@ -67,7 +67,7 @@ export const logs = {
         break;
       default:
         message.reply(
-          'incorrect log type. There are only `mod` and `server` so try again.'
+          'Incorrect channel log type. There are only `mod` and `server` so try again with one of those.'
         );
     }
 

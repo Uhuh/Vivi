@@ -26,7 +26,7 @@ export const checkwarns = {
       return message.react('👎');
     }
     if (!args.length) {
-      return message.reply(`please supply a user id.`);
+      return message.reply(`Please mention a user or send their ID.`);
     }
 
     const userId = getUserId(message, args);
@@ -34,9 +34,9 @@ export const checkwarns = {
     if (message.mentions.members?.first()) args.shift();
 
     if (!userId) {
-      return message.reply(`please provide a user id or mention.`);
+      return message.reply(`Please mention a user or send their ID.`);
     } else if (Number.isNaN(Number(userId))) {
-      return message.reply(`user ids are numbers. Please try again.`);
+      return message.reply(`Make sure you copied the user ID correctly.`);
     }
 
     const warns = await GET_USER_WARNS(guild.id, userId);

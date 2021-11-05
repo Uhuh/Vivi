@@ -26,20 +26,22 @@ export const unmute = {
     if (!args.length) {
       const prefix = client.guildPrefix.get(guild.id) || 'v.';
       return message.reply(
-        `you forgot some arguements. \`${prefix}unmute <user id> <reason>\``
+        `I require a user mention or ID to unmute. Example: \`${prefix}unmute <user id> <reason>\``
       );
     }
 
     if (!config.muteRole) {
       return message.reply(
-        `there is no mute role configured for this server. Try \`${config.prefix}setMute <mute roleId/mention>\``
+        `No mute role is configured. Try this \`${config.prefix}mute-role <role mention / role id>\``
       );
     }
 
     const userId = getUserId(message, args);
 
     if (!userId) {
-      return message.reply(`missing the user id argument!`);
+      return message.reply(
+        `You need to mention a user or pass their ID to unmute them.`
+      );
     }
 
     if (message.mentions.members?.first()) args.shift();
@@ -55,7 +57,7 @@ export const unmute = {
 
     if (!member) {
       return message.reply(
-        `couldn't find that user, check that the ID is correct.`
+        `I couldn't find that user, check that the user ID is correct.`
       );
     }
 
@@ -74,7 +76,7 @@ export const unmute = {
         if (!member) return;
         if (!config.muteRole) {
           return message.reply(
-            `I wasn't able to find the mute role in the config.`
+            `I couldn't find the servers set mute role. Check the mute role is setup and try again.`
           );
         }
 
@@ -82,13 +84,13 @@ export const unmute = {
           .remove(config.muteRole)
           .catch(() =>
             message.reply(
-              `unable to remove mute role from user. Maybe they left?`
+              `I was unable to remove the mute role from the user. It's possible they left the server.`
             )
           );
       })
       .catch(() => {
         message.reply(
-          `unable to unmute, I don't think they were muted to begin with.`
+          `I had an issue trying to unmute that user. It's possible they aren't muted.`
         );
       });
 

@@ -84,9 +84,7 @@ export class WarnService {
           );
           return;
         } else {
-          message.reply(
-            `warning. You gained a warn. You have ${activeWarns}/${config.maxWarns} warns.`
-          );
+          message.reply(`Warned for saying a banned word.`);
 
           this.logIssue(
             guild.id,
