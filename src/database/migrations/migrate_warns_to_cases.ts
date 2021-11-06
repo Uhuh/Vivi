@@ -29,6 +29,7 @@ export function nuke_null_reason(guildId: string) {
   CaseModel.findOneAndDelete({
     guildId,
     type: CaseType.warn,
-    reason: undefined,
+    //@ts-ignore
+    reason: null,
   });
 }
