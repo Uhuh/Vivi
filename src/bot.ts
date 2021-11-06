@@ -233,10 +233,6 @@ export default class ViviBot extends Discord.Client {
     return member;
   }
 
-  nuke_data = async () => {
-    nuke_null_reason('731977848251744267');
-  };
-
   migrate_data = async () => {
     for (const [id] of this.guilds.cache) {
       await this.migrate_guild_data(id);
