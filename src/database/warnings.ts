@@ -10,7 +10,7 @@ const Warnings = new Schema({
 });
 
 export interface IWarn {
-  guildId: string;
+  guildId: number;
   warnId: number;
   reason: string;
   userId: string;

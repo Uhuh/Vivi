@@ -1,20 +1,19 @@
 import WarnModel from '../warnings';
-import CaseModel from '../cases';
+import CaseModel, { CaseType } from '../cases';
 import * as moment from 'moment';
 
 export async function migrate_warns_to_cases(guildId: string) {
-  const warns = await WarnModel.find({ guildId });
-  console.log(warns);
+  const warns = await WarnModel.find({ guildId: Number(guildId) });
 
   for (const warn of warns) {
     CaseModel.findOneAndUpdate(
-      { guildId: guildId, userId: warn.userId, warnId: warn.warnId },
+      { guildId: guildId, warnId: warn.warnId },
       {
         reason: warn.reason,
-        creationDate: moment(warn.date).toDate(),
+        creationDate: moment.unix(warn.date).toDate(),
       }
-    );
+    ).exec();
   }
-  const updatedCases = await CaseModel.find({ guildId });
+  const updatedCases = await CaseModel.find({ guildId, type: CaseType.warn });
   console.log(updatedCases);
 }
