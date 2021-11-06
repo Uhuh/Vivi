@@ -24,6 +24,9 @@ import * as config from './vars';
 import { Command } from '../utilities/types/commands';
 import { WarnService } from './services/warnService';
 import { CaseType } from './database/cases';
+import { AntiPhishService, PhishingBody } from './services/antiPhishService';
+import { migrate_mutes_to_cases } from './database/migrations/migrate_mutes_to_cases';
+import { migrate_warns_to_cases } from './database/migrations/migrate_warns_to_cases';
 
 export default class ViviBot extends Discord.Client {
   config: any;
@@ -62,6 +65,14 @@ export default class ViviBot extends Discord.Client {
     //CMD Handling
     this.on('messageCreate', (message) => {
       if (message.author?.bot) return;
+
+      AntiPhishService.doesMessageContainPhishingLinks(message.content).then(
+        (matches) => {
+          if (!matches.trust_rating) return;
+          this._warnService.phishingBan(matches as PhishingBody, message);
+        }
+      );
+
       msg(this, message as Discord.Message);
       // Verify user message into the server.
       if (
@@ -231,5 +242,7 @@ export default class ViviBot extends Discord.Client {
     mongoose.set('useFindAndModify', false);
     await this.login(this.config.TOKEN);
     await Promise.all([this.loadBannedWords(), this.loadGuildPrefixes()]);
+    migrate_mutes_to_cases();
+    migrate_warns_to_cases('731977848251744267');
   };
 }
