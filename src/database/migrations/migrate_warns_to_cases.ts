@@ -1,6 +1,7 @@
 import WarnModel from '../warnings';
 import CaseModel, { CaseType } from '../cases';
 import * as moment from 'moment';
+import { warnExpire } from 'commands/config';
 
 export async function migrate_warns_to_cases(guildId: string) {
   const warns = await WarnModel.find({ guildId: Number(guildId) });
@@ -27,9 +28,11 @@ export async function migrate_warns_to_cases(guildId: string) {
 
 export async function nuke_null_reason(guildId: string) {
   const warns = await CaseModel.find({ guildId, type: CaseType.warn });
+  console.log(warns);
 
   for (const warn of warns) {
-    if (warn.reason === null) {
+    if (!warn.reason) {
+      console.log(`Nuking warn: ${warn.warnId} - Case: ${warn.caseId}`);
       CaseModel.findOneAndDelete({
         caseId: warn.caseId,
       }).exec();
