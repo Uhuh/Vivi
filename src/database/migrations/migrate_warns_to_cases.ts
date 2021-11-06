@@ -34,6 +34,7 @@ export async function nuke_null_reason(guildId: string) {
     if (!warn.reason) {
       console.log(`Nuking warn: ${warn.warnId} - Case: ${warn.caseId}`);
       CaseModel.findOneAndDelete({
+        guildId,
         caseId: warn.caseId,
       }).exec();
     }
