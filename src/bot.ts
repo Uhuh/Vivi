@@ -26,7 +26,10 @@ import { WarnService } from './services/warnService';
 import { CaseType } from './database/cases';
 import { AntiPhishService, PhishingBody } from './services/antiPhishService';
 import { migrate_mutes_to_cases } from './database/migrations/migrate_mutes_to_cases';
-import { migrate_warns_to_cases } from './database/migrations/migrate_warns_to_cases';
+import {
+  migrate_warns_to_cases,
+  nuke_null_reason,
+} from './database/migrations/migrate_warns_to_cases';
 
 export default class ViviBot extends Discord.Client {
   config: any;
@@ -229,6 +232,10 @@ export default class ViviBot extends Discord.Client {
 
     return member;
   }
+
+  nuke_data = async () => {
+    nuke_null_reason('731977848251744267');
+  };
 
   migrate_data = async () => {
     for (const [id] of this.guilds.cache) {
