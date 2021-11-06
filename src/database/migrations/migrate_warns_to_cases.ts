@@ -25,11 +25,14 @@ export async function migrate_warns_to_cases(guildId: string) {
   console.log(updatedCases);
 }
 
-export function nuke_null_reason(guildId: string) {
-  CaseModel.findOneAndDelete({
-    guildId,
-    type: CaseType.warn,
-    //@ts-ignore
-    reason: null,
-  });
+export async function nuke_null_reason(guildId: string) {
+  const warns = await CaseModel.find({ guildId, type: CaseType.warn });
+
+  for (const warn of warns) {
+    if (warn.reason === null) {
+      CaseModel.findOneAndDelete({
+        caseId: warn.caseId,
+      }).exec();
+    }
+  }
 }
