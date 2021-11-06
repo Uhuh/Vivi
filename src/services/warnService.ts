@@ -8,6 +8,7 @@ import {
   NEW_CASE,
 } from '../database/database';
 import { CLIENT_ID } from '../vars';
+import { PhishingBody } from './antiPhishService';
 import { EmbedService } from './embedService';
 
 export class WarnService {
@@ -16,6 +17,39 @@ export class WarnService {
   constructor(client: ViviBot) {
     this._client = client;
   }
+
+  phishingBan = async (phishBody: PhishingBody, message: Message) => {
+    const { guild } = message;
+    // If we're not in a guild ignore.
+    if (!guild) return;
+
+    message.member
+      ?.ban({ days: 7 })
+      .then(() => {
+        this.logIssue(
+          guild.id,
+          CaseType.ban,
+          `User tried to send bad links: ${
+            phishBody.domain
+          } (${phishBody.type.toLowerCase()})`,
+          this._client.user || CLIENT_ID,
+          message.author
+        );
+      })
+      .catch(() =>
+        message.channel.send(
+          `Issue banning <@${message.author.id}>. **Note that they sent a ${phishBody.type} URL!**`
+        )
+      );
+
+    message
+      .delete()
+      .catch(() =>
+        message.reply(
+          `Issue deleting ${phishBody.type} URL. Do not click this link as it's a scam.`
+        )
+      );
+  };
 
   filter = async (message: Message) => {
     const { guild } = message;
