@@ -23,32 +23,40 @@ export class WarnService {
     // If we're not in a guild ignore.
     if (!guild) return;
 
-    message.member
-      ?.ban({ days: 7 })
-      .then(() => {
-        this.logIssue(
-          guild.id,
-          CaseType.ban,
-          `User tried to send bad links: ${
-            phishBody.domain
-          } (${phishBody.type.toLowerCase()})`,
-          this._client.user || CLIENT_ID,
-          message.author
-        );
-      })
-      .catch(() =>
-        message.channel.send(
-          `Issue banning <@${message.author.id}>. **Note that they sent a ${phishBody.type} URL!**`
-        )
-      );
-
     try {
+      message.member
+        ?.ban({ days: 7 })
+        .then(() => {
+          this.logIssue(
+            guild.id,
+            CaseType.ban,
+            `User tried to send bad links: ${
+              phishBody.domain
+            } (${phishBody.type.toLowerCase()})`,
+            this._client.user || CLIENT_ID,
+            message.author
+          );
+        })
+        .catch(() =>
+          message.channel
+            .send(
+              `Issue banning <@${message.author.id}>. **Note that they sent a ${phishBody.type} URL!**`
+            )
+            .catch(() =>
+              console.error(`Issues sending phishing warning messages`)
+            )
+        );
+
       message
         .delete()
         .catch(() =>
-          message.reply(
-            `Issue deleting ${phishBody.type} URL. Do not click this link as it's a scam.`
-          )
+          message
+            .reply(
+              `Issue deleting ${phishBody.type} URL. Do not click this link as it's a scam.`
+            )
+            .catch(() =>
+              console.error(`Issue sending phishing warning messages`)
+            )
         );
     } catch {}
   };
