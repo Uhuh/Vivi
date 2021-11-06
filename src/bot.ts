@@ -230,6 +230,12 @@ export default class ViviBot extends Discord.Client {
     return member;
   }
 
+  migrate_data = async () => {
+    for (const [id] of this.guilds.cache) {
+      await migrate_warns_to_cases(id);
+    }
+  };
+
   start = async () => {
     await mongoose.connect(
       `mongodb://${config.MONGODB}:27017/${config.DATABASE_TYPE}`,
@@ -241,6 +247,10 @@ export default class ViviBot extends Discord.Client {
     );
     mongoose.set('useFindAndModify', false);
     await this.login(this.config.TOKEN);
-    await Promise.all([this.loadBannedWords(), this.loadGuildPrefixes()]);
+    await Promise.all([
+      this.loadBannedWords(),
+      this.loadGuildPrefixes(),
+      this.migrate_data(),
+    ]);
   };
 }
