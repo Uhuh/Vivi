@@ -63,8 +63,7 @@ export class WarnService {
 
     if (!words) return;
     for (const word of words) {
-      const reg = new RegExp('\\b' + word + '\\b', 'g');
-      const match = reg.exec(content);
+      const match = content.toLowerCase().includes(word);
       /**
        * Only get users warnings IF they match a banned word so that the bot doesn't query for each users warns
        * for every single message.
@@ -72,7 +71,8 @@ export class WarnService {
       if (match) {
         let userWarnings = await GET_USER_WARNS(guild.id, message.author.id);
         const config = await GET_GUILD_CONFIG(guild.id);
-        if (!config) return;
+        if (!config || message.member?.roles.cache.has(config.modRole || ''))
+          return;
 
         if (!userWarnings) userWarnings = [];
 
@@ -85,8 +85,6 @@ export class WarnService {
           if (moment(warn.creationDate).isBefore(WEEK_OLD)) continue;
           activeWarns++;
         }
-
-        const id = match[0];
 
         activeWarns++;
         if (activeWarns > config.maxWarns!) {
@@ -106,13 +104,15 @@ export class WarnService {
                 'Issue sending ban appeal message to user. Oh well?'
               )
             );
+
           message.member
             ?.ban()
             .catch(() => message.channel.send(`Issues banning user.`));
+
           this.logIssue(
             guild.id,
             CaseType.ban,
-            `Strike! You're out! (Banned word: ||${id}||)`,
+            `Strike! You're out! (Banned word: ||${word}||)`,
             this._client.user || CLIENT_ID,
             message.author
           );
@@ -123,13 +123,13 @@ export class WarnService {
           this.logIssue(
             guild.id,
             CaseType.warn,
-            `Warned for saying a banned word. ||${id}||`,
+            `Warned for saying a banned word. ||${word}||`,
             this._client.user || CLIENT_ID,
             message.author
           );
           message.author
             .send(
-              `You have been warned!\n**Reason:** Warned for saying a banned word. ${id}`
+              `You have been warned!\n**Reason:** Warned for saying a banned word. ${word}`
             )
             .catch(() =>
               console.error(`Can't DM user, probably has friends on.`)
