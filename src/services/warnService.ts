@@ -128,7 +128,7 @@ export class WarnService {
           );
           return;
         } else {
-          message.reply(`Warned for saying a banned word.`);
+          message.channel.send(`Warned for saying a banned word.`);
 
           this.logIssue(
             guild.id,
