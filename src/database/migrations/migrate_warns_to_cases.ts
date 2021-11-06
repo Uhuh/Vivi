@@ -8,7 +8,7 @@ export async function migrate_warns_to_cases(guildId: string) {
 
   for (const warn of warns) {
     CaseModel.findOneAndUpdate(
-      { guildId: warn.guildId, userId: warn.userId, warnId: warn.warnId },
+      { guildId: guildId, userId: warn.userId, warnId: warn.warnId },
       {
         reason: warn.reason,
         creationDate: moment(warn.date).toDate(),
