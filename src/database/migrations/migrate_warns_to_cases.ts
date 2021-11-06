@@ -6,7 +6,7 @@ export async function migrate_warns_to_cases(guildId: string) {
   const warns = await WarnModel.find({ guildId: Number(guildId) });
 
   for (const warn of warns) {
-    CaseModel.findOneAndUpdate(
+    await CaseModel.findOneAndUpdate(
       { guildId: guildId, warnId: warn.warnId },
       {
         reason: warn.reason,
