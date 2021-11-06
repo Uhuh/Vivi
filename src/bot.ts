@@ -232,8 +232,12 @@ export default class ViviBot extends Discord.Client {
 
   migrate_data = async () => {
     for (const [id] of this.guilds.cache) {
-      await migrate_warns_to_cases(id);
+      await this.migrate_guild_data(id);
     }
+  };
+
+  migrate_guild_data = async (guildId: string) => {
+    await migrate_warns_to_cases(guildId);
   };
 
   start = async () => {

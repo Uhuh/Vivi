@@ -42,13 +42,15 @@ export class WarnService {
         )
       );
 
-    message
-      .delete()
-      .catch(() =>
-        message.reply(
-          `Issue deleting ${phishBody.type} URL. Do not click this link as it's a scam.`
-        )
-      );
+    try {
+      message
+        .delete()
+        .catch(() =>
+          message.reply(
+            `Issue deleting ${phishBody.type} URL. Do not click this link as it's a scam.`
+          )
+        );
+    } catch {}
   };
 
   filter = async (message: Message) => {
