@@ -43,7 +43,9 @@ export class WarnService {
               `Issue banning <@${message.author.id}>. **Note that they sent a ${phishBody.type} URL!**`
             )
             .catch(() =>
-              console.error(`Issues sending phishing warning messages`)
+              console.error(
+                `Couldn't ban user[${message.author.id}] or send a message based on the phishing URL.`
+              )
             )
         );
 
@@ -55,7 +57,9 @@ export class WarnService {
               `Issue deleting ${phishBody.type} URL. Do not click this link as it's a scam.`
             )
             .catch(() =>
-              console.error(`Issue sending phishing warning messages`)
+              console.error(
+                `Couldn't delete user[${message.author.id}] message related to phishing URL.`
+              )
             )
         );
     } catch {}
