@@ -1,5 +1,4 @@
 import * as Discord from 'discord.js';
-import * as moment from 'moment';
 import * as mongoose from 'mongoose';
 import * as dotenv from 'dotenv';
 dotenv.config();
@@ -25,11 +24,7 @@ import { Command } from '../utilities/types/commands';
 import { WarnService } from './services/warnService';
 import { CaseType } from './database/cases';
 import { AntiPhishService, PhishingBody } from './services/antiPhishService';
-import { migrate_mutes_to_cases } from './database/migrations/migrate_mutes_to_cases';
-import {
-  migrate_warns_to_cases,
-  nuke_null_reason,
-} from './database/migrations/migrate_warns_to_cases';
+import { SelectService } from './services/dropDownService';
 
 export default class ViviBot extends Discord.Client {
   config: any;
@@ -65,16 +60,19 @@ export default class ViviBot extends Discord.Client {
       setInterval(() => this.checkMutes(), 60000); // 1 minute // 600000 = 10minutes
     });
 
-    //CMD Handling
+    // Parse and filter every message for commands or if they're supposed to get warned.
     this.on('messageCreate', (message) => {
       if (message.author?.bot) return;
 
-      AntiPhishService.doesMessageContainPhishingLinks(message.content).then(
-        (matches) => {
-          if (!matches.trust_rating) return;
-          this._warnService.phishingBan(matches as PhishingBody, message);
-        }
-      );
+      // We can't really ban a user from their DMs or delete their messages.
+      if (message.channel.type !== 'DM') {
+        AntiPhishService.doesMessageContainPhishingLinks(message.content).then(
+          (matches) => {
+            if (!matches.trust_rating) return;
+            this._warnService.phishingBan(matches as PhishingBody, message);
+          }
+        );
+      }
 
       msg(this, message as Discord.Message);
       // Verify user message into the server.
@@ -87,6 +85,14 @@ export default class ViviBot extends Discord.Client {
 
       return;
     });
+
+    this.on('interactionCreate', (interaction) => {
+      if (SelectService.isSelectMenu(interaction)) {
+        SelectService.parseSelection(interaction, this);
+      }
+    });
+
+    // Server events that get logged
     this.on('messageDelete', (message) => {
       try {
         if (message.author?.bot || message.channel?.type === 'DM') return;
@@ -110,14 +116,20 @@ export default class ViviBot extends Discord.Client {
         console.error(`Error on message update!`);
       }
     });
+
+    // Check if user is trying to remove mute role by rejoining.
     this.on('guildMemberAdd', (member) => {
       UserJoinRoles(member);
       MemberUpdated(member, 'join');
     });
     this.on('guildMemberRemove', (member) => MemberUpdated(member, 'left'));
+
+    // Make sure to generate the config when we join a new server.
     this.on('guildCreate', (guild) => {
       GENERATE_GUILD_CONFIG(guild.id);
     });
+
+    // If a guild deletes a role try to delete from join list so there isn't a deleted role being added to users.
     this.on('roleDelete', (role) => {
       REMOVE_JOIN_ROLE(role.guild.id, role.id);
     });
