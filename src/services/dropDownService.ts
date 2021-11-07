@@ -2,7 +2,7 @@ import { Interaction, SelectMenuInteraction } from 'discord.js';
 import ViviBot from '../bot';
 import { Category } from '../../utilities/types/commands';
 import { EmbedService } from './embedService';
-import { SUPPORT_URL } from 'src/vars';
+import { SUPPORT_URL } from '../vars';
 
 export class SelectService {
   /**

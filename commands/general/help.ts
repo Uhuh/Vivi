@@ -7,7 +7,7 @@ import {
 import ViviBot from '../../src/bot';
 import { INVITE_URL, SUPPORT_URL } from '../../src/vars';
 import { missingPerms } from '../../utilities/functions/missingPerm';
-import { Category, CategoryStrings } from '../../utilities/types/commands';
+import { Category } from '../../utilities/types/commands';
 import { COLOR, Emojis } from '../../utilities/types/global';
 
 export const help = {
@@ -16,7 +16,7 @@ export const help = {
   args: '',
   alias: ['cmds', 'h', 'commands'],
   type: '',
-  run: async function (message: Message, args: string[], client: ViviBot) {
+  run: async function (message: Message, _args: string[], client: ViviBot) {
     const embed = new MessageEmbed();
 
     const { user } = client;
