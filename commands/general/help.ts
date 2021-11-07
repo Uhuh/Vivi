@@ -1,9 +1,14 @@
-import { Message, MessageEmbed } from 'discord.js';
+import {
+  Message,
+  MessageActionRow,
+  MessageEmbed,
+  MessageSelectMenu,
+} from 'discord.js';
 import ViviBot from '../../src/bot';
-import { INVITE_URL } from '../../src/vars';
+import { INVITE_URL, SUPPORT_URL } from '../../src/vars';
 import { missingPerms } from '../../utilities/functions/missingPerm';
 import { Category, CategoryStrings } from '../../utilities/types/commands';
-import { COLOR } from '../../utilities/types/global';
+import { COLOR, Emojis } from '../../utilities/types/global';
 
 export const help = {
   desc: 'Sends a list of all available commands.',
@@ -14,17 +19,35 @@ export const help = {
   run: async function (message: Message, args: string[], client: ViviBot) {
     const embed = new MessageEmbed();
 
-    const key = (args[0]?.toLowerCase() || '') as CategoryStrings;
-
-    if (args.length && !(key in Category)) return;
-
     const { user } = client;
     if (!user) return;
 
-    const prefix = client.guildPrefix.get(message.guild?.id || '') || 'v.';
+    const selectMenu = new MessageActionRow().addComponents(
+      new MessageSelectMenu()
+        .setCustomId('select-help')
+        .setPlaceholder('Pick a category')
+        .addOptions([
+          {
+            label: 'Configure server settings',
+            description:
+              'Change bot settings for the server. Requires MANAGE_SERVER permissions.',
+            value: `help-${Category.config}`,
+          },
+          {
+            label: 'Mod commands',
+            description: `Commands for server moderation. Requires moderation role.`,
+            value: `help-${Category.mod}`,
+          },
+          {
+            label: 'General commands',
+            description: 'Basic commands everyone can use!',
+            value: `help-${Category.general}`,
+          },
+        ])
+    );
 
     embed
-      .setTitle('**Commands**')
+      .setTitle('Command Help')
       .setColor(COLOR.AQUA)
       .setURL(INVITE_URL)
       .setAuthor(user.username, user.avatarURL() || '')
@@ -32,36 +55,14 @@ export const help = {
       .setFooter(`Replying to: ${message.author.tag}`)
       .setTimestamp(new Date());
 
-    /**
-     * If no category is specified then list all categories.
-     */
-    if (!args.length) {
-      embed.setTitle('**Command Categories**');
-      embed.addField(`**General**`, `Try out \`${prefix}help general\``);
-      if (message.member?.permissions.has('MANAGE_MESSAGES')) {
-        embed.addField(
-          `**Config**`,
-          `Try out \`${prefix}config help\`\nAll config commands require MANAGE_GUILD permissions.`
-        );
-        embed.addField(`**Mod**`, `Try out \`${prefix}help mod\``);
-      }
-    } else if (key) {
-      // If they specify a list type (general, config, etc) show those respective commands
-      embed.setTitle(`**${key.toUpperCase()} commands**`);
+    embed.setDescription(
+      `${
+        Emojis.vivilove
+      } Thanks for bringing me aboard! The dropdown menus will tell you what you need, whether its general user commands or commands specific to a role.${''}\n\nIf you need more specific help, please join the [support server](${SUPPORT_URL}).`
+    );
 
-      const hasPerm = message.member?.permissions.has('MANAGE_MESSAGES');
-      client.commands
-        .filter((c) => c.type === key)
-        .filter((func) => !(func.type === Category.mod && !hasPerm))
-        .forEach((func) =>
-          embed.addField(`**${prefix}${func.name} ${func.args}**`, func.desc)
-        );
-
-      embed.setDescription('***<> = required arguments, [] = optional.***\n\n');
-    }
-
-    message.channel
-      .send({ embeds: [embed] })
+    message
+      .reply({ embeds: [embed], components: [selectMenu] })
       .catch(() => missingPerms(message, 'embed'));
   },
 };
