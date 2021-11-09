@@ -44,9 +44,9 @@ export class WarnService {
             )
             .catch(() =>
               console.error(
-                `Couldn't ban user[${
+                `[WarnService:PhishingBan] Couldn't ban user[${
                   message.author.id
-                }] or send a message based on the phishing URL.${''}\nPhishing trust_rating: ${
+                }] or send a message based on the phishing URL.${''}\n\tPhishing trust_rating: ${
                   phishBody.trust_rating
                 } | URL: ${phishBody.domain}`
               )
@@ -62,7 +62,7 @@ export class WarnService {
             )
             .catch(() =>
               console.error(
-                `Couldn't delete user[${message.author.id}] message related to phishing URL. | Message already deleted: ${message.deleted}\n\tPhishing trust_rating: ${phishBody.trust_rating} | URL: ${phishBody.domain}`
+                `[WarnService:PhishingBan] Couldn't delete user[${message.author.id}] message related to phishing URL. | Message already deleted: ${message.deleted}\n\tPhishing trust_rating: ${phishBody.trust_rating} | URL: ${phishBody.domain}`
               )
             )
         );
