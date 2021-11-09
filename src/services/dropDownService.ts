@@ -3,6 +3,7 @@ import ViviBot from '../bot';
 import { Category } from '../../utilities/types/commands';
 import { EmbedService } from './embedService';
 import { SUPPORT_URL } from '../vars';
+import { LogService } from './logService';
 
 export class SelectService {
   /**
@@ -28,7 +29,7 @@ export class SelectService {
           interaction
             .reply({ ephemeral: true, embeds: [embed] })
             .catch(() =>
-              console.error(
+              LogService.logError(
                 `[SelectService] Error sending help embed for interaction. [${interaction.guildId}]`
               )
             );
@@ -42,7 +43,7 @@ export class SelectService {
             content: `I couldn't find that select option. Try again or report it to the [support server](${SUPPORT_URL}).`,
           })
           .catch(() =>
-            console.error(
+            LogService.logError(
               `[SelectService] Error telling user that I couldn't the selected dropdown.`
             )
           );

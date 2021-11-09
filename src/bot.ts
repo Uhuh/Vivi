@@ -25,6 +25,7 @@ import { WarnService } from './services/warnService';
 import { CaseType } from './database/cases';
 import { AntiPhishService, PhishingBody } from './services/antiPhishService';
 import { SelectService } from './services/dropDownService';
+import { LogService } from './services/logService';
 
 export default class ViviBot extends Discord.Client {
   config: any;
@@ -53,8 +54,8 @@ export default class ViviBot extends Discord.Client {
     commandHandler(this);
 
     this.once('ready', () => {
-      console.info(`[Started]: ${new Date()}\n`);
-      console.info('Vivi reporting for duty!');
+      LogService.logInfo(`[Started]: ${new Date()}\n`);
+      LogService.logOk('Vivi reporting for duty!');
       // Post bot stats to top.gg
       setInterval(() => this.setBotPresence(), 10000);
       setInterval(() => this.checkMutes(), 60000); // 1 minute // 600000 = 10minutes
@@ -98,7 +99,7 @@ export default class ViviBot extends Discord.Client {
         if (message.author?.bot || message.channel?.type === 'DM') return;
         MessageDelete(message);
       } catch {
-        console.error(`Error on message delete!`);
+        LogService.logError(`Error on message delete!`);
       }
     });
     this.on('messageUpdate', (oldMsg, newMsg) => {
@@ -113,7 +114,7 @@ export default class ViviBot extends Discord.Client {
           this._warnService.filter(newMsg as Discord.Message);
         }
       } catch {
-        console.error(`Error on message update!`);
+        LogService.logError(`Error on message update!`);
       }
     });
 
@@ -137,7 +138,10 @@ export default class ViviBot extends Discord.Client {
 
   setBotPresence = () => {
     const user = this.user;
-    if (!user) return console.log('Client dead?');
+    if (!user)
+      return LogService.logError(
+        `Couldn't find bot user when setting presence.`
+      );
 
     user.setPresence({
       activities: [
@@ -181,7 +185,11 @@ export default class ViviBot extends Discord.Client {
           if (member) {
             member.roles
               .remove(config.muteRole)
-              .catch(() => console.error(`Permission issue.`));
+              .catch(() =>
+                LogService.logError(
+                  `Could not remove mute role from user[${member.id}]. Permission issue most likely.`
+                )
+              );
 
             this._warnService.logIssue(
               id,
@@ -235,7 +243,7 @@ export default class ViviBot extends Discord.Client {
       await guild.members
         .fetch(userId || '')
         .catch(() =>
-          console.error(
+          LogService.logError(
             `Failed to get user to mute. Potentially not a user ID. [${userId}]`
           )
         );
@@ -246,6 +254,8 @@ export default class ViviBot extends Discord.Client {
   }
 
   start = async () => {
+    LogService.logInfo(`Starting up Vivi....`);
+    LogService.logInfo(`Connecting to MongoDB: ${config.MONGODB}`);
     await mongoose.connect(
       `mongodb://${config.MONGODB}:27017/${config.DATABASE_TYPE}`,
       {
@@ -255,7 +265,10 @@ export default class ViviBot extends Discord.Client {
       }
     );
     mongoose.set('useFindAndModify', false);
+    LogService.logInfo(`Verifying bot token with Discord.`);
     await this.login(this.config.TOKEN);
+    LogService.logInfo(`Loading banned words and prefixes.`);
     await Promise.all([this.loadBannedWords(), this.loadGuildPrefixes()]);
+    LogService.logOk(`Started up correctly with zero issues.`);
   };
 }

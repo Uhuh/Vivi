@@ -1,4 +1,5 @@
 import { Message, MessageEmbed, Role } from 'discord.js';
+import { LogService } from '../../src/services/logService';
 import {
   ADD_JOIN_ROLE,
   GUILD_JOIN_ROLES,
@@ -52,8 +53,8 @@ export const joinRole = {
         );
 
         if (!clientMember) {
-          return console.error(
-            `Join command - I don't know why the client member was unfindable.`
+          return LogService.logError(
+            `[JoinRole] Could not find client guild member object.`
           );
         }
 

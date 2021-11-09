@@ -7,8 +7,6 @@
     "lib": ["es2017", "dom"],
     "outDir": "build",
 
-    "baseUrl": "./",
-
     "alwaysStrict": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,

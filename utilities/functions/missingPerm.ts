@@ -1,7 +1,8 @@
 import { Message } from 'discord.js';
+import { LogService } from '../../src/services/logService';
 
 export const missingPerms = (msg: Message, perm: string) => {
-  console.error(
+  LogService.logError(
     `Appear to be missing some permission[${perm}] for guild[${
       msg.guild?.id || 'no guild found'
     }]`

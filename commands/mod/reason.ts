@@ -7,6 +7,7 @@ import {
   UPDATE_CASE_REASON,
   UPDATE_USER_MUTE,
 } from '../../src/database/database';
+import { LogService } from '../../src/services/logService';
 import { COLOR } from '../../utilities/types/global';
 
 export const reason = {
@@ -41,7 +42,9 @@ export const reason = {
     message
       .delete()
       .catch(() =>
-        console.error(`Failed to delete reason message for guild[${guild.id}]`)
+        LogService.logError(
+          `Failed to delete reason message for guild[${guild.id}]`
+        )
       );
 
     const caseId = args.shift();
@@ -72,7 +75,7 @@ export const reason = {
       await channel.messages
         .fetch(modCase.messageId)
         .catch(() =>
-          console.error(
+          LogService.logError(
             `Failed to fetch mod log case message: Case ID: ${modCase.id}`
           )
         );
@@ -87,10 +90,10 @@ export const reason = {
     await Promise.all([
       message.guild.members
         .fetch(modCase.userId)
-        .catch(() => console.error(`User is not in guild.`)),
+        .catch(() => LogService.logError(`User is not in guild.`)),
       message.guild.members
         .fetch(modCase.modId)
-        .catch(() => console.error(`Mod not in guild ????`)),
+        .catch(() => LogService.logError(`Mod not in guild ????`)),
     ]);
 
     const user: User | string =
@@ -209,7 +212,7 @@ const muteDurationChange = async (
       ).unix()}:R>.`
     )
     .catch(() =>
-      console.error(`Issues updating user on their mute duration change.`)
+      LogService.logError(`Issues updating user on their mute duration change.`)
     );
 
   return;

@@ -4,6 +4,7 @@ import * as moment from 'moment';
 import { GET_GUILD_CONFIG, GET_USER_WARNS } from '../../src/database/database';
 import { getUserId } from '../../utilities/functions/getUserId';
 import { CaseType } from '../../src/database/cases';
+import { LogService } from '../../src/services/logService';
 
 export const warn = {
   desc: 'warn a user',
@@ -46,7 +47,7 @@ export const warn = {
     await guild.members
       .fetch(userId)
       .catch(() =>
-        console.error(
+        LogService.logError(
           `Failed to get user to warn. Probably message ID. [${userId}]`
         )
       );
@@ -87,7 +88,7 @@ export const warn = {
       message.reply(
         `Seems I couldn't determine the max warns for the server...`
       );
-      return console.error(`Missing maxWarns for guild[${guild.id}]`);
+      return LogService.logError(`Missing maxWarns for guild[${guild.id}]`);
     }
 
     if (activeWarns > config.maxWarns) {
@@ -103,7 +104,9 @@ export const warn = {
       await user
         .send(banMessage)
         .catch(() =>
-          console.error('Issue sending ban appeal message to user. Oh well?')
+          LogService.logError(
+            'Issue sending ban appeal message to user. Oh well?'
+          )
         );
 
       // After sending the ban message, ban the user.
@@ -141,10 +144,12 @@ export const warn = {
         .send(
           `You have been warned in **${guild.name}**\n${warnCount}\n\n**Reason:** ${reason}`
         )
-        .catch(() => console.error(`Can't DM user, probably has friends on.`));
+        .catch(() =>
+          LogService.logError(`Can't DM user, probably has friends on.`)
+        );
       message
         .delete()
-        .catch(() => console.error(`Issues deleting the warn message!`));
+        .catch(() => LogService.logError(`Issues deleting the warn message!`));
     }
 
     return;

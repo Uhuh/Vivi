@@ -4,6 +4,7 @@ import * as moment from 'moment';
 import { GET_GUILD_CONFIG, GET_USER_MUTE } from '../../src/database/database';
 import { getUserId } from '../../utilities/functions/getUserId';
 import { CaseType } from '../../src/database/cases';
+import { LogService } from '../../src/services/logService';
 
 enum timeForm {
   h = 'hour',
@@ -147,14 +148,16 @@ export const mute = {
             ).unix()}:R>`
           )
           .catch(() =>
-            console.error(
+            LogService.logError(
               `Guild[${guild.id}] - Issue sending mute reason to user. Oh well?`
             )
           );
       })
       .catch(() => {
         message.reply(`I was unable to give that user the mute role!`);
-        console.log(config.muteRole);
+        LogService.logError(
+          `[Mute] Unable to give user[${userId}] the mute rule[${config.muteRole}]`
+        );
       });
 
     return;

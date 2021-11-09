@@ -2,6 +2,7 @@ import { Message } from 'discord.js';
 import ViviBot from '../../src/bot';
 import { CaseType } from '../../src/database/cases';
 import { GET_GUILD_CONFIG } from '../../src/database/database';
+import { LogService } from '../../src/services/logService';
 import { getUserId } from '../../utilities/functions/getUserId';
 
 export const ban = {
@@ -51,7 +52,9 @@ export const ban = {
       await member
         .send(banMessage)
         .catch(() =>
-          console.error('Issue sending ban appeal message to member. Oh well?')
+          LogService.logError(
+            'Issue sending ban appeal message to member. Oh well?'
+          )
         );
 
       member

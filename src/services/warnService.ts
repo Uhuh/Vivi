@@ -10,6 +10,7 @@ import {
 import { CLIENT_ID } from '../vars';
 import { PhishingBody } from './antiPhishService';
 import { EmbedService } from './embedService';
+import { LogService } from './logService';
 
 export class WarnService {
   _client: ViviBot;
@@ -43,7 +44,7 @@ export class WarnService {
               `Issue banning <@${message.author.id}>. **Note that they sent a ${phishBody.type} URL!**`
             )
             .catch(() =>
-              console.error(
+              LogService.logError(
                 `[WarnService:PhishingBan] Couldn't ban user[${
                   message.author.id
                 }] or send a message based on the phishing URL.${''}\n\tPhishing trust_rating: ${
@@ -61,7 +62,7 @@ export class WarnService {
               `Issue deleting ${phishBody.type} URL. Do not click this link as it's a scam.`
             )
             .catch(() =>
-              console.error(
+              LogService.logError(
                 `[WarnService:PhishingBan] Couldn't delete user[${message.author.id}] message related to phishing URL. | Message already deleted: ${message.deleted}\n\tPhishing trust_rating: ${phishBody.trust_rating} | URL: ${phishBody.domain}`
               )
             )
@@ -111,14 +112,14 @@ export class WarnService {
           );
           message
             .delete()
-            .catch(() => console.error(`Issues deleting the message!`));
+            .catch(() => LogService.logError(`Issues deleting the message!`));
 
           await message.member
             ?.send(
               config.banMessage || `You've been banned from ${guild.name}.`
             )
             .catch(() =>
-              console.error(
+              LogService.logError(
                 'Issue sending ban appeal message to user. Oh well?'
               )
             );
@@ -150,11 +151,11 @@ export class WarnService {
               `You have been warned!\n**Reason:** Warned for saying a banned word. ${word}`
             )
             .catch(() =>
-              console.error(`Can't DM user, probably has friends on.`)
+              LogService.logError(`Can't DM user, probably has friends on.`)
             );
           message
             .delete()
-            .catch(() => console.error(`Issues deleting the message!`));
+            .catch(() => LogService.logError(`Issues deleting the message!`));
         }
       }
     }
@@ -171,11 +172,13 @@ export class WarnService {
     const config = await GET_GUILD_CONFIG(guildId);
 
     if (!config) {
-      return console.error(
+      return LogService.logError(
         `Failed to find guild[${guildId}] config while logging issue.`
       );
     } else if (!config.modLog) {
-      return console.info(`No mod channel to log to.`);
+      return LogService.logInfo(
+        `[WarnService] ModLog not found. Cannot create embed.`
+      );
     }
 
     const channel = this._client.getChannel(guildId, config.modLog);
@@ -201,7 +204,7 @@ export class WarnService {
           });
       }
     } catch {
-      console.error(`Issue when trying to write log case`);
+      LogService.logError(`Issue when trying to write log case`);
     }
   };
 }

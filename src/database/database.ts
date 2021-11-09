@@ -1,5 +1,6 @@
 import ConfigModel from './guild';
 import CaseModel, { CaseType } from './cases';
+import { LogService } from '../services/logService';
 
 /**
  * Create a new config model for guild.
@@ -7,7 +8,9 @@ import CaseModel, { CaseType } from './cases';
  */
 export const GENERATE_GUILD_CONFIG = (guildId: string) => {
   return ConfigModel.create({ guildId }).catch(() =>
-    console.error(`Failed to generate a config for guild[${guildId}]`)
+    LogService.logError(
+      `[DB] Failed to generate a config for guild[${guildId}]`
+    )
   );
 };
 
@@ -89,7 +92,7 @@ export const NEW_CASE = async (
   punishmentLength?: Date
 ) => {
   const config = await ConfigModel.findOne({ guildId });
-  if (!config) return console.error(`Could not find guild config`);
+  if (!config) return LogService.logError(`[DB] Could not find guild config`);
 
   CaseModel.create({
     guildId,
@@ -103,15 +106,15 @@ export const NEW_CASE = async (
   })
     .then(() => {
       config.save();
-      console.log(
+      LogService.logOk(
         `Successfully created case for user[${userId}] by mod[${modId}]`
       );
     })
     .catch((err: any) => {
-      console.error(
+      LogService.logError(
         `Error creating case for user[${userId}] by mod[${modId}] : Type[${CaseType[type]}]`
       );
-      console.error(err);
+      LogService.logError(err);
     });
 };
 
@@ -143,10 +146,10 @@ export const UPDATE_CASE_REASON = (
 ) => {
   CaseModel.findOneAndUpdate({ guildId, caseId }, { reason })
     .then(() => {
-      console.log('Updated warn with new reason');
+      LogService.logOk('[DB] Updated warn with new reason.');
     })
     .catch(() =>
-      console.error(
+      LogService.logError(
         `Error on updating warn[${caseId}] with reason["${reason}"]`
       )
     );
@@ -187,7 +190,7 @@ export const SET_MOD_CHANNEL = (guildId: string, modLog: string) => {
     { modLog },
     { new: true },
     (err: any) => {
-      if (err) console.error(`Error on setting mod log channel.`);
+      if (err) LogService.logError(`[DB] Error on setting mod log channel.`);
     }
   );
 };
@@ -203,7 +206,7 @@ export const SET_SERVER_CHANNEL = (guildId: string, serverLog: string) => {
     { serverLog },
     { new: true },
     (err: any) => {
-      if (err) console.error(`Error on setting server log channel.`);
+      if (err) LogService.logError(`[DB] Error on setting server log channel.`);
     }
   );
 };
@@ -279,7 +282,7 @@ export const REMOVE_CHANNEL_WHITELIST = (
 export const GET_BANNED_WORDS = async (guildId: string) => {
   const config = await ConfigModel.findOne({ guildId });
   if (!config) {
-    console.error(
+    LogService.logError(
       `Failed to get guild[${guildId}] when grabbing banned word list.`
     );
   }
@@ -302,7 +305,7 @@ export const NEW_BANNED_WORD = (guildId: string, words: string[]) => {
       },
     }
   ).catch(() =>
-    console.error(
+    LogService.logError(
       `Error on adding banned words, could not find guild[${guildId}]`
     )
   );
@@ -326,7 +329,7 @@ export const REMOVE_BANNED_WORD = (guildId: string, words: string[]) => {
     { new: true },
     (err: any) => {
       if (err) {
-        return console.error(
+        return LogService.logError(
           `Error on removing words[${words}] for guild[${guildId}]`
         );
       }
@@ -379,7 +382,7 @@ export const SET_MUTE_ROLE = (guildId: string, muteRole: string) => {
     { new: true },
     (err: any) => {
       if (err)
-        return console.error(
+        return LogService.logError(
           `Error on setting guilds[${guildId}] mute role[${muteRole}]`
         );
     }
@@ -392,7 +395,7 @@ export const SET_MUTE_ROLE = (guildId: string, muteRole: string) => {
  */
 export const REMOVE_MUTE_ROLE = (guildId: string) => {
   ConfigModel.findOneAndUpdate({ guildId }, { $unset: { muteRole: 1 } }).catch(
-    () => console.error(`Error on removing mute role`)
+    () => LogService.logError(`[DB] Error on removing mute role`)
   );
 };
 
@@ -403,7 +406,7 @@ export const REMOVE_MUTE_ROLE = (guildId: string) => {
  */
 export const SET_WARN_LIMIT = (guildId: string, maxWarns: number) => {
   return ConfigModel.findOneAndUpdate({ guildId }, { maxWarns }).catch(() =>
-    console.error(`Error on setting max warns for guild[${guildId}]`)
+    LogService.logError(`[DB] Error on setting max warns for guild[${guildId}]`)
   );
 };
 
@@ -440,7 +443,7 @@ export const UPDATE_USER_MUTE = (
 ) => {
   CaseModel.findOneAndUpdate({ guildId, userId }, { punishmentLength }).catch(
     () =>
-      console.error(
+      LogService.logError(
         `Error on updating user[${userId}] mute time[${punishmentLength}]`
       )
   );
@@ -494,7 +497,7 @@ export const SET_MOD_ROLE = async (guildId: string, modRole: string) => {
     { new: true },
     (err: any) => {
       if (err)
-        return console.error(
+        return LogService.logError(
           `Error on setting guilds[${guildId}] mute role[${modRole}]`
         );
     }
@@ -507,7 +510,7 @@ export const SET_MOD_ROLE = async (guildId: string, modRole: string) => {
  */
 export const REMOVE_MOD_ROLE = async (guildId: string) => {
   ConfigModel.findOneAndUpdate({ guildId }, { $unset: { modRole: 1 } }).catch(
-    () => console.error(`Error on removing mute role`)
+    () => LogService.logError(`[DB] Error on removing mute role`)
   );
 };
 
@@ -516,7 +519,7 @@ export const SET_BANNER = async (
   banner: 'left' | 'center'
 ) => {
   ConfigModel.findOneAndUpdate({ guildId }, { bannerType: banner }).catch(() =>
-    console.error(
+    LogService.logError(
       `Error on setting banner[${banner}] type for guild[${guildId}]`
     )
   );
@@ -524,7 +527,7 @@ export const SET_BANNER = async (
 
 export const SET_WELCOME = async (guildId: string, welcomeChannel: string) => {
   ConfigModel.findOneAndUpdate({ guildId }, { welcomeChannel }).catch(() =>
-    console.error(
+    LogService.logError(
       `Error on setting welcome-channel[${welcomeChannel}] for guild[${guildId}]`
     )
   );
@@ -535,6 +538,8 @@ export const REMOVE_WELCOME = async (guildId: string) => {
     { guildId },
     { $unset: { welcomeChannel: 1 } }
   ).catch(() =>
-    console.error(`Error on removing welcome-channel for guild[${guildId}]`)
+    LogService.logError(
+      `Error on removing welcome-channel for guild[${guildId}]`
+    )
   );
 };

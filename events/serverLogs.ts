@@ -8,6 +8,7 @@ import {
 import { IGuildConfigDoc } from '../src/database/guild';
 import * as moment from 'moment';
 import { BannerDims } from '../utilities/objects/bannerDimensions';
+import { LogService } from '../src/services/logService';
 
 // Discord Message
 type DMsg = Discord.Message | Discord.PartialMessage;
@@ -30,12 +31,12 @@ export const UserJoinRoles = async (
   if (user && config?.muteRole) {
     member.roles
       ?.add(config?.muteRole)
-      .catch(() => console.error(`Couldn't mute the user on join.`));
+      .catch(() => LogService.logError(`Couldn't mute the user on join.`));
   }
   for (const role of joinRoles?.joinRoles || []) {
     member.roles
       ?.add(role)
-      .catch(() => console.error(`Couldn't give join role to user.`));
+      .catch(() => LogService.logError(`Couldn't give join role to user.`));
   }
 
   /**
@@ -106,7 +107,7 @@ export const MemberUpdated = async (
   channel
     .send({ embeds: [embed] })
     .catch(() =>
-      console.error(
+      LogService.logError(
         `Failed to send member updated message for guild[${member.guild.id}]`
       )
     );
@@ -155,7 +156,7 @@ export const MessageDelete = async (message: DMsg) => {
   channel
     .send({ embeds: [embed] })
     .catch(() =>
-      console.error(
+      LogService.logError(
         `Failed to send message deleted event for guild[${message.guild?.id}]`
       )
     );
@@ -212,7 +213,7 @@ export const MessageEdit = async (oldMsg: DMsg, newMsg: DMsg) => {
   channel
     .send({ embeds: [embed] })
     .catch((e) =>
-      console.error(
+      LogService.logError(
         `Failed to send message edit event for guild[${newMsg.guild?.id}]\n\n${e}`
       )
     );
@@ -234,7 +235,7 @@ export const userBanner = async (
 
   // If the channel doesn't exist ignore it.
   if (!channel) {
-    return console.error(
+    return LogService.logError(
       `Cannot get channel for user banner on guild[${member.guild.id}]`
     );
   }
@@ -285,7 +286,7 @@ export const userBanner = async (
       files: [attachment],
     })
     .catch((e) =>
-      console.error(
+      LogService.logError(
         `Failed to send welcome banner[${config.bannerType}] for guild[${member.guild.id}]\n\n${e}`
       )
     );

@@ -2,6 +2,7 @@ import { Message } from 'discord.js';
 import ViviBot from '../../src/bot';
 import { CaseType } from '../../src/database/cases';
 import { GET_GUILD_CONFIG } from '../../src/database/database';
+import { LogService } from '../../src/services/logService';
 import { getUserId } from '../../utilities/functions/getUserId';
 
 export const kick = {
@@ -38,7 +39,9 @@ export const kick = {
     let member = await ViviBot.getGuildMember(guild, userId);
 
     if (!member) {
-      return console.error(`Issue getting user on guild. User ID: ${userId}`);
+      return LogService.logError(
+        `Issue getting user on guild. User ID: ${userId}`
+      );
     }
 
     const reason =

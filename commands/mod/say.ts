@@ -1,5 +1,6 @@
 import { Message, TextChannel } from 'discord.js';
 import { GET_GUILD_CONFIG } from '../../src/database/database';
+import { LogService } from '../../src/services/logService';
 
 export const say = {
   desc: 'Say something in chat. If you mention a channel the bot will speak there instead.',
@@ -47,7 +48,7 @@ export const say = {
     message
       .delete()
       .catch(() =>
-        console.error(
+        LogService.logError(
           `Failed to delete say message for guild[${
             message.guild?.id || 'could not load guild'
           }]`

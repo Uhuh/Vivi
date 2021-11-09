@@ -1,5 +1,6 @@
 import { Message } from 'discord.js';
 import ViviBot from '../src/bot';
+import { LogService } from '../src/services/logService';
 import { CLIENT_ID } from '../src/vars';
 
 const msg = (client: ViviBot, message: Message) => {
@@ -38,7 +39,9 @@ const msg = (client: ViviBot, message: Message) => {
       message.reply(
         'I crashed trying to run that command. Please join the support server at discord.gg/C9skyMBn33 and report this issue.'
       );
-      console.error(e);
+      LogService.logError(
+        `[MessageHandler] Unable to run command: ${clientCommand.name}.`
+      );
     }
   }
 };
