@@ -177,7 +177,7 @@ export class WarnService {
       );
     } else if (!config.modLog) {
       return LogService.logInfo(
-        `[WarnService] ModLog not found. Cannot create embed.`
+        `[WarnService] ModLog not found. Cannot create embed. Type: ${type}`
       );
     }
 
