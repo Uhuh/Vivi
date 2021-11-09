@@ -18,7 +18,7 @@
     "noImplicitThis": true,
     "strictNullChecks": true
   },
-  "include": ["src/**/*", "events/**/*", "commands/**/*", "utilities/**/*"],
+  "include": ["src/", "events/", "commands/", "utilities/"],
   "exclude": ["node_modules/**/*"],
   "compileOnSave": true
 }
