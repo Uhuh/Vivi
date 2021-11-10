@@ -5,6 +5,7 @@ dotenv.config();
 import commandHandler from '../commands/commandHandler';
 import msg from '../events/message';
 import {
+  GuildMemberUpdate,
   MemberUpdated,
   MessageDelete,
   MessageEdit,
@@ -124,6 +125,10 @@ export default class ViviBot extends Discord.Client {
       MemberUpdated(member, 'join');
     });
     this.on('guildMemberRemove', (member) => MemberUpdated(member, 'left'));
+
+    this.on('guildMemberUpdate', (oldMem, newMem) => {
+      GuildMemberUpdate(oldMem, newMem);
+    });
 
     // Make sure to generate the config when we join a new server.
     this.on('guildCreate', (guild) => {

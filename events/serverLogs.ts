@@ -9,6 +9,7 @@ import { IGuildConfigDoc } from '../src/database/guild';
 import * as moment from 'moment';
 import { BannerDims } from '../utilities/objects/bannerDimensions';
 import { LogService } from '../src/services/logService';
+import { COLOR } from '../utilities/types/global';
 
 // Discord Message
 type DMsg = Discord.Message | Discord.PartialMessage;
@@ -160,6 +161,68 @@ export const MessageDelete = async (message: DMsg) => {
         `Failed to send message deleted event for guild[${message.guild?.id}]`
       )
     );
+};
+
+export const GuildMemberUpdate = async (
+  oldMember: Discord.GuildMember | Discord.PartialGuildMember,
+  newMember: Discord.GuildMember | Discord.PartialGuildMember
+) => {
+  try {
+    if (!newMember.guild) return;
+    const config = await GET_GUILD_CONFIG(newMember.guild.id);
+
+    if (!config?.serverLog) return;
+
+    const channel = newMember.guild.channels.cache.get(
+      config?.serverLog
+    ) as Discord.TextChannel;
+
+    if (!channel || channel.type !== 'GUILD_TEXT') return;
+
+    let embed: Discord.MessageEmbed;
+
+    if (oldMember.nickname !== newMember.nickname) {
+      embed = NickNameUpdate(oldMember, newMember);
+    } else {
+      LogService.logDebug(
+        `Something about the user changed that I currently don't track.`
+      );
+      return;
+    }
+
+    return channel.send({ embeds: [embed] });
+  } catch (e) {
+    return LogService.logError(
+      `Error handling GuildMemberUpdate. I'm assuming Discord perms.\n${e}`
+    );
+  }
+};
+
+export const NickNameUpdate = (
+  oldMember: Discord.GuildMember | Discord.PartialGuildMember,
+  newMember: Discord.GuildMember | Discord.PartialGuildMember
+) => {
+  const embed = new Discord.MessageEmbed();
+
+  embed
+    .setTitle(`**Member nickname changed**`)
+    .setDescription(
+      `<@${newMember.id}>'s nickname changed. \`(${newMember.id})\``
+    )
+    .addField(
+      `**Previous Nickname:**`,
+      oldMember.nickname ?? oldMember.displayName,
+      true
+    )
+    .addField(
+      `**New Nickname:**`,
+      newMember.nickname ?? newMember.displayName,
+      true
+    )
+    .setColor(COLOR.AQUA)
+    .setTimestamp(new Date());
+
+  return embed;
 };
 
 /**
