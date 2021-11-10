@@ -54,7 +54,7 @@ export default class ViviBot extends Discord.Client {
     commandHandler(this);
 
     this.once('ready', () => {
-      LogService.logInfo(`[Started]: ${new Date()}\n`);
+      LogService.logDebug(`[Started]: ${new Date()}\n`);
       LogService.logOk('Vivi reporting for duty!');
       // Post bot stats to top.gg
       setInterval(() => this.setBotPresence(), 10000);
