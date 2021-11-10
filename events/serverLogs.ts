@@ -184,10 +184,10 @@ export const GuildMemberUpdate = async (
     if (oldMember.nickname !== newMember.nickname) {
       embed = NickNameUpdate(oldMember, newMember);
     } else {
+      return;
       LogService.logDebug(
         `Something about the user changed that I currently don't track.`
       );
-      return;
     }
 
     return channel.send({ embeds: [embed] });
