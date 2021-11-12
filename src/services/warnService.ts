@@ -137,7 +137,13 @@ export class WarnService {
           );
           return;
         } else {
-          message.channel.send(`Warned for saying a banned word.`);
+          message.channel
+            .send(`Warned for saying a banned word.`)
+            .catch(() =>
+              LogService.logError(
+                `Couldn't warn user. Message already deleted: ${message.deleted}`
+              )
+            );
 
           this.logIssue(
             guild.id,
