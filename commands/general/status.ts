@@ -1,5 +1,6 @@
 import { Message, MessageEmbed } from 'discord.js';
 import { missingPerms } from '../../utilities/functions/missingPerm';
+import { Category } from '../../utilities/types/commands';
 import { COLOR } from '../../utilities/types/global';
 
 export const status = {
@@ -7,7 +8,7 @@ export const status = {
   name: 'status',
   args: '',
   alias: ['s'],
-  type: 'general',
+  type: Category.general,
   run: async function (message: Message) {
     const embed = new MessageEmbed();
     const { guild } = message;

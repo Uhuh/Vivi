@@ -3,13 +3,14 @@ import { EmbedService } from '../../src/services/embedService';
 import ViviBot from '../../src/bot';
 import { GET_GUILD_CONFIG } from '../../src/database/database';
 import { missingPerms } from '../../utilities/functions/missingPerm';
+import { Category } from '../../utilities/types/commands';
 
 export const config = {
   desc: 'Show the servers current config',
   name: 'config',
   args: '[help]',
   alias: [],
-  type: 'config',
+  type: Category.config,
   run: async (message: Message, args: string[], client: ViviBot) => {
     const { guild } = message;
     if (!guild || !message.member?.permissions.has(['MANAGE_GUILD'])) return;

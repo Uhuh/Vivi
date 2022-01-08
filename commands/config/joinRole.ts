@@ -8,13 +8,14 @@ import {
 import { CLIENT_ID } from '../../src/vars';
 import { missingPerms } from '../../utilities/functions/missingPerm';
 import { COLOR } from '../../utilities/types/global';
+import { Category } from '../../utilities/types/commands';
 
 export const joinRole = {
   desc: 'Add, remove or list the guilds join roles.',
   name: 'join',
   args: '<add | remove | list> <@Role | Role ID>',
   alias: ['j'],
-  type: 'config',
+  type: Category.config,
   run: async (message: Message, args: string[]) => {
     if (
       !message.guild ||

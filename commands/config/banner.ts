@@ -1,12 +1,13 @@
 import { Message } from 'discord.js';
 import { SET_BANNER } from '../../src/database/database';
+import { Category } from '../../utilities/types/commands';
 
 export const banner = {
   desc: 'Set your servers welcome banner type.',
   name: 'banner',
   args: '<left | center>',
   alias: [],
-  type: 'config',
+  type: Category.config,
   run: async (message: Message, args: string[]) => {
     if (!message.guild || !message.member?.permissions.has(['MANAGE_GUILD']))
       return;

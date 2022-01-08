@@ -1,7 +1,8 @@
 export enum Category {
-  general = 'general',
-  config = 'config',
-  mod = 'mod',
+  general,
+  config,
+  mod,
+  owner,
 }
 
 export type CategoryStrings = keyof typeof Category;

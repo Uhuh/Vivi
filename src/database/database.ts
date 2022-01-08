@@ -86,9 +86,9 @@ export const NEW_CASE = async (
   guildId: string,
   modId: string,
   userId: string,
-  messageId: string,
   type: CaseType,
   reason: string,
+  messageId?: string,
   punishmentLength?: Date
 ) => {
   const config = await ConfigModel.findOne({ guildId });

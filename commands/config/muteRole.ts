@@ -4,13 +4,14 @@ import {
   REMOVE_MUTE_ROLE,
   SET_MUTE_ROLE,
 } from '../../src/database/database';
+import { Category } from '../../utilities/types/commands';
 
 export const mute = {
   desc: 'Set the mute role for the server',
   name: 'mute-role',
   args: '<@role | id | remove>',
   alias: ['mr'],
-  type: 'config',
+  type: Category.config,
   run: async (message: Message, args: string[]) => {
     if (!message.guild || !message.member?.permissions.has(['MANAGE_GUILD']))
       return;

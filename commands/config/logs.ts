@@ -5,13 +5,14 @@ import {
   SET_MOD_CHANNEL,
   SET_SERVER_CHANNEL,
 } from '../../src/database/database';
+import { Category } from '../../utilities/types/commands';
 
 export const logs = {
   desc: 'Set Mod or Server logging channels',
   name: 'logs',
   args: '<mod | server> <#channel | id | remove>',
   alias: ['l'],
-  type: 'config',
+  type: Category.config,
   run: async (message: Message, args: string[]) => {
     if (!message.guild || !message.member?.permissions.has(['MANAGE_GUILD']))
       return;

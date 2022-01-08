@@ -1,12 +1,13 @@
 import { Message } from 'discord.js';
 import { SET_BANNED_MSG } from '../../src/database/database';
+import { Category } from '../../utilities/types/commands';
 
 export const banMsg = {
   desc: `Set ban message. This will get DMd to a user right before they're banned.`,
   name: 'banmsg',
   args: '<words n stuff>',
   alias: ['bm'],
-  type: 'config',
+  type: Category.config,
   run: (message: Message, args: string[]) => {
     if (!message.guild || !message.member?.permissions.has(['MANAGE_GUILD']))
       return;

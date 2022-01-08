@@ -1,12 +1,13 @@
 import { Message } from 'discord.js';
 import { SET_WARN_LIMIT } from '../../src/database/database';
+import { Category } from '../../utilities/types/commands';
 
 export const warnsMax = {
   desc: 'Set the max warns a user can get before getting banned.',
   name: 'maxwarns',
   args: '<a number in the range [1, 10]>',
   alias: ['mw'],
-  type: 'config',
+  type: Category.config,
   run: (message: Message, args: string[]) => {
     if (!message.guild || !message.member?.permissions.has(['MANAGE_GUILD']))
       return;

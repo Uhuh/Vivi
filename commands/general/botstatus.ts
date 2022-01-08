@@ -2,6 +2,7 @@ import { Message, MessageEmbed } from 'discord.js';
 import * as OS from 'os';
 import ViviBot from '../../src/bot';
 import { missingPerms } from '../../utilities/functions/missingPerm';
+import { Category } from '../../utilities/types/commands';
 import { COLOR } from '../../utilities/types/global';
 
 export const botstatus = {
@@ -9,7 +10,7 @@ export const botstatus = {
   name: 'botstatus',
   args: '',
   alias: ['bs'],
-  type: 'general',
+  type: Category.general,
   run: async function (message: Message, _args: string[], client: ViviBot) {
     const { user } = client;
 

@@ -1,13 +1,14 @@
 import { Message, MessageEmbed } from 'discord.js';
 import { GENERATE_GUILD_CONFIG } from '../../src/database/database';
 import { missingPerms } from '../../utilities/functions/missingPerm';
+import { Category } from '../../utilities/types/commands';
 
 export const setup = {
   desc: 'If Vivi failed to setup the server config, run this to fix it.',
   name: 'setup',
   args: '',
   alias: [],
-  type: 'setup',
+  type: Category.config,
   run: async (message: Message) => {
     const { guild } = message;
     if (!guild || !message.member?.permissions.has(['MANAGE_GUILD'])) return;

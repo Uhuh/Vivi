@@ -21,7 +21,7 @@ export class SelectService {
       case 'help':
         if (value in Category) {
           const embed = this.helpSelectParse(
-            value,
+            Number(value),
             interaction.guild?.id ?? '',
             client
           );
@@ -69,7 +69,7 @@ export class SelectService {
    * @returns Generated help embed.
    */
   private static helpSelectParse(
-    type: string,
+    type: Category,
     guildId: string,
     client: ViviBot
   ) {

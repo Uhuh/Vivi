@@ -5,13 +5,14 @@ import { GET_USER_WARNS } from '../../src/database/database';
 import { CLIENT_ID } from '../../src/vars';
 import { missingPerms } from '../../utilities/functions/missingPerm';
 import { COLOR } from '../../utilities/types/global';
+import { Category } from '../../utilities/types/commands';
 
 export const userinfo = {
   desc: 'Information about user.',
   name: 'userinfo',
   args: '[user: mention/id]',
   alias: ['ui'],
-  type: 'general',
+  type: Category.general,
   run: async function (message: Message, args: string[], client: ViviBot) {
     const { user } = client;
     const { guild } = message;

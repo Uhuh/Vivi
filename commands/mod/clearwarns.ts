@@ -6,13 +6,14 @@ import {
   GET_GUILD_CONFIG,
 } from '../../src/database/database';
 import { getUserId } from '../../utilities/functions/getUserId';
+import { Category } from '../../utilities/types/commands';
 
 export const clearwarns = {
   desc: 'Remove all warnings for a user.',
   name: 'clearwarns',
   args: '<user id> <reason>',
   alias: ['cw'],
-  type: 'mod',
+  type: Category.mod,
   run: async (message: Message, args: string[], client: ViviBot) => {
     if (!message.guild) return;
     const { guild } = message;

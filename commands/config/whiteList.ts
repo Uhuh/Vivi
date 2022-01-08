@@ -3,13 +3,14 @@ import {
   ADD_CHANNEL_WHITELIST,
   REMOVE_CHANNEL_WHITELIST,
 } from '../../src/database/database';
+import { Category } from '../../utilities/types/commands';
 
 export const whitelist = {
   desc: 'Whitelist a channel to ignore server logs for.',
   name: 'whitelist',
   args: '<add | remove> <#channel | ID>',
   alias: ['wl'],
-  type: 'config',
+  type: Category.config,
   run: (message: Message, args: string[]) => {
     if (!message.guild || !message.member?.permissions.has(['MANAGE_GUILD']))
       return;

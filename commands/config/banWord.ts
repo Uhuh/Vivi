@@ -5,13 +5,14 @@ import {
   NEW_BANNED_WORD,
   REMOVE_BANNED_WORD,
 } from '../../src/database/database';
+import { Category } from '../../utilities/types/commands';
 
 export const word = {
   desc: 'Add or remove a word or list of words for the banned list. Everything added will be case sensitive.\n',
   name: 'banword',
   args: '<add | remove> <list of words seperated by comma>',
   alias: ['bw'],
-  type: 'config',
+  type: Category.config,
   run: async (message: Message, args: string[], client: ViviBot) => {
     if (!message.guild || !message.member?.permissions.has(['MANAGE_GUILD']))
       return;

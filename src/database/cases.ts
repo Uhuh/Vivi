@@ -3,7 +3,7 @@ import { Schema, Document, Model, model } from 'mongoose';
 const Cases = new Schema({
   guildId: { type: String, required: true },
   caseId: { type: Number, required: true },
-  messageId: { type: String, required: true, default: null },
+  messageId: { type: String, default: null },
   userId: { type: String, required: true, default: null },
   modId: { type: String, required: true, default: null },
   type: { type: String, required: true, default: null },

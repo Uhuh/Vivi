@@ -1,6 +1,7 @@
 import * as Discord from 'discord.js';
 import ViviBot from '../../src/bot';
 import { BOT_OWNER } from '../../src/vars';
+import { Category } from '../../utilities/types/commands';
 import { Emojis } from '../../utilities/types/global';
 
 export const evalFunction = {
@@ -8,7 +9,7 @@ export const evalFunction = {
   name: 'eval',
   args: '',
   alias: ['e'],
-  type: 'owner',
+  type: Category.owner,
   //@ts-ignore
   run: async (message: Discord.Message, args: string[], client: ViviBot) => {
     if (message.author.id !== BOT_OWNER) return;

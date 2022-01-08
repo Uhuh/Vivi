@@ -1,13 +1,14 @@
 import { Message, TextChannel } from 'discord.js';
 import { GET_GUILD_CONFIG } from '../../src/database/database';
 import { LogService } from '../../src/services/logService';
+import { Category } from '../../utilities/types/commands';
 
 export const say = {
   desc: 'Say something in chat. If you mention a channel the bot will speak there instead.',
   name: 'say',
   args: '',
   alias: [],
-  type: 'mod',
+  type: Category.mod,
   run: async (message: Message, args: string[]) => {
     if (!message.guild) return;
     const { guild } = message;

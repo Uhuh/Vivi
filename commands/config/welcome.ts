@@ -1,12 +1,13 @@
 import { GuildChannel, Message } from 'discord.js';
 import { REMOVE_WELCOME, SET_WELCOME } from '../../src/database/database';
+import { Category } from '../../utilities/types/commands';
 
 export const welcome = {
   desc: 'Set your servers welcome channel.',
   name: 'welcome',
   args: '<add | remove> <#channel | channel-id>',
   alias: [],
-  type: 'config',
+  type: Category.config,
   run: async (message: Message, args: string[]) => {
     if (!message.guild || !message.member?.permissions.has(['MANAGE_GUILD']))
       return;

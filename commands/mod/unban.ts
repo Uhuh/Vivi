@@ -3,13 +3,14 @@ import ViviBot from '../../src/bot';
 import { CaseType } from '../../src/database/cases';
 import { GET_GUILD_CONFIG } from '../../src/database/database';
 import { getUserId } from '../../utilities/functions/getUserId';
+import { Category } from '../../utilities/types/commands';
 
 export const unban = {
   desc: 'Unban a user',
   name: 'unban',
   args: '<user id> <reason>',
   alias: ['ub'],
-  type: 'mod',
+  type: Category.mod,
   run: async (message: Message, args: string[], client: ViviBot) => {
     if (!message.guild) return;
     const { guild } = message;

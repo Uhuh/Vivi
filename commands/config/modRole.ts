@@ -4,13 +4,14 @@ import {
   REMOVE_MOD_ROLE,
   SET_MOD_ROLE,
 } from '../../src/database/database';
+import { Category } from '../../utilities/types/commands';
 
 export const modRole = {
   desc: 'Set the mod role, anyone with this role will be presumed as a mod and can use the mod commands.',
   name: 'mod',
   args: '<@role | id | remove>',
   alias: [''],
-  type: 'config',
+  type: Category.config,
   run: async (message: Message, args: string[]) => {
     if (!message.guild || !message.member?.permissions.has(['MANAGE_GUILD']))
       return;

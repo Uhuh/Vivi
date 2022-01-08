@@ -2,6 +2,7 @@ import { Message, MessageEmbed } from 'discord.js';
 import ViviBot from '../../src/bot';
 import { AVATAR_URL, INVITE_URL, SUPPORT_URL, VOTE_URL } from '../../src/vars';
 import { missingPerms } from '../../utilities/functions/missingPerm';
+import { Category } from '../../utilities/types/commands';
 import { COLOR } from '../../utilities/types/global';
 
 export const invite = {
@@ -9,7 +10,7 @@ export const invite = {
   name: 'info',
   args: '',
   alias: ['i'],
-  type: 'general',
+  type: Category.general,
   run: (message: Message, _args: string[], client: ViviBot) => {
     const embed = new MessageEmbed();
 

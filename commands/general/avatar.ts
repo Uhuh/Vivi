@@ -1,13 +1,14 @@
 import { Message, MessageEmbed } from 'discord.js';
 import { getUserId } from '../../utilities/functions/getUserId';
 import { missingPerms } from '../../utilities/functions/missingPerm';
+import { Category } from '../../utilities/types/commands';
 
 export const avatar = {
   desc: 'Grabs users avatar link.',
   name: 'avatar',
   args: '[user: mention/id]',
   alias: ['ava', 'a'],
-  type: 'general',
+  type: Category.general,
   run: (message: Message, args: string[]) => {
     const userId = getUserId(message, args) || message.author.id;
 

@@ -156,16 +156,20 @@ export class EmbedService {
    * @param client Vivi client to filter commands.
    * @returns Return built embed
    */
-  public static helpEmbed = (type: string, prefix: string, client: ViviBot) => {
+  public static helpEmbed = (
+    type: Category,
+    prefix: string,
+    client: ViviBot
+  ) => {
     const embed = new MessageEmbed();
 
     embed
-      .setTitle(`**${type.toUpperCase()} commands**`)
+      .setTitle(`**Here are your commands!**`)
       .setColor(COLOR.AQUA)
       .setDescription('***<> = required arguments, [] = optional.***\n\n');
 
     // I wanna keep the "config" prefix whenever a config command is ran. Don't judge me
-    const config = type === 'config' ? 'config ' : '';
+    const config = type === Category.config ? 'config ' : '';
 
     client.commands
       .filter((c) => c.type === type)

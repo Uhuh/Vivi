@@ -1,12 +1,13 @@
 import { Message } from 'discord.js';
 import { SET_WARN_EXPIRE } from '../../src/database/database';
+import { Category } from '../../utilities/types/commands';
 
 export const warnExpire = {
   desc: 'Set how long it takes for a warn to expire.',
   name: 'warnexpire',
   args: '<number in days>',
   alias: ['we'],
-  type: 'config',
+  type: Category.config,
   run: (message: Message, args: string[]) => {
     if (!message.guild || !message.member?.permissions.has(['MANAGE_GUILD']))
       return;

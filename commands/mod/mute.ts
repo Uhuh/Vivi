@@ -5,6 +5,7 @@ import { GET_GUILD_CONFIG, GET_USER_MUTE } from '../../src/database/database';
 import { getUserId } from '../../utilities/functions/getUserId';
 import { CaseType } from '../../src/database/cases';
 import { LogService } from '../../src/services/logService';
+import { Category } from '../../utilities/types/commands';
 
 enum timeForm {
   h = 'hour',
@@ -21,7 +22,7 @@ export const mute = {
   name: 'mute',
   args: '<user id or mention> <reason> | [number {m,h,d,w,y}]',
   alias: ['m'],
-  type: 'mod',
+  type: Category.mod,
   run: async (message: Message, args: string[], client: ViviBot) => {
     if (!message.guild) return;
     const { guild } = message;

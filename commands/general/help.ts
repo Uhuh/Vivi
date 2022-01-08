@@ -15,7 +15,7 @@ export const help = {
   name: 'help',
   args: '',
   alias: ['cmds', 'h', 'commands'],
-  type: '',
+  type: Category.general,
   run: async function (message: Message, _args: string[], client: ViviBot) {
     const embed = new MessageEmbed();
 

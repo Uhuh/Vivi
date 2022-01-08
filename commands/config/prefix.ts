@@ -1,13 +1,14 @@
 import { Message } from 'discord.js';
 import ViviBot from '../../src/bot';
 import { SET_GUILD_PREFIX } from '../../src/database/database';
+import { Category } from '../../utilities/types/commands';
 
 export const prefix = {
   desc: 'Set the guilds prefix.',
   name: 'prefix',
   args: '<any prefix you want>',
   alias: ['p'],
-  type: 'config',
+  type: Category.config,
   run: (message: Message, args: string[], client: ViviBot) => {
     if (
       !message.guild ||

@@ -25,7 +25,7 @@ import { Command } from '../utilities/types/commands';
 import { WarnService } from './services/warnService';
 import { CaseType } from './database/cases';
 import { AntiPhishService, PhishingBody } from './services/antiPhishService';
-import { SelectService } from './services/dropDownService';
+import { SelectService } from './services/selectService';
 import { LogService } from './services/logService';
 
 export default class ViviBot extends Discord.Client {

@@ -2,13 +2,14 @@ import * as Discord from 'discord.js';
 import ViviBot from '../../src/bot';
 import { PURGE_BANNED_WORDS } from '../../src/database/database';
 import { BOT_OWNER } from '../../src/vars';
+import { Category } from '../../utilities/types/commands';
 
 export const blacklist = {
   desc: '',
   name: 'blacklist',
   args: '',
   alias: ['e'],
-  type: 'owner',
+  type: Category.owner,
   run: async (message: Discord.Message, args: string[], client: ViviBot) => {
     if (message.author.id !== BOT_OWNER) return;
 

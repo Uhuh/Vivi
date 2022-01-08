@@ -8,6 +8,7 @@ import {
   UPDATE_USER_MUTE,
 } from '../../src/database/database';
 import { LogService } from '../../src/services/logService';
+import { Category } from '../../utilities/types/commands';
 import { COLOR } from '../../utilities/types/global';
 
 export const reason = {
@@ -15,7 +16,7 @@ export const reason = {
   name: 'reason',
   args: '<case #> <reason>',
   alias: ['r'],
-  type: 'mod',
+  type: Category.mod,
   run: async (message: Message, args: string[]) => {
     if (!message.guild) return;
     const { guild } = message;
@@ -39,14 +40,6 @@ export const reason = {
       );
     }
 
-    message
-      .delete()
-      .catch(() =>
-        LogService.logError(
-          `Failed to delete reason message for guild[${guild.id}]`
-        )
-      );
-
     const caseId = args.shift();
 
     if (!caseId) {
@@ -69,22 +62,13 @@ export const reason = {
       config?.modLog
     ) as TextChannel;
 
-    let caseMessage = channel.messages.cache.get(modCase.messageId);
-
-    if (!caseMessage) {
-      await channel.messages
-        .fetch(modCase.messageId)
-        .catch(() =>
-          LogService.logError(
-            `Failed to fetch mod log case message: Case ID: ${modCase.id}`
-          )
-        );
-      caseMessage = channel.messages.cache.get(modCase.messageId);
-
-      if (!caseMessage) return;
-    }
-
-    const embed = new MessageEmbed();
+    const caseMessage = await channel.messages
+      .fetch(modCase.messageId ?? '')
+      .catch(() =>
+        LogService.logError(
+          `Failed to fetch mod log case message: Case ID: ${modCase.id}`
+        )
+      );
 
     // Just get that stuff, it probably isn't cached.
     await Promise.all([
@@ -115,7 +99,7 @@ export const reason = {
         );
         if (user instanceof User) {
           user.send(
-            `Your warning (ID: ${modCase.caseId}) has changed reason: ${args
+            `**Your warning (ID: ${modCase.caseId}) has changed reason**: ${args
               .join(' ')
               .trim()}`
           );
@@ -132,30 +116,44 @@ export const reason = {
         break;
     }
 
-    embed
-      .setTitle(`${modCase.type} | Case #${modCase.caseId}`)
-      .addField(
-        `**User**`,
-        `${typeof user === 'string' ? user : user?.tag} (<@${
-          typeof user === 'string' ? user : user.id
-        }>)`,
-        true
-      )
-      .addField(
-        `**Moderator**`,
-        mod instanceof User ? mod.tag : `<@${mod}>`,
-        true
-      )
-      .addField(
-        `**Reason**`,
-        reason === '' || !reason
-          ? `Mod please do \`${config.prefix}reason ${modCase.caseId} <reason>\``
-          : reason
-      )
-      .setColor(color)
-      .setTimestamp(new Date());
+    if (caseMessage) {
+      const embed = new MessageEmbed();
 
-    caseMessage.edit({ embeds: [embed] });
+      embed
+        .setTitle(`${modCase.type} | Case #${modCase.caseId}`)
+        .addField(
+          `**User**`,
+          `${typeof user === 'string' ? user : user?.tag} (<@${
+            typeof user === 'string' ? user : user.id
+          }>)`,
+          true
+        )
+        .addField(
+          `**Moderator**`,
+          mod instanceof User ? mod.tag : `<@${mod}>`,
+          true
+        )
+        .addField(
+          `**Reason**`,
+          reason === '' || !reason
+            ? `Mod please do \`${config.prefix}reason ${modCase.caseId} <reason>\``
+            : reason
+        )
+        .setColor(color)
+        .setTimestamp(new Date());
+
+      caseMessage.edit({ embeds: [embed] });
+    } else {
+      message.reply(`Hey! I updated the warn reason.`);
+    }
+
+    message
+      .delete()
+      .catch(() =>
+        LogService.logError(
+          `Failed to delete reason message for guild[${guild.id}]`
+        )
+      );
 
     return;
   },

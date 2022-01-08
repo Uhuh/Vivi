@@ -10,3 +10,4 @@ services:
       - ./src:/home/panku/Vivi/src
     container_name: vivi-docker
     command: node build/src/index.js
+

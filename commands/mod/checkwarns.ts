@@ -3,6 +3,7 @@ import * as moment from 'moment';
 import { GET_GUILD_CONFIG, GET_USER_WARNS } from '../../src/database/database';
 import { getUserId } from '../../utilities/functions/getUserId';
 import { missingPerms } from '../../utilities/functions/missingPerm';
+import { Category } from '../../utilities/types/commands';
 
 export const checkwarns = {
   desc:
@@ -11,7 +12,7 @@ export const checkwarns = {
   name: 'checkwarns',
   args: '<user id> [active]',
   alias: ['cw'],
-  type: 'mod',
+  type: Category.mod,
   run: async (message: Message, args: string[]) => {
     if (!message.guild) return;
     const { guild } = message;

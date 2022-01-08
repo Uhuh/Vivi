@@ -1,12 +1,13 @@
 import { Message } from 'discord.js';
 import { GET_BANNED_WORDS } from '../../src/database/database';
+import { Category } from '../../utilities/types/commands';
 
 export const listWords = {
   desc: 'List of currently banned words.',
   name: 'banwordlist',
   args: '',
   alias: ['bwl'],
-  type: 'config',
+  type: Category.config,
   run: async (message: Message) => {
     if (!message.guild || !message.member?.permissions.has(['MANAGE_GUILD']))
       return;

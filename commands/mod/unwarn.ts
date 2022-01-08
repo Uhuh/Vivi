@@ -6,13 +6,14 @@ import {
   GET_GUILD_CONFIG,
   GET_WARN,
 } from '../../src/database/database';
+import { Category } from '../../utilities/types/commands';
 
 export const unwarn = {
   desc: 'Remove a warning from a user',
   name: 'unwarn',
   args: '<warn id> <reason>',
   alias: ['uw'],
-  type: 'mod',
+  type: Category.mod,
   run: async (message: Message, args: string[], client: ViviBot) => {
     if (!message.guild) return;
     const { guild } = message;

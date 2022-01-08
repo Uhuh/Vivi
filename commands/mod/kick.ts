@@ -4,13 +4,14 @@ import { CaseType } from '../../src/database/cases';
 import { GET_GUILD_CONFIG } from '../../src/database/database';
 import { LogService } from '../../src/services/logService';
 import { getUserId } from '../../utilities/functions/getUserId';
+import { Category } from '../../utilities/types/commands';
 
 export const kick = {
   desc: 'Kick a user',
   name: 'kick',
   args: '<user id> <reason>',
   alias: ['k'],
-  type: 'mod',
+  type: Category.mod,
   run: async (message: Message, args: string[], client: ViviBot) => {
     if (!message.guild) return;
     const { guild } = message;

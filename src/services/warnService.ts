@@ -182,12 +182,12 @@ export class WarnService {
         `Failed to find guild[${guildId}] config while logging issue.`
       );
     } else if (!config.modLog) {
-      return LogService.logInfo(
+      LogService.logInfo(
         `[WarnService] ModLog not found. Cannot create embed. Type: ${type}`
       );
     }
 
-    const channel = this._client.getChannel(guildId, config.modLog);
+    const channel = this._client.getChannel(guildId, config.modLog ?? '');
 
     try {
       if (channel && channel instanceof TextChannel) {
@@ -200,14 +200,26 @@ export class WarnService {
               guildId,
               typeof mod === 'string' ? mod : mod.id,
               typeof user === 'string' ? user : user.id,
-              m.id,
               type,
               reason === '' || !reason
                 ? `Mod please do \`${config.prefix}reason ${config.nextCaseId} <reason here>\``
                 : reason,
+              m.id,
               punishmentLength
             );
           });
+      } else {
+        NEW_CASE(
+          guildId,
+          typeof mod === 'string' ? mod : mod.id,
+          typeof user === 'string' ? user : user.id,
+          type,
+          reason === '' || !reason
+            ? `Mod please do \`${config.prefix}reason ${config.nextCaseId} <reason here>\``
+            : reason,
+          undefined,
+          punishmentLength
+        );
       }
     } catch {
       LogService.logError(`Issue when trying to write log case`);

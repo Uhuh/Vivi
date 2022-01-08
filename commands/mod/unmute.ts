@@ -3,13 +3,14 @@ import ViviBot from '../../src/bot';
 import { CaseType } from '../../src/database/cases';
 import { GET_GUILD_CONFIG, UNMUTE_USER } from '../../src/database/database';
 import { getUserId } from '../../utilities/functions/getUserId';
+import { Category } from '../../utilities/types/commands';
 
 export const unmute = {
   desc: 'Unmute a user',
   name: 'unmute',
   args: '<user id or mention> <reason>',
   alias: ['um'],
-  type: 'mod',
+  type: Category.mod,
   run: async (message: Message, args: string[], client: ViviBot) => {
     if (!message.guild) return;
     const { guild } = message;
