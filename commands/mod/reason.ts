@@ -34,10 +34,6 @@ export const reason = {
       return message.reply(
         `Cannot find this servers config. Try again, and if it fails try running \`v.config setup\``
       );
-    } else if (!config.modLog) {
-      return message.reply(
-        `I could not find a mod log channel setup for this server. Set up the mod/server log channel with the logs command.`
-      );
     }
 
     const caseId = args.shift();
@@ -58,17 +54,26 @@ export const reason = {
       return message.reply(`Could not find a log with case ID ${caseId}.`);
     }
 
-    const channel = message.guild.channels.cache.get(
-      config?.modLog
-    ) as TextChannel;
+    const channel = await message.guild.channels
+      .fetch(config?.modLog ?? '1337')
+      .catch(() => {});
 
-    const caseMessage = await channel.messages
-      .fetch(modCase.messageId ?? '')
-      .catch(() =>
-        LogService.logError(
-          `Failed to fetch mod log case message: Case ID: ${modCase.id}`
-        )
+    if (channel && channel.type !== 'GUILD_TEXT') {
+      return message.reply(
+        `Hey! For some reason I have the mod-log saved as a none text channel. Please remove it or change it and try again.`
       );
+    }
+
+    let caseMessage = null;
+    if (channel) {
+      caseMessage = await channel?.messages
+        .fetch(modCase.messageId ?? '')
+        .catch(() =>
+          LogService.logError(
+            `Failed to fetch mod log case message: Case ID: ${modCase.id}`
+          )
+        );
+    }
 
     // Just get that stuff, it probably isn't cached.
     await Promise.all([

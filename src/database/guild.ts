@@ -15,7 +15,9 @@ const GuildConfig = new Schema({
   banMessage: { type: String, default: null, maxlength: 1020 },
   bannedWords: {
     type: [String],
-    default: [...config.DEFAULT_BANNED.split(' ')],
+    default: config.DEFAULT_BANNED.length
+      ? [...config.DEFAULT_BANNED.split(' ')]
+      : [],
     maxlength: 120,
   },
   joinRoles: {
